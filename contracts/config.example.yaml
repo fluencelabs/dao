@@ -1,0 +1,50 @@
+networks:
+  etherscanApiKey: key
+  repotGas: true
+  testnet:
+    url: http://test.com
+    privateKey: "0x0000000000000000000000000000000000000000000000000000000000000000"
+  mainnet:
+    url: http://test.com
+    privateKey: "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+deployment:
+  token:
+    totalSupply: 100000
+
+  executor:
+    delayDays: 1
+
+  devRewardDistributor:
+    merkleRoot: "0x0000000000000000000000000000000000000000000000000000000000000000"
+    initialReward: 1
+    totalRewards: 100
+    halvePeriodMonths: 1
+    claimingPeriodMonths: 1
+
+  investorsVesting:
+    cliffDurationMonths: 1
+    vestingDurationMonths: 1
+    accounts:
+      - "0x0000000000000000000000000000000000000000"
+    amounts:
+      - 10
+
+  fluenceVesting:
+    cliffDurationMonths: 1
+    vestingDurationMonths: 1
+    account: "0x0000000000000000000000000000000000000000"
+    amount: 10
+
+  teamVesting:
+    cliffDurationMonths: 1
+    vestingDurationMonths: 1
+    accounts:
+      - "0x0000000000000000000000000000000000000000"
+    amounts:
+      - 10
+
+  governor:
+    votingDelayDays: 1
+    votingPeriodDays: 1
+    proposalThreshold: 100
