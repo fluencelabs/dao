@@ -21,6 +21,5 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-      - run: cd contracts
-      - run: npm i
-      - run: npm run test
+      - run: cd contracts && npm i
+      - run: cd contracts && npm run test
