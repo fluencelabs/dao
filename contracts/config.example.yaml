@@ -4,19 +4,32 @@ networks:
   testnet:
     url: http://test.com
     privateKey: "0x0000000000000000000000000000000000000000000000000000000000000000"
-    contracts:
-      usdToken: "0x0000000000000000000000000000000000000000"
-      balancerLBPFactory: "0x0000000000000000000000000000000000000000"
-      uniswapFactory: "0x0000000000000000000000000000000000000000"
-      balancerVault: "0x0000000000000000000000000000000000000000"
 
   mainnet:
     url: http://test.com
     privateKey: "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 deployment:
+  contracts:
+    usdToken: "0x0000000000000000000000000000000000000000"
+    balancerLBPFactory: "0x0000000000000000000000000000000000000000"
+    uniswapFactory: "0x0000000000000000000000000000000000000000"
+    balancerVault: "0x0000000000000000000000000000000000000000"
+
+  pool:
+    lbpPoolDurationDays: 1
+    swapFeePercentage: 1
+    flt:
+      weight: 1
+      endWeight: 1
+      initialAmount: 1000000
+    usd:
+      weight: 1
+      endWeight: 1
+      initialAmount: 1000000
+
   token:
-    totalSupply: 100000
+    totalSupply: 1000000000
 
   executor:
     delayDays: 1

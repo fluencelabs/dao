@@ -14,7 +14,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = Config.get();
   const executorAddress = (await hre.deployments.get("Executor")).address;
 
-  const usdTokenAddress = config.networks?.mainnet?.contracts?.usdToken ?? "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+  const usdTokenAddress = config.deployment!.contracts!.usdToken ?? "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
   const usdToken = IERC20Metadata__factory.connect(usdTokenAddress, hre.ethers.provider);
 
   let lbpConfigs = new Array(
@@ -38,9 +38,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     {
       from: deployer,
       args: [
-        config.networks?.mainnet?.contracts?.balancerLBPFactory ?? "0x0F3e0c4218b7b0108a3643cFe9D3ec0d4F57c54e",
-        config.networks?.mainnet?.contracts?.uniswapFactory ?? "0x1F98431c8aD98523631AE4a59f267346ea31F984",
-        config.networks?.mainnet?.contracts?.balancerVault ?? "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+        config.deployment!.contracts!.balancerLBPFactory ?? "0x0F3e0c4218b7b0108a3643cFe9D3ec0d4F57c54e",
+        config.deployment!.contracts!.uniswapFactory ?? "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+        config.deployment!.contracts!.balancerVault ?? "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
         executorAddress,
         lbpConfigs[0].token,
         lbpConfigs[1].token,

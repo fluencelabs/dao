@@ -25,6 +25,11 @@ class Config {
     }
 }
 
+enum NetworkTypes {
+    Mainnet = "mainnet",
+    Testnet = "testnet",
+}
+
 type Networks = {
     etherscanApiKey: string,
     repotGas: boolean,
@@ -35,7 +40,6 @@ type Networks = {
 type NetworkConfig = {
     url: string,
     privateKey: string,
-    contracts?: Contracts
 }
 
 type Contracts = {
@@ -46,6 +50,7 @@ type Contracts = {
 }
 
 type Deployment = {
+    contracts?: Contracts,
     pool?: Pools,
     token?: Token,
     executor?: Executor,

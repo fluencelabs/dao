@@ -68,9 +68,9 @@ contract Vesting {
 
         uint256 releaseAmount = 0;
         uint256 totalMonths = (vestingDurationMonths + cliffDurationMonths);
-        uint256 pastMonths = ((block.timestamp - startTimestamp) / 30 days);
+        uint256 past = (block.timestamp - startTimestamp);
 
-        if (pastMonths >= totalMonths) {
+        if (past >= totalMonths) {
             releaseAmount = info.locked - info.released;
         } else {
             uint256 amountByMonth = info.locked / totalMonths;

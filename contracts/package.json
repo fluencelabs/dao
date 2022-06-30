@@ -9,7 +9,7 @@
     "typechain": "hardhat clean && hardhat typechain",
     "chain": "npx hardhat --verbose node",
     "compile": "npx hardhat compile",
-    "deploy": "hardhat clean && hardhat typechain && npx hardhat run scripts/deploy.js --network localhost",
+    "deploy": "hardhat clean && hardhat typechain && hardhat deploy",
     "console": "npx hardhat console",
     "test": "hardhat clean && hardhat typechain && npx hardhat test",
     "coverage": "npx hardhat coverage",

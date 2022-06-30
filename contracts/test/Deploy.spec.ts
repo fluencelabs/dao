@@ -46,15 +46,12 @@ describe("Deploy script", () => {
       Config.reset({
         etherscanApiKey: "",
         repotGas: false,
-        mainnet: {
-          url: "",
-          privateKey: "",
-          contracts: {
-            usdToken: usdToken.address
-          }
-        },
+        mainnet: null,
         testnet: null,
       }, {
+        contracts: {
+          usdToken: usdToken.address
+        },
         pool: {
           lbpPoolDurationDays: 3,
           swapFeePercentage: 1,

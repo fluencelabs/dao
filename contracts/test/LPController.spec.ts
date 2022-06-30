@@ -28,13 +28,13 @@ const setupTest = deployments.createFixture(
       repotGas: false,
       mainnet: {
         url: "",
-        privateKey: "",
-        contracts: {
-          usdToken: token.address
-        }
+        privateKey: ""
       },
       testnet: null,
     }, {
+      contracts: {
+        usdToken: token.address
+      },
       token: {
         totalSupply: lbpFLTAmount,
       },
