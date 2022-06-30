@@ -12,14 +12,16 @@ contract VestingWithVoting is Vesting {
         uint256 cliffMonthDuration_,
         uint256 vestingMonthDuration_,
         address[] memory accounts,
-        uint256[] memory amounts
+        uint256[] memory amounts,
+        uint256 period_
     )
         Vesting(
             token_,
             cliffMonthDuration_,
             vestingMonthDuration_,
             accounts,
-            amounts
+            amounts,
+            period_
         )
     {}
 

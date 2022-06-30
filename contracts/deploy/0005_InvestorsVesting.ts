@@ -18,6 +18,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       config.deployment!.investorsVesting!.vestingDurationMonths,
       config.deployment!.investorsVesting!.accounts,
       config.deployment!.investorsVesting!.amounts.map(x => hre.ethers.utils.parseEther(String(x))),
+      1
     ],
     log: true,
     autoMine: true,

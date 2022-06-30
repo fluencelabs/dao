@@ -44,6 +44,7 @@ const setupTest = deployments.createFixture(
         vestingDurationMonths,
         [mainAccount],
         [vestingAmount],
+        MONTH
       ],
       log: true,
       autoMine: true,

@@ -23,6 +23,7 @@ contract Vesting {
     uint256 public immutable startTimestamp;
     uint256 public immutable cliffDurationMonths;
     uint256 public immutable vestingDurationMonths;
+    uint256 public immutable period;
 
     mapping(address => Info) public vestingInfo;
 
@@ -39,7 +40,8 @@ contract Vesting {
         uint256 _cliffDurationMonths,
         uint256 _vestingDurationMonths,
         address[] memory accounts,
-        uint256[] memory amounts
+        uint256[] memory amounts,
+        uint256 period_
     ) {
         startTimestamp = uint64(block.timestamp);
 
@@ -54,6 +56,8 @@ contract Vesting {
         for (uint256 i = 0; i < accounts.length; i++) {
             vestingInfo[accounts[i]] = Info({locked: amounts[i], released: 0});
         }
+
+        period = period_;
     }
 
     function release() external {
@@ -67,15 +71,16 @@ contract Vesting {
         Info storage info = vestingInfo[sender];
 
         uint256 releaseAmount = 0;
-        uint256 totalMonths = (vestingDurationMonths + cliffDurationMonths);
-        uint256 past = (block.timestamp - startTimestamp);
+        uint256 total = ((vestingDurationMonths + cliffDurationMonths) *
+            30 days) / period;
+        uint256 past = (block.timestamp - startTimestamp) / period;
 
-        if (past >= totalMonths) {
+        if (past >= total) {
             releaseAmount = info.locked - info.released;
         } else {
-            uint256 amountByMonth = info.locked / totalMonths;
+            uint256 amountByPeriod = info.locked / total;
 
-            releaseAmount = pastMonths * amountByMonth - info.released;
+            releaseAmount = past * amountByPeriod - info.released;
         }
 
         require(releaseAmount > 0, "Not enough release amount.");
