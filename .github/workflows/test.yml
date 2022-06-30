@@ -2,7 +2,11 @@ name: Contract tests
 on:
   push:
   workflow_dispatch:
-
+  
+defaults:
+ run:
+  working-directory: ./contracts
+  
 jobs:
   check:
     name: HardHat Tests
@@ -21,6 +25,5 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-      - run: mv ./contracts .
       - run: npm i
       - run: npm run test
