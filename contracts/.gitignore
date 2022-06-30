@@ -11,3 +11,5 @@ artifacts
 .idea
 .vscode
 config.yaml
+team.csv
+investors.csv
