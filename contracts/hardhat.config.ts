@@ -8,8 +8,7 @@ import "hardhat-deploy";
 import { Config } from "./utils/config"
 import fs from 'fs'
 import YAML from 'yaml'
-import { url } from "inspector";
-
+import { parse } from 'csv-parse/sync';
 
 let config: Config | null = null;
 try {

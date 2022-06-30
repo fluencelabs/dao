@@ -4,11 +4,31 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { MONTH } from "../utils/time";
 import { Config } from "../utils/config";
+import { parse } from 'csv-parse/sync';
+import { BigNumber, BigNumberish, ethers } from "ethers";
+import fs from 'fs'
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
 
   const config = Config.get();
+
+  let accounts: Array<string> = [];
+  let amounts: Array<BigNumber> = [];
+
+  if (config!.deployment?.teamVesting?.csvFile != null) {
+    const file = fs.readFileSync(config!.deployment!.teamVesting!.csvFile, 'utf8')
+
+    const records = parse(file, {
+      skip_empty_lines: true
+    });
+
+    accounts = records.map(r => r[0]);
+    amounts = records.map(r => ethers.utils.parseEther(r[1]));
+  } else {
+    accounts = config!.deployment!.teamVesting!.accounts;
+    amounts = config!.deployment!.teamVesting!.amounts.map(a => ethers.utils.parseEther(String(a)));
+  }
 
   const vesting = await hre.deployments.deploy("TeamVesting", {
     from: deployer,
@@ -17,8 +37,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       (await hre.deployments.get("FluenceToken")).address,
       config.deployment!.teamVesting!.cliffDurationMonths,
       config.deployment!.teamVesting!.vestingDurationMonths,
-      config.deployment!.teamVesting!.accounts,
-      config.deployment!.teamVesting!.amounts.map(x => hre.ethers.utils.parseEther(String(x))),
+      accounts,
+      amounts,
       1
     ],
     log: true,
@@ -26,12 +46,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     waitConfirmations: 1,
   });
 
-  const total = config.deployment!.teamVesting!.amounts.reduce(
-    (previousValue, currentValue) => previousValue + currentValue,
-    0
+  const total = amounts.reduce(
+    (previousValue: BigNumber, currentValue: BigNumber) => previousValue.add(currentValue),
+    BigNumber.from(0)
   );
 
-  if (total > 0) {
+  if (!total.isZero()) {
     await hre.deployments.execute(
       "FluenceToken",
       {
@@ -42,9 +62,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       },
       "transfer",
       vesting.address,
-      hre.ethers.utils.parseEther(
-        String(total)
-      )
+      total
     );
   }
 };

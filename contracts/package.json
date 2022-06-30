@@ -55,6 +55,9 @@
     "@openzeppelin/contracts": "^4.6.0",
     "@openzeppelin/contracts-upgradeable": "^4.6.0",
     "@uniswap/sdk": "^3.0.3",
-    "@uniswap/v3-core": "^1.0.1"
+    "@uniswap/v3-core": "^1.0.1",
+    "csv-parse": "^5.2.1",
+    "i": "^0.3.7",
+    "npm": "^8.13.2"
   }
 }

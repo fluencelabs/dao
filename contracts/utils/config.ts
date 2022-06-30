@@ -91,6 +91,7 @@ type DevRewardDistributor = {
 }
 
 type Vesting = {
+    csvFile?: string,
     cliffDurationMonths: number,
     vestingDurationMonths: number,
     accounts: Array<string>,

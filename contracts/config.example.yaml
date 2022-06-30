@@ -44,6 +44,7 @@ deployment:
   investorsVesting:
     cliffDurationMonths: 1
     vestingDurationMonths: 1
+    csvFile: "table.csv"
     accounts:
       - "0x0000000000000000000000000000000000000000"
     amounts:
@@ -58,6 +59,7 @@ deployment:
   teamVesting:
     cliffDurationMonths: 1
     vestingDurationMonths: 1
+    csvFile: "table.csv"
     accounts:
       - "0x0000000000000000000000000000000000000000"
     amounts:
