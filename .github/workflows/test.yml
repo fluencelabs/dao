@@ -11,6 +11,10 @@ jobs:
   check:
     name: HardHat Tests
     runs-on: ubuntu-latest
+    steps: 
+    - shell: bash
+        env:
+          SUPER_SECRET: ${{ secrets.NODE_RL }}
     steps:
       - uses: actions/checkout@v2
 
@@ -25,8 +29,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-      - shell: bash
-        env:
-          SUPER_SECRET: ${{ secrets.NODE_RL }}
+
       - run: npm i
       - run: npm run test
