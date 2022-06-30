@@ -23,8 +23,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       skip_empty_lines: true
     });
 
-    accounts = records.map(r => r[0]);
-    amounts = records.map(r => ethers.utils.parseEther(r[1]));
+    accounts = records.map((r: any) => r[0]);
+    amounts = records.map((r: any) => ethers.utils.parseEther(r[1]));
   } else {
     accounts = config!.deployment!.teamVesting!.accounts;
     amounts = config!.deployment!.teamVesting!.amounts.map(a => ethers.utils.parseEther(String(a)));
