@@ -9,7 +9,9 @@ defaults:
   
 jobs:
   check:
-    name: HardHat Tests
+    name: Tests
+    env:
+      NODE_URL: ${{ secrets.NODE_URL }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,5 +27,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
+
       - run: npm i
       - run: npm run test
