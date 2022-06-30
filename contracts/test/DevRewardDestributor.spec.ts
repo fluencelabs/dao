@@ -60,13 +60,14 @@ const setupTest = deployments.createFixture(
       },
       devRewardDistributor: {
         merkleRoot: merkleTree.getHexRoot(),
-        totalRewards: 1,
+        totalRewards: 100,
         initialReward: 1,
         halvePeriodMonths: 1,
         claimingPeriodMonths: 3
       }
     });
 
+    await deployments.fixture([]);
     await hre.deployments.fixture(["FluenceToken", "Executor", "DevRewardDistributor"]);
 
     const token = (await ethers.getContractAt(
@@ -215,7 +216,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'DevRewardDistributor: Tokens already claimed.'`
+      `${THROW_ERROR_PREFIX} 'Tokens already claimed.'`
     );
   });
 
@@ -233,7 +234,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'DevRewardDistributor: Valid Proof Required.'`
+      `${THROW_ERROR_PREFIX} 'Valid proof required.'`
     );
   });
 
@@ -250,7 +251,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'DevRewardDistributor: Valid msg.sender Signature required.'`
+      `${THROW_ERROR_PREFIX} 'Invalid signature'`
     );
   });
 
@@ -283,7 +284,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'DevRewardDistributor: Claiming status not as expected.'`
+      `${THROW_ERROR_PREFIX} 'Claiming status not as expected.'`
     );
   });
 
@@ -309,7 +310,7 @@ describe("DevRewardDistributor", () => {
 
   it("transfer unclaimed when claiming is active", async () => {
     await expect(rewardDistributor.transferUnclaimed()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'DevRewardDistributor: Claiming status not as expected.'`
+      `${THROW_ERROR_PREFIX} 'Claiming status not as expected.'`
     );
   });
 

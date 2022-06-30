@@ -1,4 +1,6 @@
-pragma solidity ^0.8.15;
+// SPDX-License-Identifier: Apache-2.0
+
+pragma solidity >=0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./FluenceToken.sol";
@@ -45,6 +47,10 @@ contract Vesting {
         cliffDurationMonths = _cliffDurationMonths;
         vestingDurationMonths = _vestingDurationMonths;
 
+        require(
+            accounts.length == amounts.length,
+            "accounts and amounts must have the same length"
+        );
         for (uint256 i = 0; i < accounts.length; i++) {
             vestingInfo[accounts[i]] = Info({locked: amounts[i], released: 0});
         }
@@ -55,7 +61,7 @@ contract Vesting {
 
         require(
             block.timestamp > startTimestamp + (cliffDurationMonths * 30 days),
-            "Vesting: cliff period has not ended yet."
+            "Cliff period has not ended yet."
         );
 
         Info storage info = vestingInfo[sender];
@@ -72,7 +78,7 @@ contract Vesting {
             releaseAmount = pastMonths * amountByMonth - info.released;
         }
 
-        require(releaseAmount > 0, "Vesting: not enough release amount.");
+        require(releaseAmount > 0, "Not enough release amount.");
 
         info.released += releaseAmount;
         IERC20(token).safeTransfer(sender, releaseAmount);

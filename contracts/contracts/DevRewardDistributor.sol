@@ -1,4 +1,6 @@
-pragma solidity ^0.8.15;
+// SPDX-License-Identifier: Apache-2.0
+
+pragma solidity >=0.8.15;
 
 import "./FluenceToken.sol";
 import "./Executor.sol";
@@ -58,7 +60,7 @@ contract DevRewardDistributor {
     modifier whenClaimingIs(bool isActive) {
         require(
             isClaimingActive() == isActive,
-            "DevRewardDistributor: Claiming status not as expected."
+            "Claiming status not as expected."
         );
         _;
     }
@@ -77,16 +79,13 @@ contract DevRewardDistributor {
         bytes calldata signature
     ) external whenClaimingIs(true) {
         // one claim per user
-        require(
-            !isClaimed(userId),
-            "DevRewardDistributor: Tokens already claimed."
-        );
+        require(!isClaimed(userId), "Tokens already claimed.");
 
         bytes32 leaf = keccak256(abi.encode(userId, temporaryAddress));
 
         require(
             MerkleProof.verify(merkleProof, merkleRoot, leaf),
-            "DevRewardDistributor: Valid Proof Required."
+            "Valid proof required."
         );
 
         bytes32 msgHash = keccak256(
@@ -94,10 +93,7 @@ contract DevRewardDistributor {
         );
 
         address signer = ECDSA.recover(msgHash, signature);
-        require(
-            signer == temporaryAddress,
-            "DevRewardDistributor: Valid msg.sender Signature required."
-        );
+        require(signer == temporaryAddress, "Invalid signature");
 
         _setClaimed(userId);
 

@@ -8,6 +8,7 @@ import "hardhat-deploy";
 import { Config } from "./utils/config"
 import fs from 'fs'
 import YAML from 'yaml'
+import { url } from "inspector";
 
 
 let config: Config | null = null;
@@ -33,7 +34,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 const hardhatConfig: HardhatUserConfig = {
   networks: {
-    hardhat: {},
+    hardhat: {
+      forking: {
+        url: config!.networks!.mainnet!.url,
+      },
+    },
     mainnet: {
       url: config?.networks?.mainnet?.url ?? "",
       accounts: config?.networks?.mainnet?.privateKey ? [config.networks.mainnet?.privateKey] : []

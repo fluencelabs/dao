@@ -10,18 +10,11 @@
     "chain": "npx hardhat --verbose node",
     "compile": "npx hardhat compile",
     "deploy": "hardhat clean && hardhat typechain && npx hardhat run scripts/deploy.js --network localhost",
-    "migrate": "npx hardhat run scripts/migrate_bravo_testnet.js --network localhost",
-    "award": "npx hardhat run scripts/award.js --network localhost",
-    "award-deploy": "npx hardhat run scripts/deployAward.js --network localhost",
-    "console": "npx hardhat console --network localhost",
+    "console": "npx hardhat console",
     "test": "hardhat clean && hardhat typechain && npx hardhat test",
     "coverage": "npx hardhat coverage",
-    "clean": "npx hardhat clean --network localhost",
-    "deploy-kovan": "npx hardhat run scripts/deploy.js --network kovan",
-    "migrate-kovan": "npx hardhat run scripts/migrate_bravo_testnet.js --network kovan",
-    "award-deploy-kovan": "npx hardhat run scripts/deployAward.js --network kovan",
-    "lint-fix": "eslint . --ext .ts --cache --fix",
-    "prepare": "husky install"
+    "clean": "npx hardhat clean",
+    "lint-fix": "eslint . --ext .ts --cache --fix"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
@@ -61,6 +54,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.6.0",
     "@openzeppelin/contracts-upgradeable": "^4.6.0",
+    "@uniswap/sdk": "^3.0.3",
     "@uniswap/v3-core": "^1.0.1"
   }
 }

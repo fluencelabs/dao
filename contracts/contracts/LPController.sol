@@ -1,4 +1,6 @@
-pragma solidity 0.8.15;
+// SPDX-License-Identifier: Apache-2.0
+
+pragma solidity >=0.8.15;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -11,14 +13,20 @@ import "./Balancer.sol";
 contract LPController is Ownable, IUniswapV3MintCallback {
     using SafeERC20 for IERC20;
 
+    struct LBPTokenConfig {
+        uint256 weight;
+        uint256 endWeight;
+        uint256 initialAmount;
+    }
+
     uint24 public constant UNISWAP_FEE = 3000;
 
     ILiquidityBootstrappingPoolFactory public immutable balancerLBPFactory;
     IUniswapV3Factory public immutable uniswapFactory;
     IBalancerVault public immutable balancerVault;
-    address public immutable executor;
 
     IERC20[] public tokens;
+    address public immutable executor;
 
     ILiquidityBootstrappingPool public liquidityBootstrappingPool;
     bytes32 public lbpPoolId;
@@ -29,17 +37,18 @@ contract LPController is Ownable, IUniswapV3MintCallback {
         IUniswapV3Factory _uniswapFactory,
         IBalancerVault _balancerVault,
         address _executor,
-        IERC20 _token0,
-        IERC20 _token1
+        IERC20 token0,
+        IERC20 token1
     ) {
         balancerLBPFactory = _balancerLBPFactory;
         uniswapFactory = _uniswapFactory;
         balancerVault = _balancerVault;
         executor = _executor;
 
-        require(_token0 < _token1, "Token0 must be less than token1");
-        tokens[0] = _token0;
-        tokens[1] = _token1;
+        require(token0 < token1, "Token0 must be less than token1");
+
+        tokens.push(token0);
+        tokens.push(token1);
     }
 
     function uniswapV3MintCallback(
@@ -54,9 +63,8 @@ contract LPController is Ownable, IUniswapV3MintCallback {
     }
 
     function createBalancerLBP(
-        uint256[] memory weights,
-        uint256[] memory endWeight,
-        uint256 poolDuration,
+        LBPTokenConfig[] memory lbpTokensConfigs,
+        uint256 lbpPoolDuration,
         uint256 swapFeePercentage
     ) external onlyOwner {
         require(
@@ -64,10 +72,22 @@ contract LPController is Ownable, IUniswapV3MintCallback {
             "LBP already exists"
         );
 
+        require(lbpTokensConfigs.length >= 2, "LBP configs must be 2");
+
+        uint256[] memory weights = new uint256[](2);
+        uint256[] memory endWeights = new uint256[](2);
+        uint256[] memory initBalances = new uint256[](2);
+
+        for (uint256 i = 0; i < 2; i++) {
+            weights[i] = lbpTokensConfigs[i].weight;
+            endWeights[i] = lbpTokensConfigs[i].endWeight;
+            initBalances[i] = lbpTokensConfigs[i].initialAmount;
+        }
+
         liquidityBootstrappingPool = ILiquidityBootstrappingPool(
             balancerLBPFactory.create(
                 "Fluence LBP",
-                "FLP",
+                "FLTLBP",
                 tokens,
                 weights,
                 swapFeePercentage,
@@ -78,19 +98,15 @@ contract LPController is Ownable, IUniswapV3MintCallback {
 
         lbpPoolId = liquidityBootstrappingPool.getPoolId();
 
-        uint256[] memory initialBalances = new uint256[](tokens.length);
         for (uint256 i = 0; i < tokens.length; i++) {
-            initialBalances[i] = tokens[i].balanceOf(address(this));
-            tokens[i].safeApprove(
-                address(liquidityBootstrappingPool),
-                initialBalances[i]
-            );
+            tokens[i].transferFrom(msg.sender, address(this), initBalances[i]);
+            tokens[i].safeApprove(address(balancerVault), initBalances[i]);
         }
 
         JoinPoolRequest memory request = JoinPoolRequest({
             assets: tokens,
-            maxAmountsIn: initialBalances,
-            userData: abi.encode(0, initialBalances),
+            maxAmountsIn: initBalances,
+            userData: abi.encode(0, initBalances),
             fromInternalBalance: false
         });
 
@@ -103,8 +119,8 @@ contract LPController is Ownable, IUniswapV3MintCallback {
 
         liquidityBootstrappingPool.updateWeightsGradually(
             block.timestamp,
-            block.timestamp + poolDuration,
-            endWeight
+            block.timestamp + lbpPoolDuration,
+            endWeights
         );
 
         liquidityBootstrappingPool.setSwapEnabled(true);
@@ -117,6 +133,7 @@ contract LPController is Ownable, IUniswapV3MintCallback {
     function exitBalancer() external onlyOwner {
         uint256 bptBalance = IERC20(address(liquidityBootstrappingPool))
             .balanceOf(address(this));
+
         require(bptBalance > 0, "No BPT balance");
 
         IERC20(address(liquidityBootstrappingPool)).approve(

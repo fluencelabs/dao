@@ -34,10 +34,19 @@ type Networks = {
 
 type NetworkConfig = {
     url: string,
-    privateKey: string
+    privateKey: string,
+    contracts?: Contracts
+}
+
+type Contracts = {
+    usdToken?: string,
+    balancerLBPFactory?: string,
+    uniswapFactory?: string,
+    balancerVault?: string
 }
 
 type Deployment = {
+    pool?: Pools,
     token?: Token,
     executor?: Executor,
     devRewardDistributor?: DevRewardDistributor,
@@ -45,6 +54,19 @@ type Deployment = {
     teamVesting?: Vesting,
     fluenceVesting?: FluenceVesting,
     governor?: Governor
+}
+
+type Pools = {
+    lbpPoolDurationDays: number,
+    swapFeePercentage: number,
+    flt: TokenPoolConfig,
+    usd: TokenPoolConfig
+}
+
+type TokenPoolConfig = {
+    weight: number,
+    endWeight: number,
+    initialAmount: number
 }
 
 type Token = {

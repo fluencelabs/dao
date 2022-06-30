@@ -10,11 +10,19 @@ import { BigNumber } from "ethers";
 const RPROPOSER_ROLE = ethers.utils.keccak256(
   ethers.utils.toUtf8Bytes("PROPOSER_ROLE")
 );
+const TIMELOCK_ADMIN_ROLE = ethers.utils.keccak256(
+  ethers.utils.toUtf8Bytes("TIMELOCK_ADMIN_ROLE")
+);
+const CANCELLER_ROLE = ethers.utils.keccak256(
+  ethers.utils.toUtf8Bytes("CANCELLER_ROLE")
+);
+
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
 
   const config = Config.get();
 
+  const executorAddress = (await hre.deployments.get("Executor")).address;
   const governorDeployment = await hre.deployments.deploy("Governor", {
     from: deployer,
     proxy: {
@@ -25,7 +33,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         args: [
           (await hre.deployments.get("FluenceToken")).address,
           (await hre.deployments.get("TeamVesting")).address,
-          (await hre.deployments.get("Executor")).address,
+          executorAddress,
           config.deployment!.governor!.votingDelayDays * DAY,
           config.deployment!.governor!.votingPeriodDays * DAY,
           hre.ethers.utils.parseEther(String(config.deployment!.governor!.proposalThreshold))
@@ -63,6 +71,32 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deployer
   );
 
+  await hre.deployments.execute(
+    "Executor",
+    {
+      from: deployer,
+      log: true,
+      autoMine: true,
+      waitConfirmations: 1,
+    },
+    "grantRole",
+    CANCELLER_ROLE,
+    governorDeployment.address
+  );
+
+  await hre.deployments.execute(
+    "Executor",
+    {
+      from: deployer,
+      log: true,
+      autoMine: true,
+      waitConfirmations: 1,
+    },
+    "revokeRole",
+    TIMELOCK_ADMIN_ROLE,
+    deployer
+  );
+
   const balance: BigNumber = await hre.deployments.read(
     "FluenceToken",
     {
@@ -82,7 +116,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         waitConfirmations: 1,
       },
       "transfer",
-      governorDeployment.address,
+      (await hre.deployments.get("Executor")).address,
       balance
     );
   }

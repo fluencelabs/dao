@@ -27,11 +27,12 @@ const setupTest = deployments.createFixture(
       testnet: null,
     }, {
       token: {
-        totalSupply: 1000000,
+        totalSupply: 100000000,
       }
     });
-    await hre.deployments.fixture(["FluenceToken"]);
 
+    await deployments.fixture([]);
+    await hre.deployments.fixture(["FluenceToken"]);
     const { deployer, mainAccount } = await hre.getNamedAccounts();
 
     const tokenAddress = (await hre.deployments.get("FluenceToken")).address;
@@ -53,6 +54,7 @@ const setupTest = deployments.createFixture(
       "FluenceToken",
       tokenAddress
     )) as FluenceToken;
+
     await (await token.transfer(vesting.address, vestingAmount)).wait(1);
 
     return {
@@ -91,7 +93,7 @@ describe("Vesting", () => {
 
   it("release when cliff is active", async () => {
     await expect(vesting.release()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Vesting: cliff period has not ended yet.'`
+      `${THROW_ERROR_PREFIX} 'Cliff period has not ended yet.'`
     );
   });
 
@@ -163,7 +165,7 @@ describe("Vesting", () => {
     await ethers.provider.send("evm_mine", []);
 
     await expect(vesting.release()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Vesting: not enough release amount.'`
+      `${THROW_ERROR_PREFIX} 'Not enough release amount.'`
     );
   });
 
@@ -185,7 +187,7 @@ describe("Vesting", () => {
     await ethers.provider.send("evm_mine", []);
 
     await expect(vesting.release()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Vesting: not enough release amount.'`
+      `${THROW_ERROR_PREFIX} 'Not enough release amount.'`
     );
   });
 });
