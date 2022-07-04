@@ -32,6 +32,22 @@ contract LPController is Ownable, IUniswapV3MintCallback {
     bytes32 public lbpPoolId;
     IUniswapV3Pool public uniswapPool;
 
+    event CreateBalancerLBP(
+        ILiquidityBootstrappingPool lbp,
+        LBPTokenConfig[] lbpTokensConfigs,
+        uint256 lbpPoolDuration,
+        uint256 swapFeePercentage
+    );
+    event ExitFromBalancerLBP(uint256 amount0, uint256 amount1);
+    event CreateUniswapLP(IUniswapV3Pool lp);
+    event AddLiquidityToUniswapLP(
+        int24 tickLower,
+        int24 tickUpper,
+        uint128 amount
+    );
+    event UniswapCallback(uint256 amount0Owed, uint256 amount01wed);
+    event Withdraw(IERC20 token, uint256 amount);
+
     constructor(
         ILiquidityBootstrappingPoolFactory _balancerLBPFactory,
         IUniswapV3Factory _uniswapFactory,
@@ -60,6 +76,8 @@ contract LPController is Ownable, IUniswapV3MintCallback {
 
         tokens[0].safeTransfer(address(uniswapPool), amount0Owed);
         tokens[1].safeTransfer(address(uniswapPool), amount1Owed);
+
+        emit UniswapCallback(amount0Owed, amount1Owed);
     }
 
     function createBalancerLBP(
@@ -124,13 +142,20 @@ contract LPController is Ownable, IUniswapV3MintCallback {
         );
 
         liquidityBootstrappingPool.setSwapEnabled(true);
+
+        emit CreateBalancerLBP(
+            liquidityBootstrappingPool,
+            lbpTokensConfigs,
+            lbpPoolDuration,
+            swapFeePercentage
+        );
     }
 
-    function setSwapEnabled(bool swapEnabled) external onlyOwner {
+    function setSwapEnabledInBalancerLBP(bool swapEnabled) external onlyOwner {
         liquidityBootstrappingPool.setSwapEnabled(swapEnabled);
     }
 
-    function exitBalancer() external onlyOwner {
+    function exitFromBalancerLBP() external onlyOwner {
         uint256 bptBalance = IERC20(address(liquidityBootstrappingPool))
             .balanceOf(address(this));
 
@@ -154,9 +179,14 @@ contract LPController is Ownable, IUniswapV3MintCallback {
             payable(address(this)),
             request
         );
+
+        emit ExitFromBalancerLBP(
+            tokens[0].balanceOf(address(this)),
+            tokens[1].balanceOf(address(this))
+        );
     }
 
-    function createUniswap() external onlyOwner {
+    function createUniswapLP() external onlyOwner {
         require(
             address(uniswapPool) == address(0),
             "Uniswap pool already exists"
@@ -169,9 +199,11 @@ contract LPController is Ownable, IUniswapV3MintCallback {
                 UNISWAP_FEE
             )
         );
+
+        emit CreateUniswapLP(uniswapPool);
     }
 
-    function transferLiquidityToUniswap(
+    function addLiquidityToUniswapLP(
         int24 tickLower,
         int24 tickUpper,
         uint128 amount
@@ -190,11 +222,15 @@ contract LPController is Ownable, IUniswapV3MintCallback {
         );
 
         uniswapPool.mint(executor, tickLower, tickUpper, amount, new bytes(0));
+
+        emit AddLiquidityToUniswapLP(tickLower, tickUpper, amount);
     }
 
     function withdraw(IERC20 token, uint256 amount) external onlyOwner {
         require(token.balanceOf(address(this)) != 0, "Invalid balance");
 
         token.safeTransfer(executor, amount);
+
+        emit Withdraw(token, amount);
     }
 }

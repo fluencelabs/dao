@@ -60,7 +60,7 @@ contract DevRewardDistributor {
     modifier whenClaimingIs(bool isActive) {
         require(
             isClaimingActive() == isActive,
-            "Claiming status not as expected."
+            "Claiming status not as expected"
         );
         _;
     }
@@ -79,13 +79,13 @@ contract DevRewardDistributor {
         bytes calldata signature
     ) external whenClaimingIs(true) {
         // one claim per user
-        require(!isClaimed(userId), "Tokens already claimed.");
+        require(!isClaimed(userId), "Tokens already claimed");
 
         bytes32 leaf = keccak256(abi.encode(userId, temporaryAddress));
 
         require(
             MerkleProof.verify(merkleProof, merkleRoot, leaf),
-            "Valid proof required."
+            "Valid proof required"
         );
 
         bytes32 msgHash = keccak256(
@@ -107,7 +107,7 @@ contract DevRewardDistributor {
     /**
      * @notice used to move any remaining tokens out of the contract after expiration
      **/
-    function transferUnclaimed() public whenClaimingIs(false) {
+    function transferUnclaimed() external whenClaimingIs(false) {
         uint256 remainingBalance = IERC20(token).balanceOf(address(this));
         IERC20(token).safeTransfer(address(executor), remainingBalance);
 

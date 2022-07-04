@@ -239,39 +239,55 @@ describe("Deploy script", () => {
 
   it("InvestorVesting is correct", async () => {
     expect(await investorsVesting.token()).to.eq(token.address);
-    expect(await investorsVesting.cliffDurationMonths()).to.eq(config.deployment!.investorsVesting!.cliffDurationMonths);
-    expect(await investorsVesting.vestingDurationMonths()).to.eq(config.deployment!.investorsVesting!.vestingDurationMonths);
+    const startTimestamp = investorsVesting.startTimestamp();
+    //TODO: expect(await investorsVesting.startTimestamp()).to.eq(config.deployment!.investorsVesting!.cliffDurationMonths);
+    expect(await investorsVesting.cliffEndTimestamp()).to.eq((await startTimestamp).add(config.deployment!.investorsVesting!.cliffDurationMonths * MONTH));
+    expect(await investorsVesting.totalLockedTime()).to.eq(
+      (config.deployment!.investorsVesting!.cliffDurationMonths + config.deployment!.investorsVesting!.vestingDurationMonths) * MONTH
+    );
 
     const accounts = config.deployment!.investorsVesting!.accounts;
     const amounts = config.deployment!.investorsVesting!.amounts;
     for (let i = 0; i < accounts.length; i++) {
-      const account = await investorsVesting.vestingInfo(accounts[i]);
-      expect(account.locked).to.eq(ethers.utils.parseEther(String(amounts[i])));
-      expect(account.released).to.eq(0);
+      const locked = await investorsVesting.lockedAmounts(accounts[i]);
+      const balance = await investorsVesting.balanceOf(accounts[i]);
+
+      expect(locked).to.eq(balance);
+      expect(locked).to.eq(ethers.utils.parseEther(String(amounts[i])));
     }
   });
 
   it("FluenceVesting is correct", async () => {
     expect(await fluenceVesting.token()).to.eq(token.address);
-    expect(await fluenceVesting.cliffDurationMonths()).to.eq(config.deployment!.fluenceVesting!.cliffDurationMonths);
-    expect(await fluenceVesting.vestingDurationMonths()).to.eq(config.deployment!.fluenceVesting!.vestingDurationMonths);
+    const startTimestamp = fluenceVesting.startTimestamp();
+    //TODO: expect(await investorsVesting.startTimestamp()).to.eq(config.deployment!.investorsVesting!.cliffDurationMonths);
+    expect(await fluenceVesting.cliffEndTimestamp()).to.eq((await startTimestamp).add(config.deployment!.fluenceVesting!.cliffDurationMonths * MONTH));
+    expect(await fluenceVesting.totalLockedTime()).to.eq(
+      (config.deployment!.fluenceVesting!.cliffDurationMonths + config.deployment!.fluenceVesting!.vestingDurationMonths) * MONTH
+    );
 
-    const account = await fluenceVesting.vestingInfo(config.deployment!.fluenceVesting!.account);
-    expect(account.locked).to.eq(ethers.utils.parseEther(String(config.deployment!.fluenceVesting!.amount)));
-    expect(account.released).to.eq(0);
+    const lockedAmount = await fluenceVesting.lockedAmounts(config.deployment!.fluenceVesting!.account);
+    expect(lockedAmount).to.eq(ethers.utils.parseEther(String(config.deployment!.fluenceVesting!.amount)));
   });
 
   it("TeamVesting is correct", async () => {
     expect(await teamVesting.token()).to.eq(token.address);
-    expect(await teamVesting.cliffDurationMonths()).to.eq(config.deployment!.teamVesting!.cliffDurationMonths);
-    expect(await teamVesting.vestingDurationMonths()).to.eq(config.deployment!.teamVesting!.vestingDurationMonths);
+
+    const startTimestamp = teamVesting.startTimestamp();
+    //TODO: expect(await investorsVesting.startTimestamp()).to.eq(config.deployment!.investorsVesting!.cliffDurationMonths);
+    expect(await teamVesting.cliffEndTimestamp()).to.eq((await startTimestamp).add(config.deployment!.teamVesting!.cliffDurationMonths * MONTH));
+    expect(await teamVesting.totalLockedTime()).to.eq(
+      (config.deployment!.teamVesting!.cliffDurationMonths + config.deployment!.teamVesting!.vestingDurationMonths) * MONTH
+    );
 
     const accounts = config.deployment!.teamVesting!.accounts;
     const amounts = config.deployment!.teamVesting!.amounts;
     for (let i = 0; i < accounts.length; i++) {
-      const account = await teamVesting.vestingInfo(accounts[i]);
-      expect(account.locked).to.eq(ethers.utils.parseEther(String(amounts[i])));
-      expect(account.released).to.eq(0);
+      const locked = await teamVesting.lockedAmounts(accounts[i]);
+      const balance = await teamVesting.balanceOf(accounts[i]);
+
+      expect(locked).to.eq(balance);
+      expect(locked).to.eq(ethers.utils.parseEther(String(amounts[i])));
     }
   });
 

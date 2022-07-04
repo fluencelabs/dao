@@ -84,13 +84,13 @@ describe("LPController", () => {
   });
 
   it("exit from lbp", async () => {
-    await lpController.exitBalancer()
+    await lpController.exitFromBalancerLBP()
 
     //TODO
   });
 
   it("create Uniswap", async () => {
-    await lpController.createUniswap()
+    await lpController.createUniswapLP()
     //TODO
   });
 });

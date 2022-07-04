@@ -216,7 +216,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Tokens already claimed.'`
+      `${THROW_ERROR_PREFIX} 'Tokens already claimed'`
     );
   });
 
@@ -234,7 +234,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Valid proof required.'`
+      `${THROW_ERROR_PREFIX} 'Valid proof required'`
     );
   });
 
@@ -284,7 +284,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Claiming status not as expected.'`
+      `${THROW_ERROR_PREFIX} 'Claiming status not as expected'`
     );
   });
 
@@ -310,7 +310,7 @@ describe("DevRewardDistributor", () => {
 
   it("transfer unclaimed when claiming is active", async () => {
     await expect(rewardDistributor.transferUnclaimed()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Claiming status not as expected.'`
+      `${THROW_ERROR_PREFIX} 'Claiming status not as expected'`
     );
   });
 

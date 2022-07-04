@@ -34,11 +34,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     contract: "Vesting",
     args: [
       (await hre.deployments.get("FluenceToken")).address,
+      "Investors Vesting",
+      "FLTIV",
       config.deployment!.investorsVesting!.cliffDurationMonths,
       config.deployment!.investorsVesting!.vestingDurationMonths,
       accounts,
-      amounts,
-      1
+      amounts
     ],
     log: true,
     autoMine: true,

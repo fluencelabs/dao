@@ -12,6 +12,8 @@ chai.use(waffle.solidity);
 const vestingAmount = ethers.utils.parseEther("100");
 const cliffDurationMonths = 3;
 const vestingDurationMonths = 12;
+const amountBySec: BigNumber = vestingAmount
+  .div(BigNumber.from((cliffDurationMonths + vestingDurationMonths) * MONTH));
 
 const setupTest = deployments.createFixture(
   async (
@@ -40,11 +42,12 @@ const setupTest = deployments.createFixture(
       from: deployer,
       args: [
         tokenAddress,
+        "TestVesting",
+        "TV",
         cliffDurationMonths,
         vestingDurationMonths,
         [mainAccount],
-        [vestingAmount],
-        MONTH
+        [vestingAmount]
       ],
       log: true,
       autoMine: true,
@@ -63,7 +66,7 @@ const setupTest = deployments.createFixture(
       vesting: (await ethers.getContractAt(
         "Vesting",
         vesting.address
-      )) as Vesting,
+      )) as Vesting
     };
   }
 );
@@ -72,6 +75,14 @@ describe("Vesting", () => {
   let vesting: Vesting;
   let token: FluenceToken;
   let receiverAccount: Wallet;
+  let startTime: number;
+
+  const setTimeAfterStart = async (time: number) => {
+    await ethers.provider.send("evm_setNextBlockTimestamp", [
+      startTime + time
+    ]);
+    await ethers.provider.send("evm_mine", []);
+  }
 
   before(async () => {
     const { mainAccount } = await getNamedAccounts();
@@ -88,107 +99,92 @@ describe("Vesting", () => {
     const settings = await setupTest();
     vesting = settings.vesting;
     token = settings.token;
+    startTime = (await vesting.startTimestamp()).toNumber()
 
     vesting = vesting.connect(receiverAccount);
   });
 
-  it("release when cliff is active", async () => {
-    await expect(vesting.release()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Cliff period has not ended yet.'`
+  it("when cliff is active #1", async () => {
+    await expect(vesting.release(1)).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Not enough release amount'`
     );
   });
 
-  it("release after cliff", async () => {
-    const amount = vestingAmount
-      .div(BigNumber.from(cliffDurationMonths + vestingDurationMonths))
-      .mul(BigNumber.from(cliffDurationMonths));
+  it("when cliff is active #2", async () => {
+    await setTimeAfterStart(cliffDurationMonths * MONTH)
 
-    await ethers.provider.send("evm_increaseTime", [
-      cliffDurationMonths * MONTH,
-    ]);
-    await ethers.provider.send("evm_mine", []);
-
-    await expect(() => vesting.release())
-      .to.emit(token.address, "Transfer")
-      .withArgs(ZERO_ADDRESS, receiverAccount, amount)
-      .to.changeTokenBalance(token, receiverAccount, amount);
+    expect(await vesting.getReleaseAmount(receiverAccount.address)).to.eq(BigNumber.from(0))
   });
 
-  it("release vesting month #1", async () => {
-    const cliffAmount = vestingAmount
-      .div(BigNumber.from(cliffDurationMonths + vestingDurationMonths))
-      .mul(BigNumber.from(cliffDurationMonths));
+  it("after cliff", async () => {
+    const time = cliffDurationMonths * MONTH + 1;
+    await setTimeAfterStart(time)
 
-    // get cliff amount
-    await ethers.provider.send("evm_increaseTime", [
-      cliffDurationMonths * MONTH,
-    ]);
-    await ethers.provider.send("evm_mine", []);
-    await expect(() => vesting.release())
-      .to.emit(token.address, "Transfer")
-      .withArgs(ZERO_ADDRESS, receiverAccount, cliffAmount)
-      .to.changeTokenBalance(token, receiverAccount, cliffAmount);
+    const expectedAmount = amountBySec.mul(BigNumber.from(time))
 
-    // get vesting amounts for all month but without last
-    let total = cliffAmount;
-    for (let i = 0; i < vestingDurationMonths - 1; i++) {
-      const amount = vestingAmount.div(
-        BigNumber.from(cliffDurationMonths + vestingDurationMonths)
-      );
+    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+    expect(amount).to.eq(expectedAmount);
 
-      await ethers.provider.send("evm_increaseTime", [MONTH]);
-      await ethers.provider.send("evm_mine", []);
-
-      await expect(() => vesting.release())
-        .to.emit(token.address, "Transfer")
-        .withArgs(ZERO_ADDRESS, receiverAccount, amount)
-        .to.changeTokenBalance(token, receiverAccount, amount);
-
-      total = total.add(amount);
-    }
-
-    // get vesting amount for the last month
-    const amount = vestingAmount.sub(total);
-    await ethers.provider.send("evm_increaseTime", [MONTH]);
-    await ethers.provider.send("evm_mine", []);
-
-    await expect(() => vesting.release())
+    await expect(() => vesting.release(amount))
       .to.emit(token.address, "Transfer")
       .withArgs(ZERO_ADDRESS, receiverAccount, amount)
       .to.changeTokenBalance(token, receiverAccount, amount);
 
-    total = total.add(amount);
 
-    expect(total.toString()).to.eq(vestingAmount.toString());
-
-    // verify that next month amount is 0
-    await ethers.provider.send("evm_increaseTime", [MONTH]);
-    await ethers.provider.send("evm_mine", []);
-
-    await expect(vesting.release()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Not enough release amount.'`
-    );
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
   });
 
-  it("release vesting with 0 amount", async () => {
-    const amount = vestingAmount
-      .div(BigNumber.from(cliffDurationMonths + vestingDurationMonths))
-      .mul(BigNumber.from(cliffDurationMonths + 2));
+  it("after cliff with random time", async () => {
+    const time = Math.floor(Math.random() * (vestingDurationMonths + cliffDurationMonths) * MONTH) + cliffDurationMonths * MONTH;
 
-    await ethers.provider.send("evm_increaseTime", [
-      cliffDurationMonths * MONTH + 2 * MONTH,
-    ]);
-    await ethers.provider.send("evm_mine", []);
-    await expect(() => vesting.release())
+    await setTimeAfterStart(time)
+    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+
+    const expectedAmount = amountBySec.mul(BigNumber.from(time))
+    expect(amount).to.eq(expectedAmount);
+
+    await expect(() => vesting.release(amount))
       .to.emit(token.address, "Transfer")
       .withArgs(ZERO_ADDRESS, receiverAccount, amount)
       .to.changeTokenBalance(token, receiverAccount, amount);
 
-    await ethers.provider.send("evm_increaseTime", [5 * DAY]);
-    await ethers.provider.send("evm_mine", []);
 
-    await expect(vesting.release()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Not enough release amount.'`
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
+  });
+
+  it("all balance #1", async () => {
+    await setTimeAfterStart((vestingDurationMonths + cliffDurationMonths) * MONTH)
+
+    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+    expect(amount).to.eq(vestingAmount);
+
+    await expect(() => vesting.release(vestingAmount))
+      .to.emit(token.address, "Transfer")
+      .withArgs(ZERO_ADDRESS, receiverAccount, vestingAmount)
+      .to.changeTokenBalance(token, receiverAccount, vestingAmount);
+
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
+  });
+
+  it("all balance #2", async () => {
+    await setTimeAfterStart((vestingDurationMonths + cliffDurationMonths) * 3 * MONTH)
+
+    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+    expect(amount).to.eq(vestingAmount);
+
+    await expect(() => vesting.release(vestingAmount))
+      .to.emit(token.address, "Transfer")
+      .withArgs(ZERO_ADDRESS, receiverAccount, vestingAmount)
+      .to.changeTokenBalance(token, receiverAccount, vestingAmount);
+
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
+  });
+
+  it("transfer", async () => {
+    const { deployer } = await getNamedAccounts()
+
+    await expect(vesting.transfer(deployer, 1)).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Transfer is not allowed'`
     );
   });
 });

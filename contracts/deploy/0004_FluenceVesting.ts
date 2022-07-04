@@ -15,11 +15,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     contract: "Vesting",
     args: [
       (await hre.deployments.get("FluenceToken")).address,
+      "Fluence Vesting",
+      "FLTFV",
       config.deployment!.fluenceVesting!.cliffDurationMonths,
       config.deployment!.fluenceVesting!.vestingDurationMonths,
       [config.deployment!.fluenceVesting!.account],
-      [hre.ethers.utils.parseEther(String(config.deployment!.fluenceVesting!.amount))],
-      1
+      [hre.ethers.utils.parseEther(String(config.deployment!.fluenceVesting!.amount))]
     ],
     log: true,
     autoMine: true,

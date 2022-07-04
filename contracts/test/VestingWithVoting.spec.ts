@@ -40,11 +40,12 @@ const setupTest = deployments.createFixture(
       from: deployer,
       args: [
         tokenAddress,
+        "Test Vesting With Votes",
+        "TVV",
         cliffDurationMonths,
         vestingDurationMonths,
         [mainAccount],
-        [vestingAmount],
-        MONTH
+        [vestingAmount]
       ],
       log: true,
       autoMine: true,
@@ -71,6 +72,14 @@ describe("Vesting", () => {
   let vesting: VestingWithVoting;
   let token: FluenceToken;
   let receiverAccount: Wallet;
+  let startTime: number;
+
+  const setTimeAfterStart = async (time: number) => {
+    await ethers.provider.send("evm_setNextBlockTimestamp", [
+      startTime + time
+    ]);
+    await ethers.provider.send("evm_mine", []);
+  }
 
   before(async () => {
     const { mainAccount } = await getNamedAccounts();
@@ -87,29 +96,27 @@ describe("Vesting", () => {
     const settings = await setupTest();
     vesting = settings.vesting;
     token = settings.token;
+    startTime = (await vesting.startTimestamp()).toNumber();
 
     vesting = vesting.connect(receiverAccount);
   });
 
   it("get votes", async () => {
-    expect(await vesting.getVotes(receiverAccount.address)).to.eq(
-      vestingAmount
-    );
+    await vesting.delegate(receiverAccount.address)
+
+    expect(await vesting.getVotes(receiverAccount.address)).to.eq(vestingAmount);
   });
 
   it("get votes after release", async () => {
-    const cliffAmount = vestingAmount
-      .div(BigNumber.from(cliffDurationMonths + vestingDurationMonths))
-      .mul(BigNumber.from(cliffDurationMonths));
+    await vesting.delegate(receiverAccount.address)
 
-    await ethers.provider.send("evm_increaseTime", [
-      cliffDurationMonths * MONTH,
-    ]);
-    await ethers.provider.send("evm_mine", []);
-    await vesting.release();
+    const time = cliffDurationMonths * MONTH + 100;
+    await setTimeAfterStart(time)
 
-    expect(await vesting.getVotes(receiverAccount.address)).to.eq(
-      vestingAmount.sub(cliffAmount)
-    );
+    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+
+    await vesting.release(amount);
+
+    expect(await vesting.getVotes(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
   });
 });
