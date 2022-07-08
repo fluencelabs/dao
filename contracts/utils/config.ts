@@ -106,6 +106,7 @@ type FluenceVesting = {
 }
 
 type Governor = {
+    quorum: number,
     votingDelayDays: number,
     votingPeriodDays: number,
     proposalThreshold: number

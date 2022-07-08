@@ -36,7 +36,7 @@ const hardhatConfig: HardhatUserConfig = {
     hardhat: {
       forking: {
         url: config?.networks?.mainnet?.url == null ? process.env.NODE_URL! : config!.networks!.mainnet!.url,
-      },
+      }
     },
     mainnet: {
       url: config?.networks?.mainnet?.url ?? "",

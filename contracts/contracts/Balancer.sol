@@ -5,21 +5,9 @@ pragma solidity >=0.8.15;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-struct JoinPoolRequest {
-    IERC20[] assets;
-    uint256[] maxAmountsIn;
-    bytes userData;
-    bool fromInternalBalance;
-}
-
-struct ExitPoolRequest {
-    IERC20[] assets;
-    uint256[] minAmountsOut;
-    bytes userData;
-    bool toInternalBalance;
-}
-
 interface ILiquidityBootstrappingPoolFactory {
+    event PoolCreated(address indexed pool);
+
     function create(
         string memory name,
         string memory symbol,
@@ -32,6 +20,46 @@ interface ILiquidityBootstrappingPoolFactory {
 }
 
 interface IBalancerVault {
+    enum PoolSpecialization {
+        GENERAL,
+        MINIMAL_SWAP_INFO,
+        TWO_TOKEN
+    }
+
+    struct JoinPoolRequest {
+        IERC20[] assets;
+        uint256[] maxAmountsIn;
+        bytes userData;
+        bool fromInternalBalance;
+    }
+
+    struct ExitPoolRequest {
+        IERC20[] assets;
+        uint256[] minAmountsOut;
+        bytes userData;
+        bool toInternalBalance;
+    }
+
+    event TokensRegistered(
+        bytes32 indexed poolId,
+        IERC20[] tokens,
+        address[] assetManagers
+    );
+
+    event PoolRegistered(
+        bytes32 indexed poolId,
+        address indexed poolAddress,
+        PoolSpecialization specialization
+    );
+
+    event PoolBalanceChanged(
+        bytes32 indexed poolId,
+        address indexed liquidityProvider,
+        IERC20[] tokens,
+        int256[] deltas,
+        uint256[] protocolFeeAmounts
+    );
+
     function joinPool(
         bytes32 poolId,
         address sender,
@@ -48,6 +76,16 @@ interface IBalancerVault {
 }
 
 interface ILiquidityBootstrappingPool {
+    event SwapEnabledSet(bool swapEnabled);
+    event SwapFeePercentageChanged(uint256 swapFeePercentage);
+
+    event GradualWeightUpdateScheduled(
+        uint256 startTime,
+        uint256 endTime,
+        uint256[] startWeights,
+        uint256[] endWeights
+    );
+
     function updateWeightsGradually(
         uint256 startTime,
         uint256 endTime,

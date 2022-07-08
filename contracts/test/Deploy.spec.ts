@@ -98,6 +98,7 @@ describe("Deploy script", () => {
           amounts: [3, 4]
         },
         governor: {
+          quorum: 1,
           votingDelayDays: 5,
           votingPeriodDays: 7,
           proposalThreshold: 12
@@ -296,8 +297,8 @@ describe("Deploy script", () => {
     expect(await governor.vesting()).to.eq(teamVesting.address);
     expect(await governor.timelock()).to.eq(executor.address);
 
-    expect(await governor.votingDelay()).to.eq(config.deployment!.governor!.votingDelayDays * DAY);
-    expect(await governor.votingPeriod()).to.eq(config.deployment!.governor!.votingPeriodDays * DAY);
+    expect(await governor.votingDelay()).to.eq(Math.floor(config.deployment!.governor!.votingDelayDays * DAY / 13.14));
+    expect(await governor.votingPeriod()).to.eq(Math.floor(config.deployment!.governor!.votingPeriodDays * DAY / 13.14));
     expect(await governor.proposalThreshold()).to.eq(ethers.utils.parseEther(String(config.deployment!.governor!.proposalThreshold)));
   });
 });

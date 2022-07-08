@@ -22,7 +22,6 @@ contract Governor is
     GovernorVotesUpgradeable,
     GovernorVotesQuorumFractionUpgradeable,
     GovernorTimelockControlUpgradeable,
-    OwnableUpgradeable,
     UUPSUpgradeable
 {
     VestingWithVoting public vesting;
@@ -36,6 +35,7 @@ contract Governor is
         IVotesUpgradeable _token,
         VestingWithVoting _vesting,
         Executor executor_,
+        uint256 quorum_,
         uint256 initialVotingDelay,
         uint256 initialVotingPeriod,
         uint256 initialProposalThreshold
@@ -49,22 +49,22 @@ contract Governor is
         );
         __GovernorCountingSimple_init();
         __GovernorVotes_init(_token);
-        __GovernorVotesQuorumFraction_init(4);
+        __GovernorVotesQuorumFraction_init(quorum_);
         __GovernorTimelockControl_init(
             TimelockControllerUpgradeable(executor_)
         );
-        __Ownable_init();
-
-        _transferOwnership(address(executor_));
 
         vesting = _vesting;
     }
 
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address /*newImplementation*/
+    ) internal view override {
+        require(
+            msg.sender == timelock(),
+            "Only the executor contract can authorize an upgrade"
+        );
+    }
 
     function _getVotes(
         address account,
@@ -76,7 +76,7 @@ contract Governor is
         override(GovernorUpgradeable, GovernorVotesUpgradeable)
         returns (uint256)
     {
-        uint256 votes = vesting.getVotes(account);
+        uint256 votes = vesting.getPastVotes(account, blockNumber);
 
         votes += super._getVotes(account, blockNumber, params);
 

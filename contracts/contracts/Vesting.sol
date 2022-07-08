@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./FluenceToken.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "hardhat/console.sol";
 
 contract Vesting is ERC20, ERC20Permit {
     using SafeERC20 for IERC20;
@@ -66,16 +65,17 @@ contract Vesting is ERC20, ERC20Permit {
             return 0;
         }
 
+        uint256 totalTime = totalLockedTime;
         uint256 locked = lockedAmounts[account];
         uint256 released = locked - balanceOf(account);
 
-        uint256 past = (block.timestamp - startTimestamp);
+        uint256 past = block.timestamp - startTimestamp;
 
         uint256 amount = 0;
-        if (past >= totalLockedTime) {
+        if (past >= totalTime) {
             amount = locked - released;
         } else {
-            uint256 amountBySec = locked / totalLockedTime;
+            uint256 amountBySec = locked / totalTime;
             amount = past * amountBySec - released;
         }
 
