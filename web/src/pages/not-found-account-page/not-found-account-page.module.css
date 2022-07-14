@@ -1,0 +1,126 @@
+.background {
+    padding-top: 54px;
+
+    background: rgba(177, 169, 153, 1);
+    background-image: url('../../images/Rectangle 76.21553159.webp');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.header {
+    margin-bottom: 149px;
+}
+
+.title {
+    margin-bottom: 80px;
+    max-width: 925px;
+}
+
+.dashboard {
+    margin-bottom: 155px;
+    max-width: 1028px;
+}
+
+
+.dashboard__text {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 15px;
+
+    font-family: "Hauora_Regular", sans-serif;
+    color:rgb(0, 0, 0);
+    font-size: 24px;
+    line-height: 33px;
+
+    letter-spacing: 0.5px;
+}
+
+.dashboard__text_mid {
+    font-size: 18px;
+    line-height: 24px;
+}
+
+
+.dashboard__caption {
+    margin-bottom: 40px;
+
+    font-family: "Hauora_Regular", sans-serif;
+    color:rgba(0, 0, 0, 0.5);
+    font-size: 15px;
+    line-height: 21px;
+
+    letter-spacing: 0.5px;
+}
+
+.dashboard__link {
+    font-family: "Hauora_Bold", sans-serif;
+}
+
+.dashboard__title {
+    margin-top: 79px;
+    margin-bottom: 63px;
+}
+
+.dashboard__list {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 30px;
+    padding: 0;
+
+    list-style: none;
+}
+
+.dashboard__item {
+    display: flex;
+
+
+    font-family: "Hauora_Regular", sans-serif;
+    font-size: 18px;
+    line-height: 32px;
+    color: rgb(0, 0, 0);
+}
+
+.dashboard__caption {
+    margin-bottom: 50px;
+}
+
+.dashboard__button {
+    margin-bottom: 32px;
+}
+
+
+.dashboard__link {
+    color: rgb(0, 0, 0);
+}
+
+.dashboard__link:hover {
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+@media screen and (max-width: 1200px) {
+    .dashboard__list {
+        display: block;
+    }
+
+    .dashboard__item {
+        margin-bottom: 32px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .main {
+        padding: 0 15px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .main {
+        padding: 0;
+    }
+
+    .title {
+        padding: 0 15px;
+    }
+}
+

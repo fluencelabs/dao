@@ -1,0 +1,20 @@
+.dashboard {
+    padding: 60px 74px 82px;
+
+    background-color: rgb(255, 255, 255);
+
+    border-radius: 22px;
+    box-sizing: border-box;
+}
+
+@media screen and (max-width: 768px) {
+    .dashboard {
+        padding: 37px 15px 68px 15px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .dashboard {
+        border-radius: 0;
+    }
+}

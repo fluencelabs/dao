@@ -1,0 +1,11 @@
+type DevRewardDistributor @entity {
+  id: ID! # contract address
+  merkleRoot: String!
+  claimers: BigInt!
+}
+
+type Account @entity {
+  id: ID! # user address
+  user_id: BigInt! # uint256
+  amount: BigInt! # uint256
+}

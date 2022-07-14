@@ -1,0 +1,17 @@
+.token__image {
+    margin-bottom: 46px;
+    width: 250px;
+    object-fit: cover;
+}
+
+.token__content_small {
+    padding: 8px 46px 9px 30px;
+}
+
+.token__advantage {
+    min-width: 250px;
+}
+
+.token__advantages {
+    width: 557px;
+}

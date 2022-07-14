@@ -1,0 +1,89 @@
+.button {
+    padding-left: 27px;
+    padding-right: 27px;
+    font-family: 'Hauora_Bold', sans-serif;
+    font-size: 15px;
+    line-height: 21px;
+    color: rgb(255, 255, 255);
+
+    background-color: rgba(0, 0, 0, 0.8);
+
+    letter-spacing: 0.2px;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    border-radius: 30px;
+
+    transition: .3s ease;
+}
+
+.button_height_default {
+    height: 46px;
+}
+
+.button_height_large {
+    height: 54px;
+}
+
+.button_height_small {
+    height: 42px;
+
+
+}
+
+.button:hover {
+    color: rgba(207, 255, 196, 1);
+
+    background-color: rgba(15, 15, 15, 0,8);
+    cursor: pointer;
+}
+
+.button:active {
+    color: rgb(255, 255, 255);
+}
+
+.button_opacity {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(0, 0, 0, 0.4);
+}
+
+.button_icon {
+    position: relative;
+
+    padding-left: 55px;
+    
+}
+
+.button_icon::before {
+    content: '';
+    position: absolute;
+}
+
+
+
+.button_icon_git::before {
+    background-image: url('../../images/github.svg');
+    transition: .3s ease;
+    width: 20.5px;
+    height: 20px;
+    top: 16px;
+    left: 20px;
+}
+
+.button_icon_git:hover::before {
+    background-image: url('../../images/github hover.svg');
+}
+
+.button_icon_twitter::before {
+    background-image: url('../../images/twitter.svg');
+    transition: .3s ease;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 16px;
+    height: 13px;
+    top: 20px;
+    left: 30px;
+}
+
+.button_icon_twitter:hover::before {
+    background-image: url('../../images/twitter hover.svg');
+}
+

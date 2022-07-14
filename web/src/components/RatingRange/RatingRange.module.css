@@ -1,0 +1,74 @@
+.range {
+    display: flex;
+}
+
+.container {
+    min-width: 305px;
+}
+
+.count {
+    font-family: "Hauora_Bold", sans-serif;
+
+    font-size: 10px;
+    line-height: 16px;
+    color: rgb(207, 255, 196);
+
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.count_nice {
+    margin-right: 7px;
+}
+
+.range__body {
+    position: relative;
+
+    align-self: center;
+    width: 75%;
+    height: 3px;
+
+    background-color:rgb(220, 32, 32);
+}
+
+
+.count_bad {
+    margin-left: 10px;
+
+    color: rgb(220, 32, 32);
+}
+
+.count_total {
+    margin-top: 25px;
+    margin-left: 37%;
+
+    color: rgb(255, 255, 255);
+
+}
+
+@media screen and (max-width: 1245px) {
+    .range__body {
+        width: 60%;
+    }
+    .container {
+        min-width: 200px;
+    }
+}
+
+@media screen and (max-width: 1005px) {
+    .container {
+        width: 100%
+    }
+    /* .range__body {
+        width: 80%;
+    } */
+}
+
+@media screen and (max-width: 750px) {
+    .range {
+        justify-content: center;
+    }
+    .range__body {
+        width: 75%;
+    }
+}

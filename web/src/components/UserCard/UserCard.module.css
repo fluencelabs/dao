@@ -1,0 +1,167 @@
+.card {
+
+    min-height: 251px;
+    padding: 27px 29px;
+
+    background-color: rgb(37, 39, 43);
+
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+.card_flex {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card__flex-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.card__user-info {
+    display: flex;
+}
+
+.card__avatar {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+}
+
+.card__name {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 2px;
+
+    font-family: 'Hauora_Bold' sans-serif;
+    font-size: 15px;
+    line-height: 21px;
+    color: rgb(204, 204, 204);
+
+    letter-spacing: 0.2px;
+}
+
+.card__wallet {
+    padding-right: 10px;
+    font-family: 'Hauora_Bold', sans-serif;
+    font-size: 10px;
+    line-height: 16px;
+    color: rgb(204, 204, 204);
+
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(204, 204, 204, 0.4);
+}
+
+.card__wallet_left {
+    padding: 0;
+    padding-left: 10px;
+
+    border: none;
+    border-left: 1px solid rgba(204, 204, 204, 0.4);
+}
+
+.card__rating {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 7px;
+
+    font-family: 'Hauora_Bold', sans-serif;
+    font-size: 15px;
+    line-height: 21px;
+    color: rgb(204, 204, 204);
+
+    letter-spacing: 0.2px;
+    text-align: end;
+}
+
+.card__delegator {
+    margin: 0;
+    font-family: 'Hauora_Bold', sans-serif;
+    font-size: 10px;
+    line-height: 16px;
+    color: rgb(204, 204, 204);
+
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.card__text {
+    margin: 0;
+    margin-bottom: 19px;
+
+    font-family: 'Hauora_Regular', sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: rgb(255, 255, 255);
+
+    letter-spacing: 0.5px;
+}
+
+@media screen and (max-width: 1035px) {
+    .card__wallet {
+        display: block;
+        border: none;
+        padding-right: 0;
+    }
+
+    .card__wallet_left {
+        padding-left: 0;
+        border: none;
+    }
+
+    .card__rating {
+        margin-bottom: 2px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .card__wallet {
+        display: initial;
+        padding-right: 10px;
+        font-family: 'Hauora_Bold', sans-serif;
+        font-size: 10px;
+        line-height: 16px;
+        color: rgb(204, 204, 204);
+    
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-right: 1px solid rgba(204, 204, 204, 0.4);
+    }
+    
+    .card__wallet_left {
+        padding: 0;
+        padding-left: 10px;
+    
+        border: none;
+        border-left: 1px solid rgba(204, 204, 204, 0.4);
+    }
+
+    .card__rating {
+        margin-bottom: 2px;
+    }
+}
+
+@media screen and (max-width: 460px) {
+    .card {
+        padding: 27px 18px;
+    }
+    .card__wallet {
+        display: block;
+        border: none;
+        padding-right: 0;
+    }
+
+    .card__wallet_left {
+        padding-left: 0;
+        border: none;
+    }
+
+    .card__rating {
+        margin-bottom: 2px;
+    }
+}

@@ -1,0 +1,82 @@
+.background {
+    padding-top: 54px;
+
+    background: radial-gradient(50% 45.85% at 50% 54.15%, #C51103 0%, #DC9E61 100%), #C4C4C4;
+    background-image: url('../../images/Rectangle 76.21553159.webp');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.progress {
+    margin-bottom: 51px;
+}
+
+.title {
+    max-width: 1028px;
+    margin-bottom: 20px;
+}
+
+.caption {
+    margin: 0;
+    margin-bottom: 50px;
+    font-family: 'Hauora_Regular', sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: rgb(255, 255, 255);
+
+    letter-spacing: 0.5px;
+}
+
+.wallets {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    margin-bottom: 15px;
+
+    list-style: none;
+}
+
+.wallet {
+    margin-right: 10px;
+}
+
+.wallet:last-child {
+    margin-right: 0;
+}
+
+.button {
+    margin-bottom: 345px;
+}
+
+@media screen and (max-width: 900px) {
+    .main {
+        padding: 0 15px;
+    }
+}
+
+@media screen and (max-width: 490px) {
+    .wallets {
+        display: block;
+    }
+    .wallet {
+        margin-right: 0;
+        margin-bottom: 10;
+        max-width: 200px;
+    }
+
+    .wallet:last-child {
+        margin-bottom: 0;
+    
+    }
+}
+
+@media screen and (max-width: 435px) {
+    .progress {
+        position: absolute;
+        right: 20px;
+    }
+
+    .wallets {
+        margin-top: 60px;
+    }
+}

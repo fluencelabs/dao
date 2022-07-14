@@ -1,0 +1,189 @@
+.background {
+    padding-top: 54px;
+
+    background: radial-gradient(50% 45.85% at 50% 54.15%, #C51103 0%, #DC9E61 100%), #C4C4C4;
+    background-image: url('../../images/Rectangle 76.21553159.webp');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.container {
+    display: flex;
+    box-sizing: border-box;
+}
+
+.content {
+    padding: 0 90px;
+    max-width: 1420px;
+    margin: 0 auto;
+}
+
+.main1 {
+    width: 100%;
+}
+
+.wallet {
+    max-width: 200px;
+}
+
+.progress {
+    margin-bottom: 30px;
+}
+
+.title {
+    margin-bottom: 82px;
+}
+
+.dashboard {
+    max-width: 1420px;
+    padding: 0 90px;
+    margin: 0 auto 161px;
+    overflow: hidden;
+}
+
+.dashboard__flex-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 53px;
+}
+
+.dashboard__logo {
+    width: 80px;
+    height: 80px;
+    margin-right: 19px;
+
+    background-color: rgb(239, 127, 36);
+    background-image: url("../../images/Ф.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+
+    border-radius: 50%;
+}
+
+.dashboard__text {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 10px;
+
+    font-family: "Hauora_Regular", sans-serif;
+    color:rgb(0, 0, 0);
+
+    letter-spacing: 0.5px;
+}
+
+.paragraph {
+    width: 100%;
+    padding: 14px;
+
+    font-family: 'Roboto_Regular' sans-serif;
+    font-size: 15px;
+    line-height: 18px;
+    color: rgb(0, 0, 0);
+
+    background-color: rgba(196, 196, 196, 0.5);
+
+    border-radius: 5px;
+}
+
+.dashboard__text_size_large {
+    font-size: 24px;
+    line-height: 33px;
+}
+
+.dashboard__text_size_mid {
+    font-size: 18px;
+    line-height: 24px;
+}
+
+.dashboard__span {
+    font-family: "Hauora_Bold", sans-serif;
+}
+
+.dashboard__span_decorate_underline {
+    text-decoration: underline;
+}
+
+.dashboard__list {
+    margin: 0 0 30px;
+    padding: 0;
+    max-width: 711px;
+
+    list-style: none;
+}
+
+.dashboard__item {
+    margin-bottom: 16px;
+
+    font-family: "Hauora_Regular", sans-serif;
+    font-size: 18px;
+    line-height: 32px;
+    color: rgb(0, 0, 0);
+}
+
+.dashboard__caption {
+    margin-bottom: 50px;
+}
+
+.dashboard__button {
+    margin-bottom: 32px;
+}
+
+.dashboard__paragraph {
+    position: relative;
+
+    font-family: "Hauora_Bold", sans-serif;
+    font-size: 10px;
+    line-height: 16px;
+    color: rgba(0, 0, 0, 0.5);
+
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dashboard__link {
+    color: rgb(0, 0, 0);
+}
+
+.dashboard__link:hover {
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.dashboard__textarea {
+    margin-top: 18px;
+}
+
+.dashboard__danger {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 23px;
+    height: 23px;
+}
+
+.dashboard__paragraph_pl_27 {
+    padding-left: 27px;
+}
+
+@media screen and (max-width: 1100px) {
+    .content,
+    .dashboard {
+        padding: 0 40px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .content,
+    .dashboard {
+        padding: 0 15px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .dashboard {
+        padding: 0;
+    }
+    .dashboard__link {
+        display: block;
+    }
+}

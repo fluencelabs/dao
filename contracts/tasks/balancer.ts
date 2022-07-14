@@ -11,7 +11,7 @@ task("exit", "Exit from LBP", async (taskArgs, hre) => {
         lpControllerAddress
     )) as LPController;
 
-    await lpController.exitBalancer()
+    await lpController.exitFromBalancerLBP()
 });
 
 module.exports = {};
