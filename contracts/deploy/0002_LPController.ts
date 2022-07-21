@@ -67,7 +67,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       waitConfirmations: 1,
     },
     "createBalancerLBP",
-    lbpConfigs.map(x => x.weight,),
+    lbpConfigs.map(x => x.weight),
     lbpConfigs.map(x => x.endWeight),
     lbpConfigs.map(x => x.initialAmount),
     BigNumber.from(config.deployment!.pool!.lbpPoolDurationDays * DAY),
