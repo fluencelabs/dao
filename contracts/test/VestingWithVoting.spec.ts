@@ -42,8 +42,8 @@ const setupTest = deployments.createFixture(
         tokenAddress,
         "Test Vesting With Votes",
         "TVV",
-        cliffDurationMonths,
-        vestingDurationMonths,
+        cliffDurationMonths * MONTH,
+        vestingDurationMonths * MONTH,
         [mainAccount],
         [vestingAmount]
       ],
@@ -68,7 +68,7 @@ const setupTest = deployments.createFixture(
   }
 );
 
-describe("Vesting", () => {
+describe("Vesting with voting", () => {
   let vesting: VestingWithVoting;
   let token: FluenceToken;
   let receiverAccount: Wallet;

@@ -6,6 +6,7 @@ import { Config } from "../utils/config";
 import { parse } from 'csv-parse/sync';
 import { BigNumber, BigNumberish, ethers } from "ethers";
 import fs from 'fs'
+import { MONTH } from "../utils/time";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -36,8 +37,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       (await hre.deployments.get("FluenceToken")).address,
       "Investors Vesting",
       "FLTIV",
-      config.deployment!.investorsVesting!.cliffDurationMonths,
-      config.deployment!.investorsVesting!.vestingDurationMonths,
+      Math.floor(config.deployment!.investorsVesting!.cliffDurationMonths * MONTH),
+      Math.floor(config.deployment!.investorsVesting!.vestingDurationMonths * MONTH),
       accounts,
       amounts
     ],

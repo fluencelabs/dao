@@ -44,8 +44,8 @@ const setupTest = deployments.createFixture(
         tokenAddress,
         "TestVesting",
         "TV",
-        cliffDurationMonths,
-        vestingDurationMonths,
+        cliffDurationMonths * MONTH,
+        vestingDurationMonths * MONTH,
         [mainAccount],
         [vestingAmount]
       ],

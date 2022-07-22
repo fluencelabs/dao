@@ -286,7 +286,9 @@ describe("Deploy script", () => {
     for (let i = 0; i < accounts.length; i++) {
       const locked = await teamVesting.lockedAmounts(accounts[i]);
       const balance = await teamVesting.balanceOf(accounts[i]);
+      const delegatee = await teamVesting.delegates(accounts[i]);
 
+      expect(delegatee).to.eq(accounts[i]);
       expect(locked).to.eq(balance);
       expect(locked).to.eq(ethers.utils.parseEther(String(amounts[i])));
     }

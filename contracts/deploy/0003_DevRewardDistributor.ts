@@ -22,9 +22,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         tokenAddress,
         (await hre.deployments.get("Executor_Proxy")).address,
         config.deployment!.devRewardDistributor!.merkleRoot,
-        config.deployment!.devRewardDistributor!.halvePeriodMonths * MONTH,
+        Math.floor(config.deployment!.devRewardDistributor!.halvePeriodMonths * MONTH),
         initialReward,
-        config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH
+        Math.floor(config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH)
       ],
       log: true,
       autoMine: true,

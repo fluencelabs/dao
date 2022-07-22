@@ -12,8 +12,8 @@ contract VestingWithVoting is Vesting, ERC20Votes {
         FluenceToken token_,
         string memory name_,
         string memory symbol_,
-        uint256 _cliffDurationMonths,
-        uint256 _vestingDurationMonths,
+        uint256 _cliffDuration,
+        uint256 _vestingDuration,
         address[] memory accounts,
         uint256[] memory amounts
     )
@@ -21,12 +21,16 @@ contract VestingWithVoting is Vesting, ERC20Votes {
             token_,
             name_,
             symbol_,
-            _cliffDurationMonths,
-            _vestingDurationMonths,
+            _cliffDuration,
+            _vestingDuration,
             accounts,
             amounts
         )
-    {}
+    {
+        for (uint256 i = 0; i < accounts.length; i++) {
+            _delegate(accounts[i], accounts[i]);
+        }
+    }
 
     function _beforeTokenTransfer(
         address from,

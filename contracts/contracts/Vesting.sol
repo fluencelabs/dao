@@ -22,8 +22,8 @@ contract Vesting is ERC20, ERC20Permit {
      * @param token_ - token address
      * @param name_ - vesting token address
      * @param symbol_ - vesting token address
-     * @param _cliffDurationMonths - cliff duration
-     * @param _vestingDurationMonths - vesting duration
+     * @param _cliffDuration - cliff duration
+     * @param _vestingDuration - vesting duration
      * @param accounts - vesting accounts
      * @param amounts - vesting amounts of accounts
      **/
@@ -31,8 +31,8 @@ contract Vesting is ERC20, ERC20Permit {
         FluenceToken token_,
         string memory name_,
         string memory symbol_,
-        uint256 _cliffDurationMonths,
-        uint256 _vestingDurationMonths,
+        uint256 _cliffDuration,
+        uint256 _vestingDuration,
         address[] memory accounts,
         uint256[] memory amounts
     ) ERC20(name_, symbol_) ERC20Permit(name_) {
@@ -43,10 +43,10 @@ contract Vesting is ERC20, ERC20Permit {
 
         startTimestamp = block.timestamp;
 
-        uint256 cliffDuration = _cliffDurationMonths * 30 days;
+        uint256 cliffDuration = _cliffDuration;
         cliffEndTimestamp = block.timestamp + cliffDuration;
 
-        totalLockedTime = _vestingDurationMonths * 30 days + cliffDuration;
+        totalLockedTime = _vestingDuration + cliffDuration;
 
         token = token_;
 
