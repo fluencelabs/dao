@@ -44,6 +44,7 @@ type NetworkConfig = {
 
 type Contracts = {
     usdToken?: string,
+    balancerHelper?: string,
     balancerLBPFactory?: string,
     uniswapFactory?: string,
     balancerVault?: string

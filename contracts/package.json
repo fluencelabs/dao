@@ -12,7 +12,7 @@
     "deploy": "hardhat deploy",
     "deploy:testnet": "hardhat deploy --network testnet",
     "console": "npx hardhat console",
-    "test": "hardhat clean && hardhat typechain && npx hardhat test",
+    "test": "npx hardhat test",
     "coverage": "npx hardhat coverage",
     "clean": "npx hardhat clean",
     "lint-fix": "eslint . --ext .ts --cache --fix"

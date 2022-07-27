@@ -2,19 +2,6 @@ import unittest
 from hexbytes import HexBytes
 import merkle
 
-# gen_merkle_root
-# 2
-# 4
-# 6
-# 7
-
-# gen_merkle_proof
-# 2
-# 4
-# 6
-# 7
-
-
 class TestUM(unittest.TestCase):
     def test_create_leafs(self):
         v = [

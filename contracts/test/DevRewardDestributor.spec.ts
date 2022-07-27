@@ -7,7 +7,7 @@ import {
   FluenceToken,
 } from "../typechain";
 import { MerkleTree } from "merkletreejs";
-import { Wallet } from "ethers";
+import { BigNumber, Wallet } from "ethers";
 import { ZERO_ADDRESS, THROW_ERROR_PREFIX } from "../utils/consts";
 import { Config } from "../utils/config";
 
@@ -174,19 +174,24 @@ describe("DevRewardDistributor", () => {
       const info = getRandomAccountInfo(lastId);
       lastId = info.accountId;
 
-      await expect(async () =>
-        rewardDistributor.claimTokens(
-          info.accountId,
-          tree.getHexProof(info.leaf),
-          info.account.address,
-          await info.account.signMessage(
-            ethers.utils.arrayify(developerAccount.address)
-          )
+      const accountSnapshotBalance = await token.balanceOf(developerAccount.address);
+      const contractSnapshotBalance = await token.balanceOf(rewardDistributor.address);
+
+      const tx = await rewardDistributor.claimTokens(
+        info.accountId,
+        tree.getHexProof(info.leaf),
+        info.account.address,
+        await info.account.signMessage(
+          ethers.utils.arrayify(developerAccount.address)
         )
-      )
-        .to.emit(token.address, "Transfer")
-        .withArgs(ZERO_ADDRESS, developerAccount.address, reward)
-        .to.changeTokenBalance(token, developerAccount, reward);
+      );
+
+      await expect(tx)
+        .to.emit(token, "Transfer")
+        .withArgs(rewardDistributor.address, developerAccount.address, reward)
+
+      await expect(await token.balanceOf(developerAccount.address)).to.eq(accountSnapshotBalance.add(reward));
+      await expect(await token.balanceOf(rewardDistributor.address)).to.eq(contractSnapshotBalance.sub(reward));
 
       expect(await rewardDistributor.isClaimed(info.accountId)).to.be.true;
     }
@@ -320,13 +325,18 @@ describe("DevRewardDistributor", () => {
     await ethers.provider.send("evm_increaseTime", [period.toNumber()]);
     await ethers.provider.send("evm_mine", []);
 
-    const amount = await token.balanceOf(token.address);
+    const amount = await token.balanceOf(rewardDistributor.address);
 
-    await expect(async () => rewardDistributor.transferUnclaimed())
-      .to.emit(executor, "TransferUnclaimed")
+    const tx = await rewardDistributor.transferUnclaimed();
+    await expect(tx)
+      .to.emit(rewardDistributor, "TransferUnclaimed")
       .withArgs(amount)
-      .to.emit(token.address, "Transfer")
-      .withArgs(ZERO_ADDRESS, executor, amount)
-      .to.changeTokenBalance(token, developerAccount, amount);
+
+    await expect(tx)
+      .to.emit(token, "Transfer")
+      .withArgs(rewardDistributor.address, executor.address, amount)
+
+    expect(await token.balanceOf(executor.address)).to.eq(amount)
+    expect(await token.balanceOf(rewardDistributor.address)).to.eq(BigNumber.from(0))
   });
 });

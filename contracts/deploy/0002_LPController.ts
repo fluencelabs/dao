@@ -41,6 +41,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         config.deployment!.contracts!.balancerLBPFactory ?? "0x0F3e0c4218b7b0108a3643cFe9D3ec0d4F57c54e",
         config.deployment!.contracts!.uniswapFactory ?? "0x1F98431c8aD98523631AE4a59f267346ea31F984",
         config.deployment!.contracts!.balancerVault ?? "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+        config.deployment!.contracts!.balancerHelper ?? "0x5aDDCCa35b7A0D07C74063c48700C8590E87864E",
         executorAddress,
         lbpConfigs[0].token,
         lbpConfigs[1].token,
