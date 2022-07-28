@@ -125,17 +125,19 @@ describe("Vesting", () => {
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
     expect(amount).to.eq(expectedAmount);
 
-    await expect(() => vesting.release(amount))
-      .to.emit(token.address, "Transfer")
-      .withArgs(ZERO_ADDRESS, receiverAccount, amount)
-      .to.changeTokenBalance(token, receiverAccount, amount);
+    const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
+    const tx = await vesting.release(amount)
+    await expect(tx)
+      .to.emit(token, "Transfer")
+      .withArgs(vesting.address, receiverAccount.address, amount);
 
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(amount));
     expect(await vesting.balanceOf(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
   });
 
   it("after cliff with random time", async () => {
-    const time = Math.floor(Math.random() * (vestingDurationMonths + cliffDurationMonths) * MONTH) + cliffDurationMonths * MONTH;
+    const time = Math.floor(Math.random() * (vestingDurationMonths - 1 + cliffDurationMonths) * MONTH) + cliffDurationMonths * MONTH;
 
     await setTimeAfterStart(time)
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
@@ -143,12 +145,13 @@ describe("Vesting", () => {
     const expectedAmount = amountBySec.mul(BigNumber.from(time))
     expect(amount).to.eq(expectedAmount);
 
-    await expect(() => vesting.release(amount))
-      .to.emit(token.address, "Transfer")
-      .withArgs(ZERO_ADDRESS, receiverAccount, amount)
-      .to.changeTokenBalance(token, receiverAccount, amount);
+    const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
+    await expect(await vesting.release(amount))
+      .to.emit(token, "Transfer")
+      .withArgs(vesting.address, receiverAccount.address, amount)
 
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(amount));
     expect(await vesting.balanceOf(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
   });
 
@@ -158,11 +161,13 @@ describe("Vesting", () => {
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
 
-    await expect(() => vesting.release(vestingAmount))
-      .to.emit(token.address, "Transfer")
-      .withArgs(ZERO_ADDRESS, receiverAccount, vestingAmount)
-      .to.changeTokenBalance(token, receiverAccount, vestingAmount);
+    const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
+    await expect(await vesting.release(vestingAmount))
+      .to.emit(token, "Transfer")
+      .withArgs(vesting.address, receiverAccount.address, vestingAmount)
+
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(vestingAmount));
     expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
   });
 
@@ -172,11 +177,13 @@ describe("Vesting", () => {
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
 
-    await expect(() => vesting.release(vestingAmount))
-      .to.emit(token.address, "Transfer")
-      .withArgs(ZERO_ADDRESS, receiverAccount, vestingAmount)
-      .to.changeTokenBalance(token, receiverAccount, vestingAmount);
+    const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
+    await expect(await vesting.release(vestingAmount))
+      .to.emit(token, "Transfer")
+      .withArgs(vesting.address, receiverAccount.address, vestingAmount)
+
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(vestingAmount));
     expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
   });
 

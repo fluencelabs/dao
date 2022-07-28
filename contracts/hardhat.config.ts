@@ -5,6 +5,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-deploy";
+import "@nomiclabs/hardhat-solhint";
 import { Config } from "./utils/config"
 import fs from 'fs'
 import YAML from 'yaml'

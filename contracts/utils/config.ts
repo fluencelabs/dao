@@ -47,6 +47,7 @@ type Contracts = {
     balancerHelper?: string,
     balancerLBPFactory?: string,
     uniswapFactory?: string,
+    uniswapNFTManager?: string,
     balancerVault?: string
 }
 

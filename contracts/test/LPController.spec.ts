@@ -174,6 +174,14 @@ describe("LPController", () => {
   }
   );
 
+  it("setSwapEnabledInBalancerLBP", async () => {
+    await lpController.setSwapEnabledInBalancerLBP(false)
+    expect(await lbp.getSwapEnabled()).to.eq(false)
+
+    await lpController.setSwapEnabledInBalancerLBP(true)
+    expect(await lbp.getSwapEnabled()).to.eq(true)
+  });
+
   it("exit from lbp", async () => {
     const tx = await lpController.exitFromBalancerLBP();
     await tx.wait();
@@ -186,12 +194,29 @@ describe("LPController", () => {
     expect(await lbp.getSwapEnabled()).to.eq(false)
   });
 
+  it("withdraw", async () => {
+    const executor = await lpController.executor();
+
+    const v = BigNumber.from(1000000);
+    const snapshotBalance = await params[0].token.balanceOf(executor)
+    await expect(await lpController.withdraw(params[0].token.address, v))
+      .to.emit(params[0].token, "Transfer")
+      .withArgs(lpController.address, executor, v)
+
+    expect(await params[0].token.balanceOf(executor)).to.eq(snapshotBalance.add(v))
+  });
+
   it("create Uniswap", async () => {
-    /*
-    await expect(await lpController.createUniswapLP())
-      await expect(txHash).to.emit(lpController, "CreateUniswapLP")
-      await expect(txHash).to.emit(lpController.uniswapFactory(), "PoolCreated")
-    */
+    /*const token0Balance = await params[0].token.balanceOf(lpController.address);
+    const token1Balance = await params[1].token.balanceOf(lpController.address);
+
+    const amount = token0Balance.mul(token1Balance).toBigInt()
+    const tx = await lpController.createUniswapLP(8388608, 8388607,);
+    
+      emit PoolCreated(token0, token1, fee, tickSpacing, pool);
+    await expect()
+    await expect(txHash).to.emit(lpController, "CreateUniswapLP")
+    await expect(txHash).to.emit(lpController.uniswapFactory(), "PoolCreated")*/
     //TODO: check event args
   });
 });
