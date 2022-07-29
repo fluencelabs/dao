@@ -30,28 +30,6 @@ contract LPController is Ownable {
     IUniswapV3Pool public uniswapPool;
     bytes32 public lbpPoolId;
 
-    event CreateBalancerLBP(
-        ILiquidityBootstrappingPool lbp,
-        uint256[] weights,
-        uint256[] endWeights,
-        uint256[] initBalances,
-        uint256 lbpPoolDuration,
-        uint256 swapFeePercentage
-    );
-
-    event ExitFromBalancerLBP(uint256 amount0, uint256 amount1);
-
-    event CreateUniswapLP(
-        IUniswapV3Pool lp,
-        uint256 tokenId,
-        int24 tickLower,
-        int24 tickUpper,
-        uint256 amount0,
-        uint256 amount1
-    );
-
-    event Withdraw(IERC20 token, uint256 amount);
-
     constructor(
         ILiquidityBootstrappingPoolFactory _balancerLBPFactory,
         IUniswapV3Factory _uniswapFactory,
@@ -141,15 +119,6 @@ contract LPController is Ownable {
 
         lbpPoolId = _lbpPoolId;
         liquidityBootstrappingPool = lbp;
-
-        emit CreateBalancerLBP(
-            lbp,
-            weights,
-            endWeights,
-            initBalances,
-            lbpPoolDuration,
-            swapFeePercentage
-        );
     }
 
     function setSwapEnabledInBalancerLBP(bool swapEnabled) external onlyOwner {
@@ -196,11 +165,6 @@ contract LPController is Ownable {
         );
 
         liquidityBootstrappingPool.setSwapEnabled(false);
-
-        emit ExitFromBalancerLBP(
-            token0.balanceOf(address(this)),
-            token1.balanceOf(address(this))
-        );
     }
 
     function createUniswapLP(
@@ -227,13 +191,13 @@ contract LPController is Ownable {
             )
         );
 
-        IUniswapV3Pool(pool).initialize(sqrtPriceX96);
+        pool.initialize(sqrtPriceX96);
 
         token0.safeApprove(address(nonfungiblePositionManager), balance0);
         token1.safeApprove(address(nonfungiblePositionManager), balance1);
 
-        IUniswapNFTManager.MintParams memory params =
-            IUniswapNFTManager.MintParams({
+        IUniswapNFTManager.MintParams memory params = IUniswapNFTManager
+            .MintParams({
                 token0: address(token0),
                 token1: address(token1),
                 fee: UNISWAP_FEE,
@@ -247,24 +211,14 @@ contract LPController is Ownable {
                 deadline: block.timestamp
             });
 
-        (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) = nonfungiblePositionManager.mint(params);
-
-        if (amount0 < balance0) {
-            token0.safeTransfer(executor, balance0 - amount0);
-        }
-        if (amount1 < balance1) {
-            token1.safeTransfer(executor, balance1 - amount1);
-        }
+        nonfungiblePositionManager.mint(params);
 
         uniswapPool = pool;
-        emit CreateUniswapLP(pool, tokenId, tickLower, tickUpper, amount0, amount0);
     }
 
     function withdraw(IERC20 token, uint256 amount) external onlyOwner {
         require(token.balanceOf(address(this)) != 0, "Invalid balance");
 
         token.safeTransfer(executor, amount);
-
-        emit Withdraw(token, amount);
     }
 }

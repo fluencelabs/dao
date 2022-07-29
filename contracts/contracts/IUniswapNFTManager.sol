@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-
 pragma solidity >=0.8.15;
 
 interface IUniswapNFTManager {
@@ -26,4 +25,11 @@ interface IUniswapNFTManager {
             uint256 amount0,
             uint256 amount1
         );
+
+    function createAndInitializePoolIfNecessary(
+        address token0,
+        address token1,
+        uint24 fee,
+        uint160 sqrtPriceX96
+    ) external payable returns (address pool);
 }

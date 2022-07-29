@@ -9,7 +9,6 @@ import "@nomiclabs/hardhat-solhint";
 import { Config } from "./utils/config"
 import fs from 'fs'
 import YAML from 'yaml'
-import { parse } from 'csv-parse/sync';
 
 let config: Config | null = null;
 try {
@@ -39,6 +38,9 @@ const hardhatConfig: HardhatUserConfig = {
         url: config?.networks?.mainnet?.url == null ? process.env.NODE_URL! : config!.networks!.mainnet!.url,
         blockNumber: 15218480
       }
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545/"
     },
     mainnet: {
       url: config?.networks?.mainnet?.url ?? "",

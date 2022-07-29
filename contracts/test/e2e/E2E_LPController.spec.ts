@@ -1,11 +1,20 @@
 import chai, { expect } from "chai";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ethers, deployments, waffle, getNamedAccounts } from "hardhat";
-import { LPController, FluenceToken__factory, IERC20Metadata, ILiquidityBootstrappingPoolFactory, ILiquidityBootstrappingPoolFactory__factory, ILiquidityBootstrappingPool, ILiquidityBootstrappingPool__factory, IBalancerVault, IBalancerVault__factory, IERC20__factory, IERC20Metadata__factory } from "../typechain";
+import { LPController, FluenceToken__factory, IERC20Metadata, ILiquidityBootstrappingPoolFactory, ILiquidityBootstrappingPoolFactory__factory, ILiquidityBootstrappingPool, ILiquidityBootstrappingPool__factory, IBalancerVault, IBalancerVault__factory, IERC20__factory, IERC20Metadata__factory, IUniswapV3Pool, IUniswapV3Pool__factory } from "../../typechain";
 import { BigNumber } from "ethers";
-import { DAY } from "../utils/time";
-import { Config } from "../utils/config";
-import exp from "constants";
+import { DAY } from "../../utils/time";
+import { Config } from "../../utils/config";
+import {
+  encodeSqrtRatioX96,
+  FeeAmount,
+  nearestUsableTick,
+  priceToClosestTick,
+  TICK_SPACINGS,
+  TickMath,
+} from '@uniswap/v3-sdk'
+import { IERC721__factory } from "../../typechain/factories/IERC721__factory";
+import { THROW_ERROR_PREFIX } from "../../utils/consts";
 
 chai.use(waffle.solidity);
 
@@ -127,11 +136,9 @@ describe("LPController", () => {
     const log = (await ethers.provider.getLogs({
       fromBlock: fromBlock,
       toBlock: "latest",
-      address: lpController.address,
-      topics: lpController.filters.CreateBalancerLBP().topics
+      address: lbpFactory.address,
+      topics: lbpFactory.filters.PoolCreated().topics
     }))[0];
-
-    const txHash = log.transactionHash
     const block = await ethers.provider.getBlock(log.blockHash)
 
     const lbpPoolDurationDays = config.deployment!.pool!.lbpPoolDurationDays * DAY
@@ -162,17 +169,7 @@ describe("LPController", () => {
       await IERC20Metadata__factory.connect(lbp.address, ethers.provider.getSigner())
         .balanceOf(lpController.address)
     ).to.eq(BigNumber.from("7363068856696822977659896"))
-
-    await expect(txHash).to.emit(lpController, "CreateBalancerLBP").withArgs(
-      lbp.address,
-      params.map(x => x.weight),
-      params.map(x => x.endWeight),
-      params.map(x => x.initialAmount),
-      lbpPoolDurationDays,
-      ethers.utils.parseUnits(String(config.deployment!.pool!.swapFeePercentage), 16)
-    )
-  }
-  );
+  });
 
   it("setSwapEnabledInBalancerLBP", async () => {
     await lpController.setSwapEnabledInBalancerLBP(false)
@@ -207,16 +204,74 @@ describe("LPController", () => {
   });
 
   it("create Uniswap", async () => {
-    /*const token0Balance = await params[0].token.balanceOf(lpController.address);
-    const token1Balance = await params[1].token.balanceOf(lpController.address);
+    const token0Balance = await params[0].token.balanceOf(lpController.address);
+    const token1Balance = await (await params[1].token.balanceOf(lpController.address));
 
-    const amount = token0Balance.mul(token1Balance).toBigInt()
-    const tx = await lpController.createUniswapLP(8388608, 8388607,);
-    
-      emit PoolCreated(token0, token1, fee, tickSpacing, pool);
-    await expect()
-    await expect(txHash).to.emit(lpController, "CreateUniswapLP")
-    await expect(txHash).to.emit(lpController.uniswapFactory(), "PoolCreated")*/
-    //TODO: check event args
+    const price = encodeSqrtRatioX96(token1Balance.toString(), token0Balance.toString())
+
+    const feeAmount: FeeAmount = Number((await lpController.UNISWAP_FEE()).toString());
+    const spacings = TICK_SPACINGS[feeAmount]
+
+    const nonfungiblePositionManager = IERC721__factory.connect(await lpController.nonfungiblePositionManager(), ethers.provider)
+    await lpController.createUniswapLP(nearestUsableTick(-887272, spacings), nearestUsableTick(887272, spacings), price.toString())
+
+    const pool = await lpController.uniswapPool();
+
+    expect(await nonfungiblePositionManager.balanceOf(await lpController.executor())).to.eq(1)
+
+    const tokenOneExpected = BigNumber.from('499999999999999998432742');
+    expect(await params[0].token.balanceOf(pool)).to.eq(tokenOneExpected)
+    expect(await params[1].token.balanceOf(pool)).to.eq(token1Balance)
+
+    expect(await params[0].token.balanceOf(lpController.address)).to.eq(token0Balance.sub(tokenOneExpected))
+    expect(await params[1].token.balanceOf(lpController.address)).to.eq(BigNumber.from(0))
+
+    const poolContract = IUniswapV3Pool__factory.connect(pool, ethers.provider)
+
+    const slot0 = await poolContract.slot0()
+    expect(slot0.sqrtPriceX96.toString()).to.eq(price.toString())
+
+    // TODO: ticker lower
+    // TODO: ticker upper
+  });
+
+  it("test method access", async () => {
+    const { mainAccount } = await getNamedAccounts();
+    const lpControllerWithMainAccount = lpController.connect(ethers.provider.getSigner(mainAccount))
+
+    await expect(lpControllerWithMainAccount.createBalancerLBP(
+      [BigNumber.from(1)],
+      [BigNumber.from(1)],
+      [BigNumber.from(1)],
+      BigNumber.from(1),
+      BigNumber.from(1),
+    )).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+    );
+
+    await expect(lpControllerWithMainAccount.setSwapEnabledInBalancerLBP(
+      false
+    )).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+    );
+
+    await expect(lpControllerWithMainAccount.exitFromBalancerLBP()).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+    );
+
+    await expect(lpControllerWithMainAccount.createUniswapLP(
+      BigNumber.from(1),
+      BigNumber.from(1),
+      BigNumber.from(1)
+    )).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+    );
+
+    await expect(lpControllerWithMainAccount.withdraw(
+      params[0].token.address,
+      BigNumber.from(1000)
+    )).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+    );
   });
 });
