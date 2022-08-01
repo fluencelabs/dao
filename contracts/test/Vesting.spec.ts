@@ -12,8 +12,9 @@ chai.use(waffle.solidity);
 const vestingAmount = ethers.utils.parseEther("100");
 const cliffDurationMonths = 3;
 const vestingDurationMonths = 12;
-const amountBySec: BigNumber = vestingAmount
-  .div(BigNumber.from((cliffDurationMonths + vestingDurationMonths) * MONTH));
+const amountBySec: BigNumber = vestingAmount.div(
+  BigNumber.from((cliffDurationMonths + vestingDurationMonths) * MONTH)
+);
 
 const setupTest = deployments.createFixture(
   async (
@@ -22,16 +23,19 @@ const setupTest = deployments.createFixture(
     token: FluenceToken;
     vesting: Vesting;
   }> => {
-    Config.reset({
-      etherscanApiKey: "",
-      repotGas: false,
-      mainnet: null,
-      testnet: null,
-    }, {
-      token: {
-        totalSupply: 100000000,
+    Config.reset(
+      {
+        etherscanApiKey: "",
+        repotGas: false,
+        mainnet: null,
+        testnet: null,
+      },
+      {
+        token: {
+          totalSupply: 100000000,
+        },
       }
-    });
+    );
 
     await deployments.fixture([]);
     await hre.deployments.fixture(["FluenceToken"]);
@@ -47,7 +51,7 @@ const setupTest = deployments.createFixture(
         cliffDurationMonths * MONTH,
         vestingDurationMonths * MONTH,
         [mainAccount],
-        [vestingAmount]
+        [vestingAmount],
       ],
       log: true,
       autoMine: true,
@@ -66,7 +70,7 @@ const setupTest = deployments.createFixture(
       vesting: (await ethers.getContractAt(
         "Vesting",
         vesting.address
-      )) as Vesting
+      )) as Vesting,
     };
   }
 );
@@ -78,11 +82,9 @@ describe("Vesting", () => {
   let startTime: number;
 
   const setTimeAfterStart = async (time: number) => {
-    await ethers.provider.send("evm_setNextBlockTimestamp", [
-      startTime + time
-    ]);
+    await ethers.provider.send("evm_setNextBlockTimestamp", [startTime + time]);
     await ethers.provider.send("evm_mine", []);
-  }
+  };
 
   before(async () => {
     const { mainAccount } = await getNamedAccounts();
@@ -99,99 +101,192 @@ describe("Vesting", () => {
     const settings = await setupTest();
     vesting = settings.vesting;
     token = settings.token;
-    startTime = (await vesting.startTimestamp()).toNumber()
+    startTime = (await vesting.startTimestamp()).toNumber();
 
     vesting = vesting.connect(receiverAccount);
   });
 
   it("when cliff is active #1", async () => {
-    await expect(vesting.release(1)).to.be.revertedWith(
+    await expect(vesting.transfer(ZERO_ADDRESS, 1)).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Not enough release amount'`
     );
   });
 
   it("when cliff is active #2", async () => {
-    await setTimeAfterStart(cliffDurationMonths * MONTH)
+    await setTimeAfterStart(cliffDurationMonths * MONTH);
 
-    expect(await vesting.getReleaseAmount(receiverAccount.address)).to.eq(BigNumber.from(0))
+    expect(await vesting.getReleaseAmount(receiverAccount.address)).to.eq(
+      BigNumber.from(0)
+    );
   });
 
   it("after cliff", async () => {
     const time = cliffDurationMonths * MONTH + 1;
-    await setTimeAfterStart(time)
+    await setTimeAfterStart(time);
 
-    const expectedAmount = amountBySec.mul(BigNumber.from(time))
+    const expectedAmount = amountBySec.mul(BigNumber.from(time));
 
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
     expect(amount).to.eq(expectedAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
-    const tx = await vesting.release(amount)
+    const tx = await vesting.transfer(ZERO_ADDRESS, amount);
     await expect(tx)
       .to.emit(token, "Transfer")
       .withArgs(vesting.address, receiverAccount.address, amount);
 
-    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(amount));
-    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(
+      balanceSnapshot.add(amount)
+    );
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(
+      vestingAmount.sub(amount)
+    );
   });
 
   it("after cliff with random time", async () => {
-    const time = Math.floor(Math.random() * (vestingDurationMonths - 1 + cliffDurationMonths) * MONTH) + cliffDurationMonths * MONTH;
+    const time =
+      Math.floor(Math.random() * vestingDurationMonths * MONTH) +
+      cliffDurationMonths * MONTH;
 
-    await setTimeAfterStart(time)
+    await setTimeAfterStart(time);
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
 
-    const expectedAmount = amountBySec.mul(BigNumber.from(time))
+    const expectedAmount = amountBySec.mul(BigNumber.from(time));
     expect(amount).to.eq(expectedAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
-    await expect(await vesting.release(amount))
+    await expect(await vesting.transfer(ZERO_ADDRESS, amount))
       .to.emit(token, "Transfer")
-      .withArgs(vesting.address, receiverAccount.address, amount)
+      .withArgs(vesting.address, receiverAccount.address, amount);
 
-    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(amount));
-    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(
+      balanceSnapshot.add(amount)
+    );
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(
+      vestingAmount.sub(amount)
+    );
   });
 
   it("all balance #1", async () => {
-    await setTimeAfterStart((vestingDurationMonths + cliffDurationMonths) * MONTH)
+    await setTimeAfterStart(
+      (vestingDurationMonths + cliffDurationMonths) * MONTH
+    );
 
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
-    await expect(await vesting.release(vestingAmount))
+    await expect(await vesting.transfer(ZERO_ADDRESS, vestingAmount))
       .to.emit(token, "Transfer")
-      .withArgs(vesting.address, receiverAccount.address, vestingAmount)
+      .withArgs(vesting.address, receiverAccount.address, vestingAmount);
 
-    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(vestingAmount));
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(
+      balanceSnapshot.add(vestingAmount)
+    );
     expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
   });
 
   it("all balance #2", async () => {
-    await setTimeAfterStart((vestingDurationMonths + cliffDurationMonths) * 3 * MONTH)
+    await setTimeAfterStart(
+      (vestingDurationMonths + cliffDurationMonths) * 3 * MONTH
+    );
 
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
 
-    await expect(await vesting.release(vestingAmount))
+    await expect(await vesting.transfer(ZERO_ADDRESS, vestingAmount))
       .to.emit(token, "Transfer")
-      .withArgs(vesting.address, receiverAccount.address, vestingAmount)
+      .withArgs(vesting.address, receiverAccount.address, vestingAmount);
 
-    expect(await token.balanceOf(receiverAccount.address)).to.eq(balanceSnapshot.add(vestingAmount));
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(
+      balanceSnapshot.add(vestingAmount)
+    );
     expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
   });
 
   it("transfer", async () => {
-    const { deployer } = await getNamedAccounts()
+    const { deployer } = await getNamedAccounts();
 
     await expect(vesting.transfer(deployer, 1)).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Transfer is not allowed'`
+      `${THROW_ERROR_PREFIX} 'Transfer allowed only to zero address'`
     );
+  });
+
+  it("balanceOf", async () => {
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(
+      vestingAmount
+    );
+  });
+
+  it("transferFrom full", async () => {
+    await setTimeAfterStart(
+      (vestingDurationMonths + cliffDurationMonths) * 3 * MONTH
+    );
+
+    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+    expect(amount).to.eq(vestingAmount);
+
+    const balanceSnapshot = await token.balanceOf(receiverAccount.address);
+
+    await expect(await vesting.transfer(ZERO_ADDRESS, 0))
+      .to.emit(token, "Transfer")
+      .withArgs(vesting.address, receiverAccount.address, vestingAmount);
+
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(
+      balanceSnapshot.add(vestingAmount)
+    );
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
+  });
+
+  it("transferFrom full", async () => {
+    await setTimeAfterStart(
+      (vestingDurationMonths + cliffDurationMonths) * 3 * MONTH
+    );
+
+    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+    expect(amount).to.eq(vestingAmount);
+
+    const balanceSnapshot = await token.balanceOf(receiverAccount.address);
+
+    await expect(
+      await vesting.transferFrom(receiverAccount.address, ZERO_ADDRESS, 0)
+    )
+      .to.emit(token, "Transfer")
+      .withArgs(vesting.address, receiverAccount.address, vestingAmount);
+
+    expect(await token.balanceOf(receiverAccount.address)).to.eq(
+      balanceSnapshot.add(vestingAmount)
+    );
+    expect(await vesting.balanceOf(receiverAccount.address)).to.eq(0);
+  });
+
+  it("transferFrom invalid from", async () => {
+    const { deployer } = await getNamedAccounts();
+
+    await expect(
+      vesting.transferFrom(deployer, ZERO_ADDRESS, 0)
+    ).to.be.revertedWith(`${THROW_ERROR_PREFIX} 'Permission denied'`);
+  });
+  it("transferFrom invalid to", async () => {
+    await expect(
+      vesting.transferFrom(receiverAccount.address, receiverAccount.address, 0)
+    ).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Transfer allowed only to zero address'`
+    );
+  });
+  it("allowance", async () => {
+    await expect(
+      vesting.allowance(receiverAccount.address, receiverAccount.address)
+    ).to.be.revertedWith(`${THROW_ERROR_PREFIX} "Method unsupported"`);
+  });
+  it("approve", async () => {
+    await expect(
+      vesting.approve(receiverAccount.address, 1000)
+    ).to.be.revertedWith(`${THROW_ERROR_PREFIX} "Method unsupported"`);
   });
 });

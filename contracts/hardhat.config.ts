@@ -6,17 +6,17 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-solhint";
-import { Config } from "./utils/config"
-import fs from 'fs'
-import YAML from 'yaml'
+import { Config } from "./utils/config";
+import fs from "fs";
+import YAML from "yaml";
 
 let config: Config | null = null;
 try {
-  const file = fs.readFileSync('./config.yaml', 'utf8')
+  const file = fs.readFileSync("./config.yaml", "utf8");
   const c = YAML.parse(file);
-  config = Config.get(c.networks, c.deployment)
+  config = Config.get(c.networks, c.deployment);
 } catch (e) {
-  console.log('No config file found')
+  console.log("No config file found");
 }
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -35,21 +35,28 @@ const hardhatConfig: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: config?.networks?.mainnet?.url == null ? process.env.NODE_URL! : config!.networks!.mainnet!.url,
-        blockNumber: 15218480
-      }
+        url:
+          config?.networks?.mainnet?.url == null
+            ? process.env.NODE_URL!
+            : config!.networks!.mainnet!.url,
+        blockNumber: 15218480,
+      },
     },
     localhost: {
-      url: "http://127.0.0.1:8545/"
+      url: "http://127.0.0.1:8545/",
     },
     mainnet: {
       url: config?.networks?.mainnet?.url ?? "",
-      accounts: config?.networks?.mainnet?.privateKey ? [config.networks.mainnet?.privateKey] : []
+      accounts: config?.networks?.mainnet?.privateKey
+        ? [config.networks.mainnet?.privateKey]
+        : [],
     },
     testnet: {
       url: config?.networks?.testnet?.url ?? "",
-      accounts: config?.networks?.testnet?.privateKey ? [config.networks.testnet?.privateKey] : []
-    }
+      accounts: config?.networks?.testnet?.privateKey
+        ? [config.networks.testnet?.privateKey]
+        : [],
+    },
   },
   namedAccounts: {
     deployer: {
@@ -69,7 +76,7 @@ const hardhatConfig: HardhatUserConfig = {
             runs: 20000,
           },
         },
-      }
+      },
     ],
   },
   gasReporter: {

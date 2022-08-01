@@ -35,9 +35,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
           (await hre.deployments.get("TeamVesting")).address,
           executorAddress,
           config.deployment!.governor!.quorum,
-          Math.floor(config.deployment!.governor!.votingDelayDays * DAY / 13.14),
-          Math.floor(config.deployment!.governor!.votingPeriodDays * DAY / 13.14),
-          hre.ethers.utils.parseEther(String(config.deployment!.governor!.proposalThreshold))
+          Math.floor(
+            (config.deployment!.governor!.votingDelayDays * DAY) / 13.14
+          ),
+          Math.floor(
+            (config.deployment!.governor!.votingPeriodDays * DAY) / 13.14
+          ),
+          hre.ethers.utils.parseEther(
+            String(config.deployment!.governor!.proposalThreshold)
+          ),
         ],
       },
     },
@@ -117,7 +123,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         waitConfirmations: 1,
       },
       "transfer",
-      (await hre.deployments.get("Executor")).address,
+      (
+        await hre.deployments.get("Executor")
+      ).address,
       balance
     );
   }

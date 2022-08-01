@@ -12,7 +12,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const tokenAddress = (await hre.deployments.get("FluenceToken")).address;
 
-  const initialReward = hre.ethers.utils.parseEther(String(config.deployment!.devRewardDistributor!.initialReward));
+  const initialReward = hre.ethers.utils.parseEther(
+    String(config.deployment!.devRewardDistributor!.initialReward)
+  );
 
   const rewardDistributor = await hre.deployments.deploy(
     "DevRewardDistributor",
@@ -22,9 +24,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         tokenAddress,
         (await hre.deployments.get("Executor_Proxy")).address,
         config.deployment!.devRewardDistributor!.merkleRoot,
-        Math.floor(config.deployment!.devRewardDistributor!.halvePeriodMonths * MONTH),
+        Math.floor(
+          config.deployment!.devRewardDistributor!.halvePeriodMonths * MONTH
+        ),
         initialReward,
-        Math.floor(config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH)
+        Math.floor(
+          config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH
+        ),
       ],
       log: true,
       autoMine: true,
@@ -32,7 +38,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     }
   );
 
-  const totalRewards = hre.ethers.utils.parseEther(String(config.deployment!.devRewardDistributor!.totalRewards));
+  const totalRewards = hre.ethers.utils.parseEther(
+    String(config.deployment!.devRewardDistributor!.totalRewards)
+  );
 
   if (!totalRewards.isZero()) {
     await hre.deployments.execute(

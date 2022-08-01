@@ -1,7 +1,21 @@
 import chai, { expect } from "chai";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ethers, deployments, waffle, getNamedAccounts } from "hardhat";
-import { LPController, FluenceToken__factory, IERC20Metadata, ILiquidityBootstrappingPoolFactory, ILiquidityBootstrappingPoolFactory__factory, ILiquidityBootstrappingPool, ILiquidityBootstrappingPool__factory, IBalancerVault, IBalancerVault__factory, IERC20__factory, IERC20Metadata__factory, IUniswapV3Pool, IUniswapV3Pool__factory } from "../../typechain";
+import {
+  LPController,
+  FluenceToken__factory,
+  IERC20Metadata,
+  ILiquidityBootstrappingPoolFactory,
+  ILiquidityBootstrappingPoolFactory__factory,
+  ILiquidityBootstrappingPool,
+  ILiquidityBootstrappingPool__factory,
+  IBalancerVault,
+  IBalancerVault__factory,
+  IERC20__factory,
+  IERC20Metadata__factory,
+  IUniswapV3Pool,
+  IUniswapV3Pool__factory,
+} from "../../typechain";
 import { BigNumber } from "ethers";
 import { DAY } from "../../utils/time";
 import { Config } from "../../utils/config";
@@ -12,7 +26,7 @@ import {
   priceToClosestTick,
   TICK_SPACINGS,
   TickMath,
-} from '@uniswap/v3-sdk'
+} from "@uniswap/v3-sdk";
 import { IERC721__factory } from "../../typechain/factories/IERC721__factory";
 import { THROW_ERROR_PREFIX } from "../../utils/consts";
 
@@ -31,45 +45,53 @@ const setupTest = deployments.createFixture(
   }> => {
     await deployments.fixture([]);
 
-    const token = await new FluenceToken__factory((await ethers.getSigners())[0]).deploy("USD", "USD", ethers.utils.parseEther(String(lbpUSDAmount)));
+    const token = await new FluenceToken__factory(
+      (
+        await ethers.getSigners()
+      )[0]
+    ).deploy("USD", "USD", ethers.utils.parseEther(String(lbpUSDAmount)));
 
-    Config.reset({
-      etherscanApiKey: "",
-      repotGas: false,
-      mainnet: {
-        url: "",
-        privateKey: ""
-      },
-      testnet: null,
-    }, {
-      contracts: {
-        usdToken: token.address
-      },
-      token: {
-        totalSupply: lbpFLTAmount,
-      },
-      pool: {
-        lbpPoolDurationDays: 3,
-        swapFeePercentage: 1,
-        flt: {
-          weight: 0.96,
-          endWeight: 0.04,
-          initialAmount: lbpFLTAmount
+    Config.reset(
+      {
+        etherscanApiKey: "",
+        repotGas: false,
+        mainnet: {
+          url: "",
+          privateKey: "",
         },
-        usd: {
-          weight: 0.04,
-          endWeight: 0.96,
-          initialAmount: lbpUSDAmount,
-        }
+        testnet: null,
       },
-      executor: {
-        delayDays: 4
+      {
+        contracts: {
+          usdToken: token.address,
+        },
+        token: {
+          totalSupply: lbpFLTAmount,
+        },
+        pool: {
+          lbpPoolDurationDays: 3,
+          swapFeePercentage: 1,
+          flt: {
+            weight: 0.96,
+            endWeight: 0.04,
+            initialAmount: lbpFLTAmount,
+          },
+          usd: {
+            weight: 0.04,
+            endWeight: 0.96,
+            initialAmount: lbpUSDAmount,
+          },
+        },
+        executor: {
+          delayDays: 4,
+        },
       }
-    });
+    );
 
     await hre.deployments.fixture(["FluenceToken", "Executor", "LPController"]);
 
-    const lpControllerAddress = (await hre.deployments.get("LPController")).address;
+    const lpControllerAddress = (await hre.deployments.get("LPController"))
+      .address;
 
     return {
       lpController: (await ethers.getContractAt(
@@ -79,7 +101,9 @@ const setupTest = deployments.createFixture(
       usdToken: token,
       fltToken: (await ethers.getContractAt(
         "FluenceToken",
-        (await hre.deployments.get("FluenceToken")).address
+        (
+          await hre.deployments.get("FluenceToken")
+        ).address
       )) as IERC20Metadata,
     };
   }
@@ -93,10 +117,10 @@ describe("LPController", () => {
   let lbp: ILiquidityBootstrappingPool;
   let poolId: string;
   let params: Array<{
-    token: IERC20Metadata,
-    weight: BigNumber,
-    endWeight: BigNumber,
-    initialAmount: BigNumber
+    token: IERC20Metadata;
+    weight: BigNumber;
+    endWeight: BigNumber;
+    initialAmount: BigNumber;
   }>;
 
   before(async () => {
@@ -106,130 +130,205 @@ describe("LPController", () => {
     config = Config.get();
 
     lpController = settings.lpController;
-    vault = IBalancerVault__factory.connect(await settings.lpController.balancerVault(), signer)
-    lbpFactory = ILiquidityBootstrappingPoolFactory__factory.connect(await settings.lpController.balancerLBPFactory(), signer)
-    lbp = ILiquidityBootstrappingPool__factory.connect(await settings.lpController.liquidityBootstrappingPool(), signer)
+    vault = IBalancerVault__factory.connect(
+      await settings.lpController.balancerVault(),
+      signer
+    );
+    lbpFactory = ILiquidityBootstrappingPoolFactory__factory.connect(
+      await settings.lpController.balancerLBPFactory(),
+      signer
+    );
+    lbp = ILiquidityBootstrappingPool__factory.connect(
+      await settings.lpController.liquidityBootstrappingPool(),
+      signer
+    );
 
     params = new Array(
       {
         token: settings.fltToken,
-        weight: ethers.utils.parseEther(String(config.deployment!.pool!.flt.weight)),
-        endWeight: ethers.utils.parseEther(String(config.deployment!.pool!.flt.endWeight)),
-        initialAmount: ethers.utils.parseEther(String(config.deployment!.pool!.flt.initialAmount))
+        weight: ethers.utils.parseEther(
+          String(config.deployment!.pool!.flt.weight)
+        ),
+        endWeight: ethers.utils.parseEther(
+          String(config.deployment!.pool!.flt.endWeight)
+        ),
+        initialAmount: ethers.utils.parseEther(
+          String(config.deployment!.pool!.flt.initialAmount)
+        ),
       },
       {
         token: settings.usdToken,
-        weight: ethers.utils.parseEther(String(config.deployment!.pool!.usd.weight)),
-        endWeight: ethers.utils.parseEther(String(config.deployment!.pool!.usd.endWeight)),
-        initialAmount: ethers.utils.parseUnits(String(config.deployment!.pool!.usd.initialAmount), Number(await settings.usdToken.decimals()))
+        weight: ethers.utils.parseEther(
+          String(config.deployment!.pool!.usd.weight)
+        ),
+        endWeight: ethers.utils.parseEther(
+          String(config.deployment!.pool!.usd.endWeight)
+        ),
+        initialAmount: ethers.utils.parseUnits(
+          String(config.deployment!.pool!.usd.initialAmount),
+          Number(await settings.usdToken.decimals())
+        ),
       }
     );
-    params = params.sort((a, b) => BigNumber.from(a.token.address).gt(BigNumber.from(b.token.address)) ? 1 : -1);
+    params = params.sort((a, b) =>
+      BigNumber.from(a.token.address).gt(BigNumber.from(b.token.address))
+        ? 1
+        : -1
+    );
 
     poolId = await lpController.lbpPoolId();
   });
 
   it("create lbp pool", async () => {
-    const fromBlock =
-      (await ethers.provider.getTransactionReceipt((await deployments.get("LPController")).transactionHash!)).blockNumber;
+    const fromBlock = (
+      await ethers.provider.getTransactionReceipt(
+        (
+          await deployments.get("LPController")
+        ).transactionHash!
+      )
+    ).blockNumber;
 
-    const log = (await ethers.provider.getLogs({
-      fromBlock: fromBlock,
-      toBlock: "latest",
-      address: lbpFactory.address,
-      topics: lbpFactory.filters.PoolCreated().topics
-    }))[0];
-    const block = await ethers.provider.getBlock(log.blockHash)
+    const log = (
+      await ethers.provider.getLogs({
+        fromBlock: fromBlock,
+        toBlock: "latest",
+        address: lbpFactory.address,
+        topics: lbpFactory.filters.PoolCreated().topics,
+      })
+    )[0];
+    const block = await ethers.provider.getBlock(log.blockHash);
 
-    const lbpPoolDurationDays = config.deployment!.pool!.lbpPoolDurationDays * DAY
+    const lbpPoolDurationDays =
+      config.deployment!.pool!.lbpPoolDurationDays * DAY;
 
-    expect(await lbp.getSwapEnabled()).to.eq(true)
-    expect(await lbp.getSwapFeePercentage()).to.eq(ethers.utils.parseUnits(String(config.deployment!.pool!.swapFeePercentage), 16))
+    expect(await lbp.getSwapEnabled()).to.eq(true);
+    expect(await lbp.getSwapFeePercentage()).to.eq(
+      ethers.utils.parseUnits(
+        String(config.deployment!.pool!.swapFeePercentage),
+        16
+      )
+    );
     expect(await lbp.getNormalizedWeights()).to.deep.eq([
-      BigNumber.from('40012704793395452'),
-      BigNumber.from('960002554461334543'),
-    ])
+      BigNumber.from("40012704793395452"),
+      BigNumber.from("960002554461334543"),
+    ]);
 
-    const gwuParams = await lbp.getGradualWeightUpdateParams()
-    expect(gwuParams.startTime).to.eq(BigNumber.from(block.timestamp))
-    expect(gwuParams.endTime).to.eq(BigNumber.from(block.timestamp + lbpPoolDurationDays))
+    const gwuParams = await lbp.getGradualWeightUpdateParams();
+    expect(gwuParams.startTime).to.eq(BigNumber.from(block.timestamp));
+    expect(gwuParams.endTime).to.eq(
+      BigNumber.from(block.timestamp + lbpPoolDurationDays)
+    );
     expect(gwuParams.endWeights).to.deep.eq([
-      BigNumber.from('960006103608758679'),
-      BigNumber.from('40009155413138018'),
-    ])
+      BigNumber.from("960006103608758679"),
+      BigNumber.from("40009155413138018"),
+    ]);
 
-    expect(await params[0].token.balanceOf(lpController.address)).to.eq(BigNumber.from(0));
-    expect(await params[1].token.balanceOf(lpController.address)).to.eq(BigNumber.from(0));
+    expect(await params[0].token.balanceOf(lpController.address)).to.eq(
+      BigNumber.from(0)
+    );
+    expect(await params[1].token.balanceOf(lpController.address)).to.eq(
+      BigNumber.from(0)
+    );
 
-    const poolTokens = await vault.getPoolTokens(poolId)
-    expect(poolTokens.tokens).to.deep.eq(params.map(x => x.token.address))
-    expect(poolTokens.balances).to.deep.eq(params.map(x => x.initialAmount))
+    const poolTokens = await vault.getPoolTokens(poolId);
+    expect(poolTokens.tokens).to.deep.eq(params.map((x) => x.token.address));
+    expect(poolTokens.balances).to.deep.eq(params.map((x) => x.initialAmount));
 
     expect(
-      await IERC20Metadata__factory.connect(lbp.address, ethers.provider.getSigner())
-        .balanceOf(lpController.address)
-    ).to.eq(BigNumber.from("7363068856696822977659896"))
+      await IERC20Metadata__factory.connect(
+        lbp.address,
+        ethers.provider.getSigner()
+      ).balanceOf(lpController.address)
+    ).to.eq(BigNumber.from("7363068856696822977659896"));
   });
 
   it("setSwapEnabledInBalancerLBP", async () => {
-    await lpController.setSwapEnabledInBalancerLBP(false)
-    expect(await lbp.getSwapEnabled()).to.eq(false)
+    await lpController.setSwapEnabledInBalancerLBP(false);
+    expect(await lbp.getSwapEnabled()).to.eq(false);
 
-    await lpController.setSwapEnabledInBalancerLBP(true)
-    expect(await lbp.getSwapEnabled()).to.eq(true)
+    await lpController.setSwapEnabledInBalancerLBP(true);
+    expect(await lbp.getSwapEnabled()).to.eq(true);
   });
 
   it("exit from lbp", async () => {
     const tx = await lpController.exitFromBalancerLBP();
     await tx.wait();
     expect(
-      await IERC20Metadata__factory.connect(lbp.address, ethers.provider.getSigner())
-        .balanceOf(lpController.address)
-    ).to.eq(BigNumber.from("0"))
-    expect(await params[0].token.balanceOf(lpController.address)).to.eq(BigNumber.from('499999999999999999500000'));
-    expect(await params[1].token.balanceOf(lpController.address)).to.eq(BigNumber.from('3999999999999999996000000'));
-    expect(await lbp.getSwapEnabled()).to.eq(false)
+      await IERC20Metadata__factory.connect(
+        lbp.address,
+        ethers.provider.getSigner()
+      ).balanceOf(lpController.address)
+    ).to.eq(BigNumber.from("0"));
+    expect(await params[0].token.balanceOf(lpController.address)).to.eq(
+      BigNumber.from("499999999999999999500000")
+    );
+    expect(await params[1].token.balanceOf(lpController.address)).to.eq(
+      BigNumber.from("3999999999999999996000000")
+    );
+    expect(await lbp.getSwapEnabled()).to.eq(false);
   });
 
   it("withdraw", async () => {
     const executor = await lpController.executor();
 
     const v = BigNumber.from(1000000);
-    const snapshotBalance = await params[0].token.balanceOf(executor)
+    const snapshotBalance = await params[0].token.balanceOf(executor);
     await expect(await lpController.withdraw(params[0].token.address, v))
       .to.emit(params[0].token, "Transfer")
-      .withArgs(lpController.address, executor, v)
+      .withArgs(lpController.address, executor, v);
 
-    expect(await params[0].token.balanceOf(executor)).to.eq(snapshotBalance.add(v))
+    expect(await params[0].token.balanceOf(executor)).to.eq(
+      snapshotBalance.add(v)
+    );
   });
 
   it("create Uniswap", async () => {
     const token0Balance = await params[0].token.balanceOf(lpController.address);
-    const token1Balance = await (await params[1].token.balanceOf(lpController.address));
+    const token1Balance = await await params[1].token.balanceOf(
+      lpController.address
+    );
 
-    const price = encodeSqrtRatioX96(token1Balance.toString(), token0Balance.toString())
+    const price = encodeSqrtRatioX96(
+      token1Balance.toString(),
+      token0Balance.toString()
+    );
 
-    const feeAmount: FeeAmount = Number((await lpController.UNISWAP_FEE()).toString());
-    const spacings = TICK_SPACINGS[feeAmount]
+    const feeAmount: FeeAmount = Number(
+      (await lpController.UNISWAP_FEE()).toString()
+    );
+    const spacings = TICK_SPACINGS[feeAmount];
 
-    const nonfungiblePositionManager = IERC721__factory.connect(await lpController.nonfungiblePositionManager(), ethers.provider)
-    await lpController.createUniswapLP(nearestUsableTick(-887272, spacings), nearestUsableTick(887272, spacings), price.toString())
+    const nonfungiblePositionManager = IERC721__factory.connect(
+      await lpController.nonfungiblePositionManager(),
+      ethers.provider
+    );
+    await lpController.createUniswapLP(
+      nearestUsableTick(-887272, spacings),
+      nearestUsableTick(887272, spacings),
+      price.toString()
+    );
 
     const pool = await lpController.uniswapPool();
 
-    expect(await nonfungiblePositionManager.balanceOf(await lpController.executor())).to.eq(1)
+    expect(
+      await nonfungiblePositionManager.balanceOf(await lpController.executor())
+    ).to.eq(1);
 
-    const tokenOneExpected = BigNumber.from('499999999999999998432742');
-    expect(await params[0].token.balanceOf(pool)).to.eq(tokenOneExpected)
-    expect(await params[1].token.balanceOf(pool)).to.eq(token1Balance)
+    const tokenOneExpected = BigNumber.from("499999999999999998432742");
+    expect(await params[0].token.balanceOf(pool)).to.eq(tokenOneExpected);
+    expect(await params[1].token.balanceOf(pool)).to.eq(token1Balance);
 
-    expect(await params[0].token.balanceOf(lpController.address)).to.eq(token0Balance.sub(tokenOneExpected))
-    expect(await params[1].token.balanceOf(lpController.address)).to.eq(BigNumber.from(0))
+    expect(await params[0].token.balanceOf(lpController.address)).to.eq(
+      token0Balance.sub(tokenOneExpected)
+    );
+    expect(await params[1].token.balanceOf(lpController.address)).to.eq(
+      BigNumber.from(0)
+    );
 
-    const poolContract = IUniswapV3Pool__factory.connect(pool, ethers.provider)
+    const poolContract = IUniswapV3Pool__factory.connect(pool, ethers.provider);
 
-    const slot0 = await poolContract.slot0()
-    expect(slot0.sqrtPriceX96.toString()).to.eq(price.toString())
+    const slot0 = await poolContract.slot0();
+    expect(slot0.sqrtPriceX96.toString()).to.eq(price.toString());
 
     // TODO: ticker lower
     // TODO: ticker upper
@@ -237,40 +336,50 @@ describe("LPController", () => {
 
   it("test method access", async () => {
     const { mainAccount } = await getNamedAccounts();
-    const lpControllerWithMainAccount = lpController.connect(ethers.provider.getSigner(mainAccount))
+    const lpControllerWithMainAccount = lpController.connect(
+      ethers.provider.getSigner(mainAccount)
+    );
 
-    await expect(lpControllerWithMainAccount.createBalancerLBP(
-      [BigNumber.from(1)],
-      [BigNumber.from(1)],
-      [BigNumber.from(1)],
-      BigNumber.from(1),
-      BigNumber.from(1),
-    )).to.be.revertedWith(
+    await expect(
+      lpControllerWithMainAccount.createBalancerLBP(
+        [BigNumber.from(1)],
+        [BigNumber.from(1)],
+        [BigNumber.from(1)],
+        BigNumber.from(1),
+        BigNumber.from(1)
+      )
+    ).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
     );
 
-    await expect(lpControllerWithMainAccount.setSwapEnabledInBalancerLBP(
-      false
-    )).to.be.revertedWith(
+    await expect(
+      lpControllerWithMainAccount.setSwapEnabledInBalancerLBP(false)
+    ).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
     );
 
-    await expect(lpControllerWithMainAccount.exitFromBalancerLBP()).to.be.revertedWith(
+    await expect(
+      lpControllerWithMainAccount.exitFromBalancerLBP()
+    ).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
     );
 
-    await expect(lpControllerWithMainAccount.createUniswapLP(
-      BigNumber.from(1),
-      BigNumber.from(1),
-      BigNumber.from(1)
-    )).to.be.revertedWith(
+    await expect(
+      lpControllerWithMainAccount.createUniswapLP(
+        BigNumber.from(1),
+        BigNumber.from(1),
+        BigNumber.from(1)
+      )
+    ).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
     );
 
-    await expect(lpControllerWithMainAccount.withdraw(
-      params[0].token.address,
-      BigNumber.from(1000)
-    )).to.be.revertedWith(
+    await expect(
+      lpControllerWithMainAccount.withdraw(
+        params[0].token.address,
+        BigNumber.from(1000)
+      )
+    ).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
     );
   });

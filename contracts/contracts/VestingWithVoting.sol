@@ -2,12 +2,13 @@
 
 pragma solidity >=0.8.15;
 
+import "@openzeppelin/contracts/governance/utils/Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./Vesting.sol";
 import "./FluenceToken.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
-contract VestingWithVoting is Vesting, ERC20Votes {
+contract VestingWithVoting is Vesting, Votes {
     constructor(
         FluenceToken token_,
         string memory name_,
@@ -26,39 +27,31 @@ contract VestingWithVoting is Vesting, ERC20Votes {
             accounts,
             amounts
         )
+        EIP712(name_, "1")
     {
         for (uint256 i = 0; i < accounts.length; i++) {
-            _delegate(accounts[i], accounts[i]);
+            address account = accounts[i];
+            _transferVotingUnits(address(0x00), account, amounts[i]);
+            _delegate(account, account);
         }
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(Vesting, ERC20) {
-        super._beforeTokenTransfer(from, to, amount);
+    function totalSupply() external view override returns (uint256) {
+        return _getTotalSupply();
     }
 
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
-        super._afterTokenTransfer(from, to, amount);
-    }
+    function _addTotalSupply(uint256 amount) internal override {}
 
-    function _mint(address to, uint256 amount)
+    function _getVotingUnits(address account)
         internal
-        override(ERC20, ERC20Votes)
+        view
+        override
+        returns (uint256)
     {
-        super._mint(to, amount);
+        return _balanceOf(account);
     }
 
-    function _burn(address account, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._burn(account, amount);
+    function _beforeBurn(address from, uint256 amount) internal override {
+        _transferVotingUnits(from, address(0x00), amount);
     }
 }

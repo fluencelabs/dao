@@ -1,11 +1,7 @@
 import chai, { expect } from "chai";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ethers, deployments, getNamedAccounts, waffle } from "hardhat";
-import {
-  DevRewardDistributor,
-  Executor,
-  FluenceToken,
-} from "../typechain";
+import { DevRewardDistributor, Executor, FluenceToken } from "../typechain";
 import { MerkleTree } from "merkletreejs";
 import { BigNumber, Wallet } from "ethers";
 import { ZERO_ADDRESS, THROW_ERROR_PREFIX } from "../utils/consts";
@@ -46,49 +42,60 @@ const setupTest = deployments.createFixture(
       devAccounts.map((x) => x.address)
     );
 
-    Config.reset({
-      etherscanApiKey: "",
-      repotGas: false,
-      mainnet: null,
-      testnet: null,
-    }, {
-      token: {
-        totalSupply: 1000000,
+    Config.reset(
+      {
+        etherscanApiKey: "",
+        repotGas: false,
+        mainnet: null,
+        testnet: null,
       },
-      executor: {
-        delayDays: 1,
-      },
-      devRewardDistributor: {
-        merkleRoot: merkleTree.getHexRoot(),
-        totalRewards: 100,
-        initialReward: 1,
-        halvePeriodMonths: 1,
-        claimingPeriodMonths: 3
+      {
+        token: {
+          totalSupply: 1000000,
+        },
+        executor: {
+          delayDays: 1,
+        },
+        devRewardDistributor: {
+          merkleRoot: merkleTree.getHexRoot(),
+          totalRewards: 100,
+          initialReward: 1,
+          halvePeriodMonths: 1,
+          claimingPeriodMonths: 3,
+        },
       }
-    });
+    );
 
     await deployments.fixture([]);
-    await hre.deployments.fixture(["FluenceToken", "Executor", "DevRewardDistributor"]);
+    await hre.deployments.fixture([
+      "FluenceToken",
+      "Executor",
+      "DevRewardDistributor",
+    ]);
 
     const token = (await ethers.getContractAt(
       "FluenceToken",
-      (await hre.deployments.get("FluenceToken")).address
+      (
+        await hre.deployments.get("FluenceToken")
+      ).address
     )) as FluenceToken;
 
     return {
-      rewardDistributor:
-        (await ethers.getContractAt(
-          "DevRewardDistributor",
-          (await hre.deployments.get("DevRewardDistributor")).address
-        )) as DevRewardDistributor,
+      rewardDistributor: (await ethers.getContractAt(
+        "DevRewardDistributor",
+        (
+          await hre.deployments.get("DevRewardDistributor")
+        ).address
+      )) as DevRewardDistributor,
       merkleTree: merkleTree,
       devAccounts: devAccounts,
       token: token,
-      executor:
-        (await ethers.getContractAt(
-          "Executor",
-          (await hre.deployments.get("Executor")).address
-        )) as Executor,
+      executor: (await ethers.getContractAt(
+        "Executor",
+        (
+          await hre.deployments.get("Executor")
+        ).address
+      )) as Executor,
     };
   }
 );
@@ -174,8 +181,12 @@ describe("DevRewardDistributor", () => {
       const info = getRandomAccountInfo(lastId);
       lastId = info.accountId;
 
-      const accountSnapshotBalance = await token.balanceOf(developerAccount.address);
-      const contractSnapshotBalance = await token.balanceOf(rewardDistributor.address);
+      const accountSnapshotBalance = await token.balanceOf(
+        developerAccount.address
+      );
+      const contractSnapshotBalance = await token.balanceOf(
+        rewardDistributor.address
+      );
 
       const tx = await rewardDistributor.claimTokens(
         info.accountId,
@@ -188,10 +199,14 @@ describe("DevRewardDistributor", () => {
 
       await expect(tx)
         .to.emit(token, "Transfer")
-        .withArgs(rewardDistributor.address, developerAccount.address, reward)
+        .withArgs(rewardDistributor.address, developerAccount.address, reward);
 
-      await expect(await token.balanceOf(developerAccount.address)).to.eq(accountSnapshotBalance.add(reward));
-      await expect(await token.balanceOf(rewardDistributor.address)).to.eq(contractSnapshotBalance.sub(reward));
+      await expect(await token.balanceOf(developerAccount.address)).to.eq(
+        accountSnapshotBalance.add(reward)
+      );
+      await expect(await token.balanceOf(rewardDistributor.address)).to.eq(
+        contractSnapshotBalance.sub(reward)
+      );
 
       expect(await rewardDistributor.isClaimed(info.accountId)).to.be.true;
     }
@@ -220,9 +235,7 @@ describe("DevRewardDistributor", () => {
           ethers.utils.arrayify(developerAccount.address)
         )
       )
-    ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Tokens already claimed'`
-    );
+    ).to.be.revertedWith(`${THROW_ERROR_PREFIX} 'Tokens already claimed'`);
   });
 
   it("try claim with invalid merkle proof", async () => {
@@ -238,9 +251,7 @@ describe("DevRewardDistributor", () => {
           ethers.utils.arrayify(developerAccount.address)
         )
       )
-    ).to.to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Valid proof required'`
-    );
+    ).to.to.be.revertedWith(`${THROW_ERROR_PREFIX} 'Valid proof required'`);
   });
 
   it("try claim with invalid sign", async () => {
@@ -255,9 +266,7 @@ describe("DevRewardDistributor", () => {
           ethers.utils.arrayify(developerAccount.address)
         )
       )
-    ).to.to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Invalid signature'`
-    );
+    ).to.to.be.revertedWith(`${THROW_ERROR_PREFIX} 'Invalid signature'`);
   });
 
   it("claiming is not active", async () => {
@@ -330,13 +339,15 @@ describe("DevRewardDistributor", () => {
     const tx = await rewardDistributor.transferUnclaimed();
     await expect(tx)
       .to.emit(rewardDistributor, "TransferUnclaimed")
-      .withArgs(amount)
+      .withArgs(amount);
 
     await expect(tx)
       .to.emit(token, "Transfer")
-      .withArgs(rewardDistributor.address, executor.address, amount)
+      .withArgs(rewardDistributor.address, executor.address, amount);
 
-    expect(await token.balanceOf(executor.address)).to.eq(amount)
-    expect(await token.balanceOf(rewardDistributor.address)).to.eq(BigNumber.from(0))
+    expect(await token.balanceOf(executor.address)).to.eq(amount);
+    expect(await token.balanceOf(rewardDistributor.address)).to.eq(
+      BigNumber.from(0)
+    );
   });
 });

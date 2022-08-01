@@ -3,11 +3,11 @@
 pragma solidity >=0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./FluenceToken.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
-contract Vesting is ERC20, ERC20Permit {
+contract Vesting is IERC20, IERC20Metadata {
     using SafeERC20 for IERC20;
 
     FluenceToken public immutable token;
@@ -15,7 +15,14 @@ contract Vesting is ERC20, ERC20Permit {
     uint256 public immutable cliffEndTimestamp;
     uint256 public immutable totalLockedTime;
 
+    uint8 private immutable _decimals;
+
     mapping(address => uint256) public lockedAmounts;
+    mapping(address => uint256) public currentAmounts;
+
+    string private _name;
+    string private _symbol;
+    uint256 private _totalSupply;
 
     /**
      * @notice constructor
@@ -35,7 +42,7 @@ contract Vesting is ERC20, ERC20Permit {
         uint256 _vestingDuration,
         address[] memory accounts,
         uint256[] memory amounts
-    ) ERC20(name_, symbol_) ERC20Permit(name_) {
+    ) {
         require(
             accounts.length == amounts.length,
             "accounts and amounts must have the same length"
@@ -49,15 +56,36 @@ contract Vesting is ERC20, ERC20Permit {
         totalLockedTime = _vestingDuration + cliffDuration;
 
         token = token_;
+        _name = name_;
+        _symbol = symbol_;
+        _decimals = token.decimals();
 
         for (uint256 i = 0; i < accounts.length; i++) {
-            lockedAmounts[accounts[i]] = amounts[i];
-            _mint(accounts[i], amounts[i]);
+            uint256 amount = amounts[i];
+            lockedAmounts[accounts[i]] = amount;
+            currentAmounts[accounts[i]] = amount;
+            _addTotalSupply(amount);
         }
     }
 
-    function release(uint256 amount) external {
-        _burn(msg.sender, amount);
+    function name() external view returns (string memory) {
+        return _name;
+    }
+
+    function symbol() external view returns (string memory) {
+        return _symbol;
+    }
+
+    function decimals() external view returns (uint8) {
+        return _decimals;
+    }
+
+    function totalSupply() external view virtual returns (uint256) {
+        return _totalSupply;
+    }
+
+    function balanceOf(address account) external view returns (uint256) {
+        return _balanceOf(account);
     }
 
     function getReleaseAmount(address account) public view returns (uint256) {
@@ -67,7 +95,7 @@ contract Vesting is ERC20, ERC20Permit {
 
         uint256 totalTime = totalLockedTime;
         uint256 locked = lockedAmounts[account];
-        uint256 released = locked - balanceOf(account);
+        uint256 released = locked - currentAmounts[account];
 
         uint256 past = block.timestamp - startTimestamp;
 
@@ -82,27 +110,72 @@ contract Vesting is ERC20, ERC20Permit {
         return amount;
     }
 
-    function _beforeTokenTransfer(
+    function transfer(address to, uint256 amount) external returns (bool) {
+        _transfer(msg.sender, to, amount);
+        return true;
+    }
+
+    function transferFrom(
         address from,
         address to,
         uint256 amount
-    ) internal virtual override {
-        require(
-            from == address(0) || to == address(0),
-            "Transfer is not allowed"
-        );
+    ) external returns (bool) {
+        require(from == msg.sender, "Permission denied");
+        _transfer(from, to, amount);
 
-        if (to == address(0)) {
-            uint256 releaseAmount = getReleaseAmount(from);
+        return true;
+    }
 
-            require(
-                amount <= releaseAmount && releaseAmount > 0,
-                "Not enough release amount"
-            );
+    function allowance(
+        address, /*owner*/
+        address /*spender*/
+    ) external pure returns (uint256) {
+        revert("Method unsupported");
+    }
 
-            IERC20(token).safeTransfer(from, amount);
+    function approve(
+        address, /*spender*/
+        uint256 /*amount*/
+    ) external pure returns (bool) {
+        revert("Method unsupported");
+    }
+
+    function _addTotalSupply(uint256 amount) internal virtual {
+        _totalSupply += amount;
+    }
+
+    function _balanceOf(address account) internal view returns (uint256) {
+        return currentAmounts[account];
+    }
+
+    function _transfer(address from, address to, uint256 amount) internal returns (bool) {
+        require(to == address(0x00), "Transfer allowed only to zero address");
+
+        _burn(from, amount);
+
+        emit Transfer(from, to, amount);
+        return true;
+    }
+
+    function _burn(address from, uint256 amount) internal {
+        uint256 releaseAmount = getReleaseAmount(from);
+
+        require(releaseAmount > 0, "Not enough release amount");
+
+        if (amount != 0) {
+            if (amount > releaseAmount) {
+                revert("Not enough release amount");
+            }
+        } else {
+            amount = releaseAmount;
         }
 
-        super._beforeTokenTransfer(from, to, amount);
+        _beforeBurn(from, amount);
+
+        IERC20(token).safeTransfer(from, amount);
+
+        currentAmounts[from] -= amount;
     }
+
+    function _beforeBurn(address from, uint256 amount) internal virtual {}
 }

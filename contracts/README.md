@@ -4,12 +4,11 @@
 
 ## Overview
 
-[Fluence](https://fluence.network/), an off-chain, decentralized peer-to-peer FaaS, aka compute, protocol and solution stack, is preparing to transition protocol governance to the community. In order to achieve this goal,a DAO, ERC20 token and liquidity bootstrapping solution need to be design and implemented. Moreove,r Fluence wants to recognize contributions not only to the Fluence protocol but also to the Web3 peer-to-peer open source community. 
+[Fluence](https://fluence.network/), an off-chain, decentralized peer-to-peer FaaS, aka compute, protocol and solution stack, is preparing to transition protocol governance to the community. In order to achieve this goal,a DAO, ERC20 token and liquidity bootstrapping solution need to be design and implemented. Moreove,r Fluence wants to recognize contributions not only to the Fluence protocol but also to the Web3 peer-to-peer open source community.
 
 Previous efforts, such as the [Radicle Liquidity Bootstrapping Event](https://lbp.radicle.network/) and the [Gitcoin Token Distributor Event](https://gitcoin.co/blog/architecting-buidling-the-gtc-token-distributor/), provide a tried solution path and supporting contract repository. Nevertheless, core contracts such as governance and liquidity pool have evolved since those projects executed their events and these changes need to be reflected in the Fluence solution.
 
-The expectations are that the Fluence community is comprised of a large number of token holders provably dedicated to Web3, decentralized FaaS and peer-to-peer.  The remainder of this document outlines the solution components, roll-out path and, where applicable, expected outcomes. Please note that specified parameter values are tentative for the time being.
-
+The expectations are that the Fluence community is comprised of a large number of token holders provably dedicated to Web3, decentralized FaaS and peer-to-peer. The remainder of this document outlines the solution components, roll-out path and, where applicable, expected outcomes. Please note that specified parameter values are tentative for the time being.
 
 ## Component Review
 
@@ -24,8 +23,8 @@ Table 1: Preliminary Governance Parameters
 | Vote Participation (Quorum) | 4 | NA|
 | Default Voting Period | NA | 3 Days |
 
+The relevant Fluence contracts and deployment scripts can be found [here](https://github.com/fluencelabs/token-wip). The _Fluence Token_, [_FLT_](https://github.com/fluencelabs/token-wip/blob/5b5de3e9940a27c8d4f9c5cef189b177e9b2bbe0/tasks/token.ts#L10), is specified in [ten (10) decimals](https://github.com/fluencelabs/token-wip/blob/5b5de3e9940a27c8d4f9c5cef189b177e9b2bbe0/contracts/imports/governance/token.sol#L24) with a [total supply](https://github.com/fluencelabs/token-wip/blob/5b5de3e9940a27c8d4f9c5cef189b177e9b2bbe0/tasks/token.ts#L11) of 1,000,000,000 units.
 
-The relevant Fluence contracts and deployment scripts can be found [here](https://github.com/fluencelabs/token-wip). The *Fluence Token*, [*FLT*](https://github.com/fluencelabs/token-wip/blob/5b5de3e9940a27c8d4f9c5cef189b177e9b2bbe0/tasks/token.ts#L10), is specified in [ten (10) decimals](https://github.com/fluencelabs/token-wip/blob/5b5de3e9940a27c8d4f9c5cef189b177e9b2bbe0/contracts/imports/governance/token.sol#L24) with a [total supply](https://github.com/fluencelabs/token-wip/blob/5b5de3e9940a27c8d4f9c5cef189b177e9b2bbe0/tasks/token.ts#L11) of 1,000,000,000 units.
 ### Token Allocation
 
 Fluence intends to distribute the total ERC20 supply to the following constituents in the following proportions:
@@ -38,9 +37,7 @@ Table 2: Preliminary Token Allocation Model -- Subject to Change
 | Investors | 25 | Yes | Yes |
 | Fluence Labs | 20| Yes | Yes |
 
-
 While the proportional allocation to the various groups is straight forward and includes token lockup and vesting, it is desired that that granted but unvested tokens are available for governance purposes, i.e. propose and vote.
-
 
 A [reference contract](https://github.com/fluencelabs/token-wip/blob/main/contracts/Shares.sol) has been developed to handle share allocations and vesting, although a simpler, script-based allocation scheme is the preferred implementation.
 
@@ -50,14 +47,13 @@ Fluence's reward solution follows but not entirely duplicates the Handshake and 
 
 #### Allocation Filter
 
-Fluence is managing the allocation filter and will deliver a *CVS* file for the reward allocation and claims proof verification including the following data:
+Fluence is managing the allocation filter and will deliver a _CVS_ file for the reward allocation and claims proof verification including the following data:
 
 Table 3: Reward CVS Format
 
 | username | key-name public key |
-|---|---|
-| ...|
-
+| -------- | ------------------- |
+| ...      |
 
 #### Claim Generation
 
@@ -67,11 +63,10 @@ The claim itself is [generated](https://github.com/fluencelabs/token-wip/blob/oz
 
 The overall reward and claim process is capture in Figure 2 below:
 
-
 ```mermaid
     sequenceDiagram
     title: Figure 2: Reward And Claim Process
-    
+
     participant Fluence
     participant Data
     participant Website
@@ -96,7 +91,7 @@ The overall reward and claim process is capture in Figure 2 below:
     Developer ->> Website: submit Merkle Proof, leaf, signature, PK
     note left of Website: validate data
     Website ->> Website: validate offchain
-    
+
     Website ->> DevRewardDistributor: call DevRewardDistributor.claim
     note right of DevRewardDistributor: user_id has not yet claimed
     note right of DevRewardDistributor: leaf == keccak(user_id, PK)
@@ -112,15 +107,13 @@ The overall reward and claim process is capture in Figure 2 below:
 
 #### Eligibility Check And Claim's Web Site
 
-The [web site](https://github.com/nsvdev/fluence/tree/integrate_proof_script) to verify reward eligibility and submit a claim proof utilizes some of these [scripts](https://github.com/fluencelabs/token-wip/tree/main/reward). 
-
+The [web site](https://github.com/nsvdev/fluence/tree/integrate_proof_script) to verify reward eligibility and submit a claim proof utilizes some of these [scripts](https://github.com/fluencelabs/token-wip/tree/main/reward).
 
 #### Proof Generation
 
 Github uses email address to link commits to the username and those emails can be easily obtained from the commit logs unless [otherwise specified](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/blocking-command-line-pushes-that-expose-your-personal-email-address). This makes Github at best pseudo-anonymous, if set up correctly.
 
 If we simply used a Github ssh key to sign a claims proof, a direct connection between the Github account and Ethereum account would be established. This linked relationship of keys undermines privacy at least within the pseudo-anonymous domain. In order to maintain the separation of claimants' Github and Ethereum personas, we introduce some cryptographic machinations discussed below.
-
 
 ### Liquidity Bootstrapping
 
@@ -130,36 +123,33 @@ The expectations of the liquidity bootstrapping event is to start with a 92-8 ra
 
 Table 4a: Balancer V2 Bootstrapping
 
-| FLT Allocation | USDC Allocation| Target Price |
-|---|---|---|
-| 2% of Treasury | Matching USDC From Fluence Labs| USDC ? (0.5)|
-
+| FLT Allocation | USDC Allocation                 | Target Price |
+| -------------- | ------------------------------- | ------------ |
+| 2% of Treasury | Matching USDC From Fluence Labs | USDC ? (0.5) |
 
 Table 4b: Balancer V2 Pool Exit
 
 | USDC Proceeds | Unsold FLT |
-|---|---|
-| Loan back to Fluence
-  Rest To Treasury | To Treasury |
+| ------------- | ---------- |
 
+| Loan back to Fluence
+Rest To Treasury | To Treasury |
 
 Table 4c: Uniswap V3 Pool
 
-| USDC Allocation | FLT Allocation|
-|---|---|
-| From Treasury | From Treasury |
-
+| USDC Allocation | FLT Allocation |
+| --------------- | -------------- |
+| From Treasury   | From Treasury  |
 
 #### Other Post DAO Launch Activities
 
-A governance forum discussion concerning the swap of FPT, a Fluence legacy token, to FLT needs to take place to determine the swap ratio and treasure allocation. 
+A governance forum discussion concerning the swap of FPT, a Fluence legacy token, to FLT needs to take place to determine the swap ratio and treasure allocation.
 
 Table 4e: FPT For FLT Swap
 
-| Swap Ratio | FLT Allocation|
-|---|---|
-| TBD:TBD | TBD% From Treasury |
-
+| Swap Ratio | FLT Allocation     |
+| ---------- | ------------------ |
+| TBD:TBD    | TBD% From Treasury |
 
 ## Roll-Out And Deployment Plan
 
@@ -170,12 +160,12 @@ For roll-out purposes, we can differentiated between pre-governance and governan
     title Figure 1: Stylized Fluence DAO and LBE Execution Path
     dateFormat YYY-MM-DD
     axisFormat %m-%d
-    
+
     section Path
     Deploy Governance And Token Contracts :p1, 2022-06-15, 1d
     Allocate entire FLT supply to constituent contracts :p2, 2022-06-15, 1d
     Github Reward Allocation & Claims Event :p3, after p2, 100d
     Balancer Liquidity Bootstrap Event :p4, 2022-06-28, 2d
     Governance Proposal To Migrate Liquidity: p5, 2022-06-28, 3d
-    Conditional Migration to Uniswap V3: p6, after p5, 1d 
+    Conditional Migration to Uniswap V3: p6, after p5, 1d
 ```

@@ -5,6 +5,7 @@ import { FluenceToken, VestingWithVoting } from "../typechain";
 import { BigNumber, Wallet } from "ethers";
 import { MONTH } from "../utils/time";
 import { Config } from "../utils/config";
+import { ZERO_ADDRESS } from "../utils/consts";
 
 chai.use(waffle.solidity);
 
@@ -19,16 +20,19 @@ const setupTest = deployments.createFixture(
     token: FluenceToken;
     vesting: VestingWithVoting;
   }> => {
-    Config.reset({
-      etherscanApiKey: "",
-      repotGas: false,
-      mainnet: null,
-      testnet: null,
-    }, {
-      token: {
-        totalSupply: 1000000,
+    Config.reset(
+      {
+        etherscanApiKey: "",
+        repotGas: false,
+        mainnet: null,
+        testnet: null,
       },
-    });
+      {
+        token: {
+          totalSupply: 1000000,
+        },
+      }
+    );
 
     await deployments.fixture([]);
     await hre.deployments.fixture(["FluenceToken"]);
@@ -45,7 +49,7 @@ const setupTest = deployments.createFixture(
         cliffDurationMonths * MONTH,
         vestingDurationMonths * MONTH,
         [mainAccount],
-        [vestingAmount]
+        [vestingAmount],
       ],
       log: true,
       autoMine: true,
@@ -75,11 +79,9 @@ describe("Vesting with voting", () => {
   let startTime: number;
 
   const setTimeAfterStart = async (time: number) => {
-    await ethers.provider.send("evm_setNextBlockTimestamp", [
-      startTime + time
-    ]);
+    await ethers.provider.send("evm_setNextBlockTimestamp", [startTime + time]);
     await ethers.provider.send("evm_mine", []);
-  }
+  };
 
   before(async () => {
     const { mainAccount } = await getNamedAccounts();
@@ -102,21 +104,25 @@ describe("Vesting with voting", () => {
   });
 
   it("get votes", async () => {
-    await vesting.delegate(receiverAccount.address)
+    await vesting.delegate(receiverAccount.address);
 
-    expect(await vesting.getVotes(receiverAccount.address)).to.eq(vestingAmount);
+    expect(await vesting.getVotes(receiverAccount.address)).to.eq(
+      vestingAmount
+    );
   });
 
   it("get votes after release", async () => {
-    await vesting.delegate(receiverAccount.address)
+    await vesting.delegate(receiverAccount.address);
 
     const time = cliffDurationMonths * MONTH + 100;
-    await setTimeAfterStart(time)
+    await setTimeAfterStart(time);
 
     const amount = await vesting.getReleaseAmount(receiverAccount.address);
 
-    await vesting.release(amount);
+    await vesting.transfer(ZERO_ADDRESS, amount);
 
-    expect(await vesting.getVotes(receiverAccount.address)).to.eq(vestingAmount.sub(amount));
+    expect(await vesting.getVotes(receiverAccount.address)).to.eq(
+      vestingAmount.sub(amount)
+    );
   });
 });
