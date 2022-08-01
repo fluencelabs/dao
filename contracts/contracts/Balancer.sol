@@ -73,12 +73,20 @@ interface IBalancerVault {
         address payable recipient,
         ExitPoolRequest memory request
     ) external;
+
+    function getPoolTokens(bytes32 poolId)
+        external
+        view
+        returns (
+            IERC20[] memory tokens,
+            uint256[] memory balances,
+            uint256 lastChangeBlock
+        );
 }
 
 interface ILiquidityBootstrappingPool {
     event SwapEnabledSet(bool swapEnabled);
     event SwapFeePercentageChanged(uint256 swapFeePercentage);
-
     event GradualWeightUpdateScheduled(
         uint256 startTime,
         uint256 endTime,
@@ -95,4 +103,28 @@ interface ILiquidityBootstrappingPool {
     function setSwapEnabled(bool swapEnabled) external;
 
     function getPoolId() external view returns (bytes32);
+
+    function getNormalizedWeights() external view returns (uint256[] memory);
+
+    function getSwapEnabled() external view returns (bool);
+
+    function getGradualWeightUpdateParams()
+        external
+        view
+        returns (
+            uint256 startTime,
+            uint256 endTime,
+            uint256[] memory endWeights
+        );
+
+    function getSwapFeePercentage() external view returns (uint256);
+}
+
+interface IBalancerHelper {
+    function queryExit(
+        bytes32 poolId,
+        address sender,
+        address recipient,
+        IBalancerVault.ExitPoolRequest memory request
+    ) external returns (uint256 bptIn, uint256[] memory amountsOut);
 }

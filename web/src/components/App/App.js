@@ -49,7 +49,7 @@ function App() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { error } = useSelector(state => state.error)
-  const { address, prevAddress } = useSelector(state => state.wallet)
+  const { network, address, prevAddress } = useSelector(state => state.wallet)
   const { username } = useSelector(state => state.user)
   const { currentRoute } = useSelector(state => state.routes)
   const location = useLocation()
@@ -68,13 +68,14 @@ function App() {
   }, [currentRoute])
 
   useEffect(() => {
-    if (!merkleRootFetched) {
-      dispatch(fetchMerkleRoot('kovan'))
-      dispatch(fetchCurrentAward('kovan'))
-      dispatch(fetchNextHalvePeriod('kovan'))
+    console.log("nerwork: " + network)
+    if (!merkleRootFetched && network) {
+      dispatch(fetchMerkleRoot(network))
+      dispatch(fetchCurrentAward(network))
+      dispatch(fetchNextHalvePeriod(network))
       setMerkleRootFetched(true)
     } 
-  }, [])
+  }, [network])
   
   useEffect(() => {
     if (address && prevAddress && (address !== prevAddress)) {

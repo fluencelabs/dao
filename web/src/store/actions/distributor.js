@@ -10,13 +10,17 @@ export const setMerkleRoot = (merkleRoot) => ({
 })
 
 export const fetchMerkleRoot = (network) => {
-    const web3 = new Web3(infuraUrlFactory('kovan'))
+    const web3 = new Web3(infuraUrlFactory(network))
     console.log("fetching merkle root from", web3);
-    const contract = new web3.eth.Contract(abis.DevRewardDistributor.abi, governanceContracts.kovan.devRewardDistributor)
+    console.log(network)
+    console.log(governanceContracts)
+    console.log(governanceContracts[network].devRewardDistributor)
+    const contract = new web3.eth.Contract(abis.DevRewardDistributor.abi, governanceContracts[network].devRewardDistributor)
 
     return async dispatch => {
         try {
             const merkleRoot = await contract.methods.merkleRoot().call()
+            console.log("merkleRoot: " + merkleRoot)
             dispatch(setMerkleRoot(merkleRoot))
         } catch (error) {
             console.log(error)
@@ -31,11 +35,11 @@ export const setCurrentAward = (award) => ({
 
 export const fetchCurrentAward = (network) => {
     const web3 = new Web3(infuraUrlFactory('kovan'))
-    const contract = new web3.eth.Contract(abis.DevRewardDistributor.abi, governanceContracts.kovan.devRewardDistributor)
+    const contract = new web3.eth.Contract(abis.DevRewardDistributor.abi, governanceContracts[network].devRewardDistributor)
 
     return async dispatch => {
         try {
-            const award = await contract.methods.currentAward().call()
+            const award = await contract.methods.currentReward().call()
             const formattedAward = web3.utils.fromWei(award)
             dispatch(setCurrentAward(formattedAward))
         } catch (error) {
@@ -50,8 +54,8 @@ export const setNextHalvePeriod = (period) => ({
 })
 
 export const fetchNextHalvePeriod = (network) => {
-    const web3 = new Web3(infuraUrlFactory('kovan'))
-    const contract = new web3.eth.Contract(abis.DevRewardDistributor.abi, governanceContracts.kovan.devRewardDistributor)
+    const web3 = new Web3(infuraUrlFactory(network))
+    const contract = new web3.eth.Contract(abis.DevRewardDistributor.abi, governanceContracts[network].devRewardDistributor)
 
     return async dispatch => {
         try {

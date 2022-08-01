@@ -4,9 +4,9 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { MONTH } from "../utils/time";
 import { Config } from "../utils/config";
-import { parse } from 'csv-parse/sync';
+import { parse } from "csv-parse/sync";
 import { BigNumber, BigNumberish, ethers } from "ethers";
-import fs from 'fs'
+import fs from "fs";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -17,17 +17,22 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let amounts: Array<BigNumber> = [];
 
   if (config!.deployment?.teamVesting?.csvFile != null) {
-    const file = fs.readFileSync(config!.deployment!.teamVesting!.csvFile, 'utf8')
+    const file = fs.readFileSync(
+      config!.deployment!.teamVesting!.csvFile,
+      "utf8"
+    );
 
     const records = parse(file, {
-      skip_empty_lines: true
+      skip_empty_lines: true,
     });
 
     accounts = records.map((r: any) => r[0]);
     amounts = records.map((r: any) => ethers.utils.parseEther(r[1]));
   } else {
     accounts = config!.deployment!.teamVesting!.accounts;
-    amounts = config!.deployment!.teamVesting!.amounts.map(a => ethers.utils.parseEther(String(a)));
+    amounts = config!.deployment!.teamVesting!.amounts.map((a) =>
+      ethers.utils.parseEther(String(a))
+    );
   }
 
   const vesting = await hre.deployments.deploy("TeamVesting", {
@@ -37,10 +42,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       (await hre.deployments.get("FluenceToken")).address,
       "Team Vesting",
       "FLTTV",
-      config.deployment!.teamVesting!.cliffDurationMonths,
-      config.deployment!.teamVesting!.vestingDurationMonths,
+      Math.floor(config.deployment!.teamVesting!.cliffDurationMonths * MONTH),
+      Math.floor(config.deployment!.teamVesting!.vestingDurationMonths * MONTH),
       accounts,
-      amounts
+      amounts,
     ],
     log: true,
     autoMine: true,
@@ -48,7 +53,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   const total = amounts.reduce(
-    (previousValue: BigNumber, currentValue: BigNumber) => previousValue.add(currentValue),
+    (previousValue: BigNumber, currentValue: BigNumber) =>
+      previousValue.add(currentValue),
     BigNumber.from(0)
   );
 

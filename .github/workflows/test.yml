@@ -29,4 +29,6 @@ jobs:
           node-version: 16
 
       - run: npm i
+      - run: npm run compile
+      - run: npm run typechain
       - run: npm run test

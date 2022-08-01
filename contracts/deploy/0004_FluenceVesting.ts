@@ -17,10 +17,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       (await hre.deployments.get("FluenceToken")).address,
       "Fluence Vesting",
       "FLTFV",
-      config.deployment!.fluenceVesting!.cliffDurationMonths,
-      config.deployment!.fluenceVesting!.vestingDurationMonths,
+      Math.floor(
+        config.deployment!.fluenceVesting!.cliffDurationMonths * MONTH
+      ),
+      Math.floor(
+        config.deployment!.fluenceVesting!.vestingDurationMonths * MONTH
+      ),
       [config.deployment!.fluenceVesting!.account],
-      [hre.ethers.utils.parseEther(String(config.deployment!.fluenceVesting!.amount))]
+      [
+        hre.ethers.utils.parseEther(
+          String(config.deployment!.fluenceVesting!.amount)
+        ),
+      ],
     ],
     log: true,
     autoMine: true,
@@ -37,7 +45,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
     "transfer",
     vesting.address,
-    hre.ethers.utils.parseEther(String(config.deployment!.fluenceVesting!.amount))
+    hre.ethers.utils.parseEther(
+      String(config.deployment!.fluenceVesting!.amount)
+    )
   );
 };
 

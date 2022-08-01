@@ -12,7 +12,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await hre.deployments.deploy("FluenceToken", {
     from: deployer,
-    args: ["Fluence Token", "FLT", ethers.utils.parseEther(String(config.deployment!.token!.totalSupply))],
+    args: [
+      "Fluence Token",
+      "FLT",
+      ethers.utils.parseEther(String(config.deployment!.token!.totalSupply)),
+    ],
     log: true,
     autoMine: true,
     waitConfirmations: 1,

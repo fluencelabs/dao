@@ -2,18 +2,19 @@
 
 pragma solidity >=0.8.15;
 
+import "@openzeppelin/contracts/governance/utils/Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./Vesting.sol";
 import "./FluenceToken.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
-contract VestingWithVoting is Vesting, ERC20Votes {
+contract VestingWithVoting is Vesting, Votes {
     constructor(
         FluenceToken token_,
         string memory name_,
         string memory symbol_,
-        uint256 _cliffDurationMonths,
-        uint256 _vestingDurationMonths,
+        uint256 _cliffDuration,
+        uint256 _vestingDuration,
         address[] memory accounts,
         uint256[] memory amounts
     )
@@ -21,40 +22,36 @@ contract VestingWithVoting is Vesting, ERC20Votes {
             token_,
             name_,
             symbol_,
-            _cliffDurationMonths,
-            _vestingDurationMonths,
+            _cliffDuration,
+            _vestingDuration,
             accounts,
             amounts
         )
-    {}
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(Vesting, ERC20) {
-        super._beforeTokenTransfer(from, to, amount);
-    }
-
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
-        super._afterTokenTransfer(from, to, amount);
-    }
-
-    function _mint(address to, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
+        EIP712(name_, "1")
     {
-        super._mint(to, amount);
+        for (uint256 i = 0; i < accounts.length; i++) {
+            address account = accounts[i];
+            _transferVotingUnits(address(0x00), account, amounts[i]);
+            _delegate(account, account);
+        }
     }
 
-    function _burn(address account, uint256 amount)
+    function totalSupply() external view override returns (uint256) {
+        return _getTotalSupply();
+    }
+
+    function _addTotalSupply(uint256 amount) internal override {}
+
+    function _getVotingUnits(address account)
         internal
-        override(ERC20, ERC20Votes)
+        view
+        override
+        returns (uint256)
     {
-        super._burn(account, amount);
+        return _balanceOf(account);
+    }
+
+    function _beforeBurn(address from, uint256 amount) internal override {
+        _transferVotingUnits(from, address(0x00), amount);
     }
 }

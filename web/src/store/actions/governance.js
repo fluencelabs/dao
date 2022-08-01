@@ -93,7 +93,6 @@ export const claim = (
                 console.log("claiming with", { userId, delegateTo, merkleProof, tmpEthAddr, senderSignatureHex })
                 const tx = await signed.claimTokens(
                     userId,
-                    delegateTo,
                     merkleProof,
                     tmpEthAddr,
                     senderSignatureHex

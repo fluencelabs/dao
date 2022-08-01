@@ -13,3 +13,5 @@ artifacts
 config.yaml
 team.csv
 investors.csv
+
+deployments/localhost
