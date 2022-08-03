@@ -70,21 +70,22 @@ const ProofPage = () => {
         
         try {
             // TODO: validate data better
-            let res = JSON.parse(proofValue)
-            let tmpEthAddr = res.address;
-            let userId = res.userId;
-            let merkleProof = res.merkleProof;
-
+            let [ userId, tmpEthAddrNoPrefix, signatureHex, merkleProofHex ] = proofValue.split(",");
+            let tmpEthAddr = '0x' + tmpEthAddrNoPrefix;
+            
             dispatch(checkHasClaimed(userId, web3Provider, networkName));
             
             try {
-                console.log("res", res);
+                console.log("signatureHex", signatureHex);
+                console.log("tmpEthAddr", tmpEthAddr);
+                let asn1Signature = Buffer.from(signatureHex, "hex");
+                let merkleProof = JSON.parse(Buffer.from(merkleProofHex, "base64").toString());
                 try {
                     console.log("address is", fromHex(address));
-                    let msg = ethers.utils.hashMessage(fromHex(address));
-                    console.log("Msg: ", msg);
-                    let expectAddress = ethers.utils.recoverAddress(msg, res.signature);
-                    console.log("Signature is correct.", expectAddress.toLowerCase() === tmpEthAddr.toLowerCase());
+                    let signedHash = ethers.utils.hashMessage(fromHex(address));
+                    console.log("Signed Hash", signedHash);
+                    let signature = validateASN1Signature(signedHash, asn1Signature, tmpEthAddr);
+                    console.log("Signature is correct.", signature);
 
                     const leaf = await hashedLeaf(userId, tmpEthAddr);
                     const verified = MerkleTree.verify(
@@ -96,7 +97,7 @@ const ProofPage = () => {
                     )
                     if (verified) {
                         setHaveProof(true)
-                        dispatch(storeProof({ userId, tmpEthAddr, signature: res.signature, merkleProof }))
+                        dispatch(storeProof({ userId, tmpEthAddr, signature, merkleProof }))
                     } else {
                         toast('Invalid merkle proof. Please check the data.')
                     }
