@@ -8,6 +8,12 @@ import "./Vesting.sol";
 import "./FluenceToken.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
+/**
+ * @title Vesting with voting
+ * @notice Vesting fluence token contract for team
+ * @dev This contract implements the ERC20 standard. It is possible to add the contract to a wallet. Transferring to zero address is unlocking the released amount.
+ *      This contract is possible for voting when the token is vesting.
+ */
 contract VestingWithVoting is Vesting, Votes {
     constructor(
         FluenceToken token_,
@@ -36,6 +42,7 @@ contract VestingWithVoting is Vesting, Votes {
         }
     }
 
+    /// @inheritdoc Vesting
     function totalSupply() external view override returns (uint256) {
         return _getTotalSupply();
     }
@@ -48,7 +55,7 @@ contract VestingWithVoting is Vesting, Votes {
         override
         returns (uint256)
     {
-        return _balanceOf(account);
+        return balanceOf[account];
     }
 
     function _beforeBurn(address from, uint256 amount) internal override {

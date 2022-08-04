@@ -24,16 +24,29 @@ contract Governor is
     GovernorTimelockControlUpgradeable,
     UUPSUpgradeable
 {
-    VestingWithVoting public vesting;
+    /**
+     * @notice Team vesting contract with voting functionality
+     **/
+    VestingWithVoting public teamVesting;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
+    /**
+     * @notice Constructor for this updatable contract
+     * @param _token - token for managing this DAO
+     * @param teamVesting_ - team
+     * @param executor_ - DAO timelock contract
+     * @param quorum_ - minimum percentage of quorum to accept a proposal
+     * @param initialVotingDelay - delay beetween the creation of a proposal and the start of voting
+     * @param initialVotingPeriod - voting duration
+     * @param initialProposalThreshold - tokens threshold for creating a proposal
+     **/
     function initialize(
         IVotesUpgradeable _token,
-        VestingWithVoting _vesting,
+        VestingWithVoting teamVesting_,
         Executor executor_,
         uint256 quorum_,
         uint256 initialVotingDelay,
@@ -54,7 +67,7 @@ contract Governor is
             TimelockControllerUpgradeable(executor_)
         );
 
-        vesting = _vesting;
+        teamVesting = teamVesting_;
     }
 
     function _authorizeUpgrade(
@@ -76,14 +89,14 @@ contract Governor is
         override(GovernorUpgradeable, GovernorVotesUpgradeable)
         returns (uint256)
     {
-        uint256 votes = vesting.getPastVotes(account, blockNumber);
+        uint256 votes = teamVesting.getPastVotes(account, blockNumber);
 
         votes += super._getVotes(account, blockNumber, params);
 
         return votes;
     }
 
-    // The following functions are overrides required by Solidity.
+    /// @inheritdoc IGovernorUpgradeable
     function votingDelay()
         public
         view
@@ -93,6 +106,7 @@ contract Governor is
         return super.votingDelay();
     }
 
+    /// @inheritdoc IGovernorUpgradeable
     function votingPeriod()
         public
         view
@@ -102,6 +116,7 @@ contract Governor is
         return super.votingPeriod();
     }
 
+    /// @inheritdoc IGovernorUpgradeable
     function quorum(uint256 blockNumber)
         public
         view
@@ -111,6 +126,7 @@ contract Governor is
         return super.quorum(blockNumber);
     }
 
+    /// @inheritdoc GovernorUpgradeable
     function state(uint256 proposalId)
         public
         view
@@ -120,6 +136,7 @@ contract Governor is
         return super.state(proposalId);
     }
 
+    /// @inheritdoc GovernorUpgradeable
     function propose(
         address[] memory targets,
         uint256[] memory values,
@@ -133,6 +150,7 @@ contract Governor is
         return super.propose(targets, values, calldatas, description);
     }
 
+    /// @inheritdoc GovernorUpgradeable
     function proposalThreshold()
         public
         view
@@ -177,6 +195,7 @@ contract Governor is
         return super._executor();
     }
 
+    /// @inheritdoc GovernorUpgradeable
     function supportsInterface(bytes4 interfaceId)
         public
         view

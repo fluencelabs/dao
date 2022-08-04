@@ -310,8 +310,10 @@ describe("Deploy script", () => {
         String(config.deployment!.devRewardDistributor!.initialReward)
       )
     );
-    expect(await devRewardDistributor.claimingPeriod()).to.eq(
-      config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH
+    expect(await devRewardDistributor.claimingEndTime()).to.eq(
+      (await devRewardDistributor.deployTime()).add(
+        config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH
+      )
     );
   });
 
@@ -367,14 +369,14 @@ describe("Deploy script", () => {
       const accounts = cfg.accounts;
       const amounts = cfg.amounts;
       for (let i = 0; i < accounts.length; i++) {
-        const locked = await vesting.lockedAmounts(accounts[i]);
+        const locked = await vesting.lockedBalances(accounts[i]);
         const balance = await vesting.balanceOf(accounts[i]);
 
         expect(locked).to.eq(balance);
         expect(locked).to.eq(ethers.utils.parseEther(String(amounts[i])));
 
         if (vesting.address === teamVesting.address) {
-          const locked = await teamVesting.lockedAmounts(accounts[i]);
+          const locked = await teamVesting.lockedBalances(accounts[i]);
           const balance = await teamVesting.balanceOf(accounts[i]);
           const delegatee = await teamVesting.delegates(accounts[i]);
 
@@ -394,7 +396,7 @@ describe("Deploy script", () => {
 
   it("Governor is correct", async () => {
     expect(await governor.token()).to.eq(token.address);
-    expect(await governor.vesting()).to.eq(teamVesting.address);
+    expect(await governor.teamVesting()).to.eq(teamVesting.address);
     expect(await governor.timelock()).to.eq(executor.address);
 
     expect(await governor.votingDelay()).to.eq(

@@ -3,32 +3,66 @@
 pragma solidity >=0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./FluenceToken.sol";
+import "./interfaces/IVestingERC20.sol";
 
-contract Vesting is IERC20, IERC20Metadata {
+/**
+ * @title Vesting
+ * @notice Vesting fluence token contract
+ * @dev This contract implements the ERC20 standard. It is possible to add the contract to a wallet. Transferring to zero address is unlocking the released amount.
+ */
+contract Vesting is IVestingERC20 {
     using SafeERC20 for IERC20;
 
+    /**
+     * @notice Returns the vesting token
+     **/
     FluenceToken public immutable token;
+
+    /**
+     * @notice Returns the  start vesting time
+     **/
     uint256 public immutable startTimestamp;
+
+    /**
+     * @notice Returns the end vesting time
+     **/
     uint256 public immutable cliffEndTimestamp;
+
+    /**
+     * @notice Returns the total locked time
+     * @dev total locked time = vesting period + clif period
+     **/
     uint256 public immutable totalLockedTime;
 
-    uint8 private immutable _decimals;
+    /**
+     * @notice Returns the vesting contract decimals
+     **/
+    uint8 public immutable decimals;
 
-    mapping(address => uint256) public lockedAmounts;
-    mapping(address => uint256) public currentAmounts;
+    bytes32 private immutable _name;
+    uint256 private immutable _nameLength;
 
-    string private _name;
-    string private _symbol;
+    bytes32 private immutable _symbol;
+    uint256 private immutable _symbolLength;
+
+    /**
+     * @notice Returns the locked vesting user's balance
+     **/
+    mapping(address => uint256) public lockedBalances;
+
+    /**
+     * @notice Returns the current vesting user's balance
+     **/
+    mapping(address => uint256) public balanceOf;
+
     uint256 private _totalSupply;
 
     /**
      * @notice constructor
-     * @param token_ - token address
-     * @param name_ - vesting token address
-     * @param symbol_ - vesting token address
+     * @param token_ - vesting token address
+     * @param name_ - vesting contract name
+     * @param symbol_ - vesting contract symbol
      * @param _cliffDuration - cliff duration
      * @param _vestingDuration - vesting duration
      * @param accounts - vesting accounts
@@ -48,6 +82,9 @@ contract Vesting is IERC20, IERC20Metadata {
             "accounts and amounts must have the same length"
         );
 
+        require(bytes(name_).length <= 31, "invalid name length");
+        require(bytes(symbol_).length <= 31, "invalid symbol length");
+
         startTimestamp = block.timestamp;
 
         uint256 cliffDuration = _cliffDuration;
@@ -56,46 +93,57 @@ contract Vesting is IERC20, IERC20Metadata {
         totalLockedTime = _vestingDuration + cliffDuration;
 
         token = token_;
-        _name = name_;
-        _symbol = symbol_;
-        _decimals = token.decimals();
+
+        _name = bytes32(bytes(name_));
+        _nameLength = bytes(name_).length;
+
+        _symbol = bytes32(bytes(symbol_));
+        _symbolLength = bytes(symbol_).length;
+
+        decimals = token.decimals();
 
         for (uint256 i = 0; i < accounts.length; i++) {
             uint256 amount = amounts[i];
-            lockedAmounts[accounts[i]] = amount;
-            currentAmounts[accounts[i]] = amount;
+            lockedBalances[accounts[i]] = amount;
+            balanceOf[accounts[i]] = amount;
             _addTotalSupply(amount);
         }
     }
 
-    function name() external view returns (string memory) {
-        return _name;
+    /**
+     * @notice Returns vesting contract name
+     **/
+    function name() external view returns (string memory n) {
+        n = string(abi.encodePacked(_name));
+        uint256 length = _nameLength;
+        assembly {
+            mstore(n, length)
+        }
     }
 
-    function symbol() external view returns (string memory) {
-        return _symbol;
+    /**
+     * @notice Returns vesting contract symbol
+     **/
+    function symbol() external view returns (string memory s) {
+        s = string(abi.encodePacked(_symbol));
+        uint256 length = _symbolLength;
+        assembly {
+            mstore(s, length)
+        }
     }
 
-    function decimals() external view returns (uint8) {
-        return _decimals;
-    }
-
-    function totalSupply() external view virtual returns (uint256) {
-        return _totalSupply;
-    }
-
-    function balanceOf(address account) external view returns (uint256) {
-        return _balanceOf(account);
-    }
-
-    function getReleaseAmount(address account) public view returns (uint256) {
+    /**
+     * @notice Get a released amount by user
+     * @return released amount
+     **/
+    function getReleasedAmount(address account) public view returns (uint256) {
         if (block.timestamp <= cliffEndTimestamp) {
             return 0;
         }
 
         uint256 totalTime = totalLockedTime;
-        uint256 locked = lockedAmounts[account];
-        uint256 released = locked - currentAmounts[account];
+        uint256 locked = lockedBalances[account];
+        uint256 released = locked - balanceOf[account];
 
         uint256 past = block.timestamp - startTimestamp;
 
@@ -110,62 +158,42 @@ contract Vesting is IERC20, IERC20Metadata {
         return amount;
     }
 
+    /**
+     * @notice Returns released amount
+     * @param to - always address 0x00
+     * @param amount - the full released amount or part of it
+     **/
     function transfer(address to, uint256 amount) external returns (bool) {
-        _transfer(msg.sender, to, amount);
+        require(
+            to == address(0x00),
+            "Transfer allowed only to the zero address"
+        );
+
+        address sender = msg.sender;
+        _burn(sender, amount);
+
+        emit Transfer(sender, to, amount);
         return true;
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool) {
-        require(from == msg.sender, "Permission denied");
-        _transfer(from, to, amount);
-
-        return true;
-    }
-
-    function allowance(
-        address, /*owner*/
-        address /*spender*/
-    ) external pure returns (uint256) {
-        revert("Method unsupported");
-    }
-
-    function approve(
-        address, /*spender*/
-        uint256 /*amount*/
-    ) external pure returns (bool) {
-        revert("Method unsupported");
+    /**
+     * @notice Returns total locked amount
+     **/
+    function totalSupply() external view virtual override returns (uint256) {
+        return _totalSupply;
     }
 
     function _addTotalSupply(uint256 amount) internal virtual {
         _totalSupply += amount;
     }
 
-    function _balanceOf(address account) internal view returns (uint256) {
-        return currentAmounts[account];
-    }
-
-    function _transfer(address from, address to, uint256 amount) internal returns (bool) {
-        require(to == address(0x00), "Transfer allowed only to zero address");
-
-        _burn(from, amount);
-
-        emit Transfer(from, to, amount);
-        return true;
-    }
-
     function _burn(address from, uint256 amount) internal {
-        uint256 releaseAmount = getReleaseAmount(from);
+        uint256 releaseAmount = getReleasedAmount(from);
 
-        require(releaseAmount > 0, "Not enough release amount");
+        require(releaseAmount > 0, "Not enough the release amount");
 
         if (amount != 0) {
-            if (amount > releaseAmount) {
-                revert("Not enough release amount");
-            }
+            require(amount <= releaseAmount, "Not enough the release amount");
         } else {
             amount = releaseAmount;
         }
@@ -174,7 +202,7 @@ contract Vesting is IERC20, IERC20Metadata {
 
         IERC20(token).safeTransfer(from, amount);
 
-        currentAmounts[from] -= amount;
+        balanceOf[from] -= amount;
     }
 
     function _beforeBurn(address from, uint256 amount) internal virtual {}
