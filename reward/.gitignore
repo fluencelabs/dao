@@ -1,9 +1,5 @@
 merkle_proof/node_modules
-rewarded_keys.csv
+./rewarded_keys.csv
 age.stderr
 openssl.stderr
 /test_data/workdir
-/test_data/age.stderr
-/test_data/openssl.stderr
-/test_data/nohup.out
-/test/data/logs

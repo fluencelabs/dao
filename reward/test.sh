@@ -31,6 +31,7 @@ start_test() {
 
     if ! ($2 = 0 || false); then
         echo - ❌ fail$'\n'
+        exit 1
     fi
     echo - ✅ success$'\n'
 }
