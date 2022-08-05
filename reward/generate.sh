@@ -12,7 +12,7 @@ set -o errexit -o nounset -o pipefail
 # NOTE: there could be multiple entries for a single GH username
 
 # `$#`` is the number of arguments
-if [ $# -eq 1 ]; then
+if [ $# -gt 0 ]; then
     REWARDED_KEYS="$(pwd)/$1"
 else
     # shellcheck disable=SC2162 # backslash mangling is expected
@@ -21,6 +21,12 @@ fi
 
 # dir to store all output files
 WORK_DIR="$(pwd)/workdir"
+
+# `$#`` is the number of arguments
+if [ $# -eq 2 ]; then
+    WORK_DIR="$2"
+fi
+
 # JS tool to generate merkle proofs
 MERKLE_PROOF_TOOL_DIR="$(pwd)/merkle_proof"
 # Data to create Merkle Tree: userId,tmp_eth_addr
@@ -46,7 +52,7 @@ USERNAMES=$(cat "$REWARDED_KEYS" | cut -d',' -f1 | sort -u)
 NUMBER_OF_USERS=$(echo "$USERNAMES" | wc -l | awk '{ print $1 }')
 
 # Shuffle usernames in $REWARDED_KEYS so user ids are assigned randomly
-cat "$REWARDED_KEYS" | sort -R | sort -t, -k1 > "$REWARDED_KEYS_SHUFFLED"
+cat "$REWARDED_KEYS" | sort -R | sort -t, -k1 >"$REWARDED_KEYS_SHUFFLED"
 
 # Generate randomized sequence of user ids
 # shellcheck disable=SC2207 # already taken care of
@@ -69,7 +75,7 @@ for USER_ID in "${USER_IDS[@]}"; do
     PUB_KEY_HASH=$(echo "$PUB_KEY" | xxd -r -p | (sha3sum -a Keccak256 -t || true) | awk -F $'\xC2\xA0' '{ print $1 }')
     ETH_ADDR=$(echo "$PUB_KEY_HASH" | xxd -r -p | xxd -p -c 20 -s 12)
     MEKLRE_TREE_ENTRY="${USER_ID},${ETH_ADDR}"
-    echo "$MEKLRE_TREE_ENTRY" >> "$TREE_DATA"
+    echo "$MEKLRE_TREE_ENTRY" >>"$TREE_DATA"
 done
 
 #####
@@ -78,7 +84,7 @@ done
 
 pushd "$MERKLE_PROOF_TOOL_DIR" >/dev/null # change directory to
 node index.js merkle_proofs "$TREE_DATA" "$MERKLE_TREE"
-node index.js merkle_root "$TREE_DATA" > "$MERKLE_ROOT"
+node index.js merkle_root "$TREE_DATA" >"$MERKLE_ROOT"
 popd >/dev/null # we're back to WORK_DIR
 
 #####
@@ -115,5 +121,5 @@ while IFS= read -r ENTRY; do
     DATA=$(echo "$ENTRY" | cut -d, -f3,4,5,6)
 
     ENCRYPTED_DATA_HEX=$(echo "$DATA" | age --encrypt --recipient "$SSH_KEY" -o - | xxd -p -c 10000)
-    echo "${GITHUB_USERNAME},${ENCRYPTED_DATA_HEX}" >> "$KEYS_BIN"
-done <<< "$DATA_WITH_SSH_KEYS"
+    echo "${GITHUB_USERNAME},${ENCRYPTED_DATA_HEX}" >>"$KEYS_BIN"
+done <<<"$DATA_WITH_SSH_KEYS"
