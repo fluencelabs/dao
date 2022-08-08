@@ -195,7 +195,7 @@ describe("Deploy script", () => {
     ]);
     await ethers.provider.send("evm_mine", []);
 
-    const amount = await teamVesting.getReleasedAmount(account.address);
+    const amount = await teamVesting.getAvailableAmount(account.address);
     expect(amount).to.not.eq(0);
 
     await teamVesting.transfer(ZERO_ADDRESS, amount);
@@ -230,7 +230,7 @@ describe("Deploy script", () => {
 
     await ethers.provider.send("evm_mine", []);
 
-    const amount = await teamVesting.getReleasedAmount(account.address);
+    const amount = await teamVesting.getAvailableAmount(account.address);
     expect(amount).to.not.eq(0);
 
     await teamVesting.transfer(ZERO_ADDRESS, amount);

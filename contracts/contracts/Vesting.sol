@@ -133,10 +133,10 @@ contract Vesting is IVestingERC20 {
     }
 
     /**
-     * @notice Get a released amount by user
-     * @return released amount
+     * @notice Get a available amount by user
+     * @return available amount
      **/
-    function getReleasedAmount(address account) public view returns (uint256) {
+    function getAvailableAmount(address account) public view returns (uint256) {
         if (block.timestamp <= cliffEndTimestamp) {
             return 0;
         }
@@ -188,7 +188,7 @@ contract Vesting is IVestingERC20 {
     }
 
     function _burn(address from, uint256 amount) internal {
-        uint256 releaseAmount = getReleasedAmount(from);
+        uint256 releaseAmount = getAvailableAmount(from);
 
         require(releaseAmount > 0, "Not enough the release amount");
 

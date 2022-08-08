@@ -115,7 +115,7 @@ describe("Vesting", () => {
   it("when cliff is active #2", async () => {
     await setTimeAfterStart(cliffDurationMonths * MONTH);
 
-    expect(await vesting.getReleasedAmount(receiverAccount.address)).to.eq(
+    expect(await vesting.getAvailableAmount(receiverAccount.address)).to.eq(
       BigNumber.from(0)
     );
   });
@@ -126,7 +126,7 @@ describe("Vesting", () => {
 
     const expectedAmount = amountBySec.mul(BigNumber.from(time));
 
-    const amount = await vesting.getReleasedAmount(receiverAccount.address);
+    const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(expectedAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
@@ -150,7 +150,7 @@ describe("Vesting", () => {
       cliffDurationMonths * MONTH;
 
     await setTimeAfterStart(time);
-    const amount = await vesting.getReleasedAmount(receiverAccount.address);
+    const amount = await vesting.getAvailableAmount(receiverAccount.address);
 
     const expectedAmount = amountBySec.mul(BigNumber.from(time));
     expect(amount).to.eq(expectedAmount);
@@ -174,7 +174,7 @@ describe("Vesting", () => {
       (vestingDurationMonths + cliffDurationMonths) * MONTH
     );
 
-    const amount = await vesting.getReleasedAmount(receiverAccount.address);
+    const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
@@ -194,7 +194,7 @@ describe("Vesting", () => {
       (vestingDurationMonths + cliffDurationMonths) * 3 * MONTH
     );
 
-    const amount = await vesting.getReleasedAmount(receiverAccount.address);
+    const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
@@ -228,7 +228,7 @@ describe("Vesting", () => {
       (vestingDurationMonths + cliffDurationMonths) * 3 * MONTH
     );
 
-    const amount = await vesting.getReleasedAmount(receiverAccount.address);
+    const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
 
     const balanceSnapshot = await token.balanceOf(receiverAccount.address);
