@@ -26,7 +26,7 @@ PUB_KEY=$(echo "$ETH_KEY_PEM" | openssl ec -pubout -outform der 2>/dev/null | xx
 PUB_KEY_HASH=$(echo "$PUB_KEY" | xxd -r -p | (sha3sum -a Keccak256 -t || true) | awk -F $'\xC2\xA0' '{ print $1 }')
 RANDOM_ETH_ADDRESS=$(echo "$PUB_KEY_HASH" | xxd -r -p | xxd -p -c 20 -s 12)
 
-if_exit_error() {
+if_error_exists() {
     if ! [ $? -eq 0 ]; then
         echo - ❌ fail$'\n'
         exit 1
@@ -50,7 +50,7 @@ test_generate() {
 
     pushd "$MERKLE_PROOF_TOOL_DIR" >/dev/null # change directory to
     EXPECTED_ROOT=$(node index.js merkle_root "$MERKLE_TREE_FILE")
-    if_exit_error
+    if_error_exists
     popd >/dev/null # we're back to WORK_DIR
 
     if [ "$MERKLE_ROOT" != "$EXPECTED_ROOT" ]; then
@@ -75,10 +75,10 @@ verify_sign() {
     VERIFICATION_RESULT=$(echo "$HASH" | xxd -r -p | openssl pkeyutl -verify -keyform DER -inkey "$TEMP_ETH_KEY_DER" -sigfile "$SIGN_FILE")
 
     TEMP_PUB_KEY=$(openssl ec -pubout -outform der -inform der -in "$TEMP_ETH_KEY_DER" 2>/dev/null | xxd -s 24 -p -c 64)
-    if_exit_error
+    if_error_exists
 
     TEMP_PUB_KEY_HASH=$(echo "$TEMP_PUB_KEY" | xxd -r -p | (sha3sum -a Keccak256 -t || true) | awk -F $'\xC2\xA0' '{ print $1 }')
-    if_exit_error
+    if_error_exists
 
     TEMP_ETH_ADDR=$(echo "$TEMP_PUB_KEY_HASH" | xxd -r -p | xxd -p -c 20 -s 12)
 
@@ -102,21 +102,21 @@ test_proof_by_user() {
     USER=$1
     pushd "$TEST_DIR" >/dev/null
     PROOF_SH_RESULT=$($PROOF_SH "$USER" ${RANDOM_ETH_ADDRESS} "${TEST_DIR}/$USER" | tail -1)
-    if_exit_error
+    if_error_exists
     popd >/dev/null
 
     parse_proof_out $PROOF_SH_RESULT
     SIGNATURE=${PARSED_OUT[2]}
     ADDRESS=${PARSED_OUT[1]}
     verify_sign $ADDRESS $SIGNATURE
-    if_exit_error
+    if_error_exists
 }
 
 test_proof() {
     for user in "${USERS[@]}"; do
         echo "- test user: $user"
         test_proof_by_user $user
-        if_exit_error
+        if_error_exists
     done
 }
 
@@ -128,7 +128,7 @@ for test in "${TESTS[@]}"; do
     $test
     set -o errexit
 
-    if_exit_error
+    if_error_exists
 
     echo - ✅ success$'\n'
 done
