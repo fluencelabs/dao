@@ -3,6 +3,7 @@ set -o errexit -o nounset -o pipefail
 
 TEST_DIR="$(pwd)/test_data"
 WORK_DIR="$TEST_DIR/workdir"
+REWARDED_KEYS_FULL_PATH="$TEST_DIR/rewarded_keys.csv"
 
 TEMP_ETH_KEY_DER="$WORK_DIR/tmp_eth.key.der"
 SIGN_FILE="$WORK_DIR/sign.bin"
@@ -15,8 +16,6 @@ GENERATE_SH="$(pwd)/generate.sh"
 PROOF_SH="$(pwd)/proof.sh"
 MERKLE_PROOF_TOOL_DIR="$(pwd)/merkle_proof"
 
-USERS=("user_1" "user_2" "user_3")
-
 # Generate random ethereum ADDRESS
 ETH_KEY_PEM=$(openssl ecparam -name secp256k1 -genkey 2>/dev/null | grep -A10 'EC PRIVATE')
 ETH_KEY_HEX=$(echo "$ETH_KEY_PEM" | openssl ec -outform der 2>/dev/null | xxd -p -c 118)
@@ -25,6 +24,9 @@ ETH_KEY_HEX=$(echo "$ETH_KEY_PEM" | openssl ec -outform der 2>/dev/null | xxd -p
 PUB_KEY=$(echo "$ETH_KEY_PEM" | openssl ec -pubout -outform der 2>/dev/null | xxd -s 24 -p -c 64)
 PUB_KEY_HASH=$(echo "$PUB_KEY" | xxd -r -p | (sha3sum -a Keccak256 -t || true) | awk -F $'\xC2\xA0' '{ print $1 }')
 RANDOM_ETH_ADDRESS=$(echo "$PUB_KEY_HASH" | xxd -r -p | xxd -p -c 20 -s 12)
+
+USERS=("user_1" "user_2" "user_3")
+TESTS=(test_generate test_proof)
 
 if_error_exists() {
     if ! [ $? -eq 0 ]; then
@@ -120,7 +122,31 @@ test_proof() {
     done
 }
 
-TESTS=(test_generate test_proof)
+init() {
+    if [ -d "$TEST_DIR" ]; then
+        rm -r $TEST_DIR
+    fi
+
+    mkdir $TEST_DIR
+
+    IS_FIRST=true
+    for user in "${USERS[@]}"; do
+        if [ $IS_FIRST ]; then
+            ssh-keygen -t ed25519 -C "$user" -f "$TEST_DIR/$user" -N ""
+        else
+            ssh-keygen -t rsa -C "$user" -f "$TEST_DIR/$user" -N ""
+        fi
+
+        PUB_KEY=$(cat "$TEST_DIR/$user.pub")
+        echo -e "$user,$(echo $PUB_KEY | awk -F ' ' '{print $1" "$2}')" >>$REWARDED_KEYS_FULL_PATH
+    done
+}
+
+echo "Initialization..."
+init
+echo "Initialization is ended."
+printf "\nStart tests...\n\n"
+
 for test in "${TESTS[@]}"; do
     print_test_title "$test"
 
@@ -132,3 +158,5 @@ for test in "${TESTS[@]}"; do
 
     echo - ✅ success$'\n'
 done
+
+rm -r $TEST_DIR
