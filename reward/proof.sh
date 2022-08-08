@@ -93,22 +93,25 @@ printf "\n\tIf you have any technical issues, take a look at openssl.stderr and 
 printf "Which SSH key to use for decryption?\n"
 
 while true; do
-    if ! [ -z "$KEY_ARG_PATH" ]; then
+    if [ -n "$KEY_ARG_PATH" ] && [ -f "$KEY_ARG_PATH" ]; then
         KEY_PATH=$KEY_ARG_PATH
     else
         if [ -d "$SSH_KEYS_DIR" ]; then
             # shellcheck disable=SC2162 # user can have spaces in the path to ssh key and use backslashes to escape them
             read -p "Enter path to the private SSH key to use or just press Enter to show existing keys: " KEY_PATH
-            if [ -z "$KEY_PATH" ]; then
+            if [ -z "$KEY_PATH" ] || ![ -f "$KEY_PATH" ]; then
                 KEY_PATH=$(ask_ssh_key)
             fi
         else
             # shellcheck disable=SC2162 # user can have spaces in the path to ssh key and use backslashes to escape them
             read -p "Enter path to the private SSH key to use: " KEY_PATH
-            if [ -z "$KEY_PATH" ]; then
+            if [ -z "$KEY_PATH" ] || ![ -f "$KEY_PATH" ]; then
                 continue
             fi
         fi
+
+        read -p "Will use SSH key to decrypt data. Press enter to proceed. "
+        printf "\n"
     fi
 
     rm -f "$DECRYPTED_DATA"
