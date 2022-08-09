@@ -5,16 +5,14 @@ import {
   LPController,
   FluenceToken__factory,
   IERC20Metadata,
-  ILiquidityBootstrappingPoolFactory,
-  ILiquidityBootstrappingPoolFactory__factory,
-  ILiquidityBootstrappingPool,
-  ILiquidityBootstrappingPool__factory,
+  IBalancerLBPFactory,
+  IBalancerLBPFactory__factory,
+  IBalancerLBP,
   IBalancerVault,
   IBalancerVault__factory,
-  IERC20__factory,
   IERC20Metadata__factory,
-  IUniswapV3Pool,
   IUniswapV3Pool__factory,
+  IBalancerLBP__factory,
 } from "../../typechain";
 import { BigNumber } from "ethers";
 import { DAY } from "../../utils/time";
@@ -23,9 +21,7 @@ import {
   encodeSqrtRatioX96,
   FeeAmount,
   nearestUsableTick,
-  priceToClosestTick,
   TICK_SPACINGS,
-  TickMath,
 } from "@uniswap/v3-sdk";
 import { IERC721__factory } from "../../typechain/factories/IERC721__factory";
 import { THROW_ERROR_PREFIX } from "../../utils/consts";
@@ -34,6 +30,8 @@ chai.use(waffle.solidity);
 
 const lbpUSDAmount = 500_000;
 const lbpFLTAmount = 4_000_000;
+
+const UNISWAP_FEE_AMOUNT: FeeAmount = 3000;
 
 const setupTest = deployments.createFixture(
   async (
@@ -113,8 +111,8 @@ describe("LPController", () => {
   let config: Config;
   let lpController: LPController;
   let vault: IBalancerVault;
-  let lbpFactory: ILiquidityBootstrappingPoolFactory;
-  let lbp: ILiquidityBootstrappingPool;
+  let lbpFactory: IBalancerLBPFactory;
+  let lbp: IBalancerLBP;
   let poolId: string;
   let params: Array<{
     token: IERC20Metadata;
@@ -134,11 +132,11 @@ describe("LPController", () => {
       await settings.lpController.balancerVault(),
       signer
     );
-    lbpFactory = ILiquidityBootstrappingPoolFactory__factory.connect(
+    lbpFactory = IBalancerLBPFactory__factory.connect(
       await settings.lpController.balancerLBPFactory(),
       signer
     );
-    lbp = ILiquidityBootstrappingPool__factory.connect(
+    lbp = IBalancerLBP__factory.connect(
       await settings.lpController.liquidityBootstrappingPool(),
       signer
     );
@@ -269,7 +267,7 @@ describe("LPController", () => {
   });
 
   it("withdraw", async () => {
-    const executor = await lpController.executor();
+    const executor = await lpController.daoExecutor();
 
     const v = BigNumber.from(1000000);
     const snapshotBalance = await params[0].token.balanceOf(executor);
@@ -293,13 +291,10 @@ describe("LPController", () => {
       token0Balance.toString()
     );
 
-    const feeAmount: FeeAmount = Number(
-      (await lpController.UNISWAP_FEE()).toString()
-    );
-    const spacings = TICK_SPACINGS[feeAmount];
+    const spacings = TICK_SPACINGS[UNISWAP_FEE_AMOUNT];
 
     const nonfungiblePositionManager = IERC721__factory.connect(
-      await lpController.nonfungiblePositionManager(),
+      await lpController.uniswapPositionManager(),
       ethers.provider
     );
     await lpController.createUniswapLP(
@@ -311,7 +306,9 @@ describe("LPController", () => {
     const pool = await lpController.uniswapPool();
 
     expect(
-      await nonfungiblePositionManager.balanceOf(await lpController.executor())
+      await nonfungiblePositionManager.balanceOf(
+        await lpController.daoExecutor()
+      )
     ).to.eq(1);
 
     const tokenOneExpected = BigNumber.from("499999999999999998432742");

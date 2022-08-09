@@ -117,7 +117,7 @@ describe("Vesting with voting", () => {
     const time = cliffDurationMonths * MONTH + 100;
     await setTimeAfterStart(time);
 
-    const amount = await vesting.getReleaseAmount(receiverAccount.address);
+    const amount = await vesting.getAvailableAmount(receiverAccount.address);
 
     await vesting.transfer(ZERO_ADDRESS, amount);
 

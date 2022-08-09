@@ -8,26 +8,60 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+/**
+ * @title DevRewardDistributor
+ * @notice Contract for managing developers reward
+ */
 contract DevRewardDistributor {
     using SafeERC20 for IERC20;
 
+    /**
+     * @notice Reward token
+     **/
     FluenceToken public immutable token;
+
+    /**
+     * @notice DAO timelock contract address
+     **/
     Executor public immutable executor;
 
+    /**
+     * @notice Claiming end time
+     **/
+    uint256 public immutable claimingEndTime;
+
+    /**
+     * @notice Time when this contract was deployed
+     **/
     uint256 public immutable deployTime;
+
+    /**
+     * @notice Merkle root from rewards tree
+     **/
     bytes32 public immutable merkleRoot;
 
-    // Reward will be halved every halvePeriod
+    /**
+     * @notice Period for dividing the reward
+     **/
     uint256 public immutable halvePeriod;
-    // Initial reward is Ne18, i.e., N tokens.
-    uint256 public immutable initialReward;
-    // How long will this contract process token claims
-    uint256 public immutable claimingPeriod;
 
-    // This is a packed array of booleans.
+    /**
+     * @notice Initial user's reward
+     **/
+    uint256 public immutable initialReward;
+
+    /**
+     * @notice Bitmap with claimed users ids
+     **/
     mapping(uint256 => uint256) private claimedBitMap;
 
-    // This event is triggered when a call to ClaimTokens succeeds.
+    /**
+     * @notice Emitted when user claims reward
+     * @param userId - reward user id
+     * @param account - reward account
+     * @param amount - reward amount
+     * @param leaf - leaf with user's info in reward tree
+     **/
     event Claimed(
         uint256 userId,
         address account,
@@ -35,9 +69,20 @@ contract DevRewardDistributor {
         bytes32 leaf
     );
 
-    // This event is triggered when unclaimed drops are moved to Timelock after contractActive period
+    /**
+     * @notice Emitted when claiming period is ended and tokens transfer to the executor
+     * @param amount - remainder balance
+     **/
     event TransferUnclaimed(uint256 amount);
 
+    /**
+     * @param _token - reward token
+     * @param _executor - DAO timelock contract
+     * @param _merkleRoot - merkle root from rewards tree
+     * @param _halvePeriod - period for dividing the reward
+     * @param _initialReward - initial user reward
+     * @param _claimingPeriod - claiming period
+     **/
     constructor(
         FluenceToken _token,
         Executor _executor,
@@ -52,23 +97,23 @@ contract DevRewardDistributor {
         merkleRoot = _merkleRoot;
         halvePeriod = _halvePeriod;
         initialReward = _initialReward;
-        claimingPeriod = _claimingPeriod;
 
         deployTime = block.timestamp;
+        claimingEndTime = block.timestamp + _claimingPeriod;
     }
 
     modifier whenClaimingIs(bool isActive) {
         require(
             isClaimingActive() == isActive,
-            "Claiming status not as expected"
+            "Claiming status is not as expected"
         );
         _;
     }
 
     /**
-     * @notice process incoming token claims, must be signed by <signer>
-     * @param userId - serves as nonce - only one claim per user_id
-     * @param merkleProof - proof hashes for leaf
+     * @notice Claim reward token
+     * @param userId - user id in merkle tree
+     * @param merkleProof - merkle proof for leaf
      * @param temporaryAddress - temporary Ethereum address that's used only for signing
      * @param signature - signature of temporary Ethereum address
      **/
@@ -78,7 +123,6 @@ contract DevRewardDistributor {
         address temporaryAddress,
         bytes calldata signature
     ) external whenClaimingIs(true) {
-        // one claim per user
         require(!isClaimed(userId), "Tokens already claimed");
 
         bytes32 leaf = keccak256(abi.encode(userId, temporaryAddress));
@@ -108,14 +152,16 @@ contract DevRewardDistributor {
      * @notice used to move any remaining tokens out of the contract after expiration
      **/
     function transferUnclaimed() external whenClaimingIs(false) {
-        uint256 remainingBalance = IERC20(token).balanceOf(address(this));
-        IERC20(token).safeTransfer(address(executor), remainingBalance);
+        IERC20 rewardToken = IERC20(token); //gas saving
+
+        uint256 remainingBalance = rewardToken.balanceOf(address(this));
+        rewardToken.safeTransfer(address(executor), remainingBalance);
 
         emit TransferUnclaimed(remainingBalance);
     }
 
     /**
-     * @notice checks claimedBitMap to see if if user_id is 0/1
+     * @notice checks claimed bitMap for userId
      * @dev fork from uniswap merkle distributor, unmodified
      * @return - boolean
      **/
@@ -128,14 +174,16 @@ contract DevRewardDistributor {
     }
 
     /**
-     * Returns true if this contract is active, false otherwise
-     */
+     * @notice Checking if claiming is active
+     * @return - boolean
+     **/
     function isClaimingActive() public view returns (bool) {
-        return block.timestamp < (deployTime + claimingPeriod);
+        return block.timestamp < claimingEndTime;
     }
 
     /**
-     * Returns current size of the reward in tokens
+     * @notice Get current user's reward
+     * @return - boolean
      **/
     function currentReward() public view returns (uint256) {
         if (!isClaimingActive()) {
@@ -149,7 +197,7 @@ contract DevRewardDistributor {
     }
 
     /**
-     * @notice Sets a given user_id to claimed
+     * @notice Sets a given user by index to claimed
      * @dev taken from uniswap merkle distributor, unmodified
      **/
     function _setClaimed(uint256 index) private {

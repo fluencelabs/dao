@@ -5,7 +5,7 @@ pragma solidity >=0.8.15;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface ILiquidityBootstrappingPoolFactory {
+interface IBalancerLBPFactory {
     event PoolCreated(address indexed pool);
 
     function create(
@@ -84,7 +84,7 @@ interface IBalancerVault {
         );
 }
 
-interface ILiquidityBootstrappingPool {
+interface IBalancerLBP {
     event SwapEnabledSet(bool swapEnabled);
     event SwapFeePercentageChanged(uint256 swapFeePercentage);
     event GradualWeightUpdateScheduled(

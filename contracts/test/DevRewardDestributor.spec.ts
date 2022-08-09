@@ -270,7 +270,7 @@ describe("DevRewardDistributor", () => {
   });
 
   it("claiming is not active", async () => {
-    const period = await rewardDistributor.claimingPeriod();
+    const period = await rewardDistributor.claimingEndTime();
 
     await ethers.provider.send("evm_increaseTime", [period.toNumber()]);
     await ethers.provider.send("evm_mine", []);
@@ -279,7 +279,7 @@ describe("DevRewardDistributor", () => {
   });
 
   it("try claim when claiming is not active", async () => {
-    const period = await rewardDistributor.claimingPeriod();
+    const period = await rewardDistributor.claimingEndTime();
 
     await ethers.provider.send("evm_increaseTime", [period.toNumber()]);
     await ethers.provider.send("evm_mine", []);
@@ -298,12 +298,12 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Claiming status not as expected'`
+      `${THROW_ERROR_PREFIX} 'Claiming status is not as expected'`
     );
   });
 
   it("claim reward when claiming is not active", async () => {
-    const period = await rewardDistributor.claimingPeriod();
+    const period = await rewardDistributor.claimingEndTime();
 
     await ethers.provider.send("evm_increaseTime", [period.toNumber()]);
     await ethers.provider.send("evm_mine", []);
@@ -324,12 +324,12 @@ describe("DevRewardDistributor", () => {
 
   it("transfer unclaimed when claiming is active", async () => {
     await expect(rewardDistributor.transferUnclaimed()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Claiming status not as expected'`
+      `${THROW_ERROR_PREFIX} 'Claiming status is not as expected'`
     );
   });
 
   it("transfer unclaimed when claiming is not active", async () => {
-    const period = await rewardDistributor.claimingPeriod();
+    const period = await rewardDistributor.claimingEndTime();
 
     await ethers.provider.send("evm_increaseTime", [period.toNumber()]);
     await ethers.provider.send("evm_mine", []);

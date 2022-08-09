@@ -7,44 +7,48 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
-import "./IUniswapNFTManager.sol";
-import "./Balancer.sol";
+import "./interfaces/IUniswapNFTManager.sol";
+import "./interfaces/Balancer.sol";
+import "./Executor.sol";
 
+/**
+ * @title LPController
+ * @notice Contract for initial management of lp pools.
+ */
 contract LPController is Ownable {
     using SafeERC20 for IERC20;
 
-    uint24 public constant UNISWAP_FEE = 3000;
+    uint24 private constant _UNISWAP_FEE = 3000;
 
-    ILiquidityBootstrappingPoolFactory public immutable balancerLBPFactory;
+    IBalancerLBPFactory public immutable balancerLBPFactory;
     IUniswapV3Factory public immutable uniswapFactory;
-    IUniswapNFTManager public immutable nonfungiblePositionManager;
+    IUniswapNFTManager public immutable uniswapPositionManager;
     IBalancerVault public immutable balancerVault;
     IBalancerHelper public immutable balancerHelper;
+    Executor public immutable daoExecutor;
 
     IERC20 public immutable token0;
     IERC20 public immutable token1;
 
-    address public immutable executor;
-
-    ILiquidityBootstrappingPool public liquidityBootstrappingPool;
+    IBalancerLBP public liquidityBootstrappingPool;
     IUniswapV3Pool public uniswapPool;
     bytes32 public lbpPoolId;
 
     constructor(
-        ILiquidityBootstrappingPoolFactory _balancerLBPFactory,
+        IBalancerLBPFactory _balancerLBPFactory,
         IUniswapV3Factory _uniswapFactory,
-        IUniswapNFTManager _nonfungiblePositionManager,
+        IUniswapNFTManager _uniswapPositionManager,
         IBalancerVault _balancerVault,
         IBalancerHelper _balancerHelper,
-        address _executor,
+        Executor _daoExecutor,
         IERC20 token0_,
         IERC20 token1_
     ) {
         balancerLBPFactory = _balancerLBPFactory;
-        nonfungiblePositionManager = _nonfungiblePositionManager;
+        uniswapPositionManager = _uniswapPositionManager;
         balancerVault = _balancerVault;
         balancerHelper = _balancerHelper;
-        executor = _executor;
+        daoExecutor = _daoExecutor;
         uniswapFactory = _uniswapFactory;
 
         require(token0_ < token1_, "Token0 must be less than token1");
@@ -53,6 +57,14 @@ contract LPController is Ownable {
         token1 = token1_;
     }
 
+    /**
+     * @notice Create lbp pool
+     * @param weights - start pool's weight
+     * @param endWeights - end pool's weight
+     * @param initBalances - initial balances
+     * @param lbpPoolDuration - duration pool working
+     * @param swapFeePercentage - swapping fee in percentage
+     **/
     function createBalancerLBP(
         uint256[] calldata weights,
         uint256[] calldata endWeights,
@@ -76,7 +88,7 @@ contract LPController is Ownable {
         assets[0] = token0;
         assets[1] = token1;
 
-        ILiquidityBootstrappingPool lbp = ILiquidityBootstrappingPool(
+        IBalancerLBP lbp = IBalancerLBP(
             balancerLBPFactory.create(
                 "Fluence LBP",
                 "FLTLBP",
@@ -121,10 +133,16 @@ contract LPController is Ownable {
         liquidityBootstrappingPool = lbp;
     }
 
+    /**
+     * @notice Set pool status
+     **/
     function setSwapEnabledInBalancerLBP(bool swapEnabled) external onlyOwner {
         liquidityBootstrappingPool.setSwapEnabled(swapEnabled);
     }
 
+    /**
+     * @notice Exit from the balancer LBP
+     **/
     function exitFromBalancerLBP() external onlyOwner {
         uint256 bptBalance = IERC20(address(liquidityBootstrappingPool))
             .balanceOf(address(this));
@@ -167,6 +185,12 @@ contract LPController is Ownable {
         liquidityBootstrappingPool.setSwapEnabled(false);
     }
 
+    /**
+     * @notice create uniswap liquidity pool
+     * @param tickLower - the minimum derivative price of position
+     * @param tickLower - the maximum derivative price of position
+     * @param sqrtPriceX96 - sqrt from initial price (Q64.96 format)
+     **/
     function createUniswapLP(
         int24 tickLower,
         int24 tickUpper,
@@ -187,38 +211,41 @@ contract LPController is Ownable {
             uniswapFactory.createPool(
                 address(token0),
                 address(token1),
-                UNISWAP_FEE
+                _UNISWAP_FEE
             )
         );
 
         pool.initialize(sqrtPriceX96);
 
-        token0.safeApprove(address(nonfungiblePositionManager), balance0);
-        token1.safeApprove(address(nonfungiblePositionManager), balance1);
+        token0.safeApprove(address(uniswapPositionManager), balance0);
+        token1.safeApprove(address(uniswapPositionManager), balance1);
 
         IUniswapNFTManager.MintParams memory params = IUniswapNFTManager
             .MintParams({
                 token0: address(token0),
                 token1: address(token1),
-                fee: UNISWAP_FEE,
+                fee: _UNISWAP_FEE,
                 tickLower: tickLower,
                 tickUpper: tickUpper,
                 amount0Desired: balance0,
                 amount1Desired: balance1,
                 amount0Min: 0,
                 amount1Min: 0,
-                recipient: address(executor),
+                recipient: address(daoExecutor),
                 deadline: block.timestamp
             });
 
-        nonfungiblePositionManager.mint(params);
+        uniswapPositionManager.mint(params);
 
         uniswapPool = pool;
     }
 
+    /**
+     * @notice Withdraw token from this contract to the DAO executor
+     **/
     function withdraw(IERC20 token, uint256 amount) external onlyOwner {
         require(token.balanceOf(address(this)) != 0, "Invalid balance");
 
-        token.safeTransfer(executor, amount);
+        token.safeTransfer(address(daoExecutor), amount);
     }
 }

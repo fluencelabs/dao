@@ -1,11 +1,13 @@
-import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-solhint";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-deploy";
-import "@nomiclabs/hardhat-solhint";
+import "hardhat-tracer";
+import "hardhat-docgen";
+import { HardhatUserConfig, task } from "hardhat/config";
 import { Config } from "./utils/config";
 import fs from "fs";
 import YAML from "yaml";
@@ -81,7 +83,7 @@ const hardhatConfig: HardhatUserConfig = {
   },
   gasReporter: {
     enabled: config?.networks?.repotGas ?? true,
-    currency: "USD",
+    currency: "USDT",
   },
   etherscan: {
     apiKey: config?.networks?.etherscanApiKey ?? "",
