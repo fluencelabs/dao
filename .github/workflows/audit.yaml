@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - "./contracts/contracts/**.sol"
+      - "contracts/contracts/**.sol"
   workflow_dispatch:
 
 jobs:
