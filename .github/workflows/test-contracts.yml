@@ -2,16 +2,16 @@ name: Contract tests
 on:
   push:
   workflow_dispatch:
-  
+
 defaults:
- run:
-  working-directory: ./contracts
-  
+  run:
+    working-directory: ./contracts
+
 jobs:
-  check:
-    name: Tests
+  test-contracts:
+    name: Test contracts
     env:
-      NODE_URL: ${{ secrets.NODE_URL }}
+      MAINNET_ETHEREUM_URL: ${{ secrets.MAINNET_ETHEREUM_URL }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

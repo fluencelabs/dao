@@ -27,14 +27,13 @@ SSH_KEYS_DIR="$HOME/.ssh"
 ask_ssh_key() {
     SSH_KEYS=()
     # list all files from ~/.ssh, except for *.pub, known_hosts, config and log files (tmux sometimes puts logs there)
-    while IFS=  read -r -d $'\0'; do
+    while IFS= read -r -d $'\0'; do
         SSH_KEYS+=("$REPLY")
     done < <(find "$SSH_KEYS_DIR" -mindepth 1 -maxdepth 1 ! -name "*.pub" ! -name "known_hosts*" ! -name "config" ! -name "*.log" -print0)
 
-    select fname in "${SSH_KEYS[@]}"
-    do
+    select fname in "${SSH_KEYS[@]}"; do
         echo "$fname"
-        break;
+        break
     done
 }
 
@@ -50,7 +49,7 @@ if [ ! -f "$KEYS_BIN" ]; then
 fi
 
 # $# is the number of arguments
-if [ $# -eq 2 ]; then
+if [ $# -gt 1 ]; then
     GITHUB_USERNAME="$1"
     ETHEREUM_ADDRESS="$2"
 else
@@ -66,6 +65,11 @@ else
         echo "$ETHEREUM_ADDRESS is not an Ethereum address. Must be hexadecimal, has non-hexadecimal symbols."
         exit 1
     fi
+fi
+
+KEY_ARG_PATH=''
+if [ $# -gt 2 ]; then
+    KEY_ARG_PATH="$3"
 fi
 
 ENCRYPTED_KEYS=()
@@ -88,28 +92,36 @@ printf "\n\tIf you have any technical issues, take a look at openssl.stderr and 
 
 printf "Which SSH key to use for decryption?\n"
 
-while true
-do
-
-    if [ -d "$SSH_KEYS_DIR" ]; then
-        # shellcheck disable=SC2162 # user can have spaces in the path to ssh key and use backslashes to escape them
-        read -p "Enter path to the private SSH key to use or just press Enter to show existing keys: " KEY_PATH
-        if [ -z "$KEY_PATH" ]; then
-            KEY_PATH=$(ask_ssh_key)
-        fi
+while true; do
+    if [ -n "$KEY_ARG_PATH" ] && [ -f "$KEY_ARG_PATH" ]; then
+        KEY_PATH=$KEY_ARG_PATH
     else
-        # shellcheck disable=SC2162 # user can have spaces in the path to ssh key and use backslashes to escape them
-        read -p "Enter path to the private SSH key to use: " KEY_PATH
-        if [ -z "$KEY_PATH" ]; then
-            continue;
+        if [ -d "$SSH_KEYS_DIR" ]; then
+            # shellcheck disable=SC2162 # user can have spaces in the path to ssh key and use backslashes to escape them
+            read -p "Enter path to the private SSH key to use or just press Enter to show existing keys: " KEY_PATH
+            if [ -z "$KEY_PATH" ]; then
+                KEY_PATH=$(ask_ssh_key)
+            fi
+        else
+            # shellcheck disable=SC2162 # user can have spaces in the path to ssh key and use backslashes to escape them
+            read -p "Enter path to the private SSH key to use: " KEY_PATH
+            if [ -z "$KEY_PATH" ]; then
+                continue
+            fi
         fi
+
+        if ! [ -f "$KEY_PATH" ]; then
+            echo "$KEY_PATH isn't a regular file or doesn't exist"
+            continue
+        fi
+
+        read -p "Will use SSH key to decrypt data. Press enter to proceed. "
+        printf "\n"
     fi
 
     rm -f "$DECRYPTED_DATA"
     printf "\n"
-    # shellcheck disable=SC2162 # no need
-    read -p "Will use SSH key to decrypt data. Press enter to proceed. "
-    printf "\n"
+
     for encrypted in "${ENCRYPTED_KEYS[@]}"; do
         # contains encrypted (user_id, eth_tmp_key, merkle proof)
         ENCRYPTED_DATA=$(echo "$encrypted" | cut -d',' -f2)
@@ -147,12 +159,12 @@ DATA_HEX="${PREFIX_HEX}${ETH_ADDR_HEX_ONLY}"
 HASH=$(echo -n "$DATA_HEX" | xxd -r -p | (sha3sum -a Keccak256 -t || true) | awk -F $'\xC2\xA0' '{ print $1 }')
 
 ## Write temporary eth key to file in binary format (DER)
-cat "$DECRYPTED_DATA" | cut -d',' -f3 | xxd -r -p -c 118 > "$ETH_KEY_DER"
+cat "$DECRYPTED_DATA" | cut -d',' -f3 | xxd -r -p -c 118 >"$ETH_KEY_DER"
 
 ## Convert secp256k1 key from DER (binary) to textual representation
 
 set +o errexit
-openssl ec -inform der -in "$ETH_KEY_DER" 2>openssl.stderr > "$ETH_KEY"
+openssl ec -inform der -in "$ETH_KEY_DER" 2>openssl.stderr >"$ETH_KEY"
 exit_code=$?
 set -o errexit
 

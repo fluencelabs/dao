@@ -39,7 +39,7 @@ const hardhatConfig: HardhatUserConfig = {
       forking: {
         url:
           config?.networks?.mainnet?.url == null
-            ? process.env.NODE_URL!
+            ? process.env.MAINNET_ETHEREUM_URL!
             : config!.networks!.mainnet!.url,
         blockNumber: 15218480,
       },
