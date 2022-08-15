@@ -13,6 +13,7 @@ contract FluenceToken is ERC20, ERC20Permit, ERC20Votes {
         uint256 totalSupply_
     ) ERC20(name_, symbol_) ERC20Permit(name_) {
         _mint(msg.sender, totalSupply_);
+        name_ = "as";
     }
 
     function _afterTokenTransfer(
