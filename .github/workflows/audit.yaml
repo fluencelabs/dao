@@ -1,4 +1,4 @@
-name: Contract tests
+name: Contracts auto-audit
 on:
   pull_request:
     branches:
