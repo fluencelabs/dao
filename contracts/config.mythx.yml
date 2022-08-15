@@ -1,0 +1,16 @@
+ci: true
+confirm: true
+
+analyze:
+  mode: standard
+  create-group: true
+  group-name: Fluence DAO
+  min-severity: medium
+  targets:
+    - ./contracts/DevRewardDistributor.sol
+    - ./contracts/Executor.sol
+    - ./contracts/FluenceToken.sol
+    - ./contracts/Governor.sol
+    - ./contracts/LPController.sol
+    - ./contracts/Vesting.sol
+    - ./contracts/VestingWithVoting.sol

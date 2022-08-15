@@ -1,0 +1,39 @@
+name: Contracts auto-audit
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "./contracts/contracts/**.sol"
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-v1-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-node
+
+      - name: Setup Node.js 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - run: pip install mythx-cli
+
+      - run: npm i
+        working-directory: contracts
+
+      - run: mythx --config config.mythx.yml --api-key ${{ secrets.MYTHX_API_KEY }} analyze --remap-import "@openzeppelin=$(pwd)/node_modules/@openzeppelin" --remap-import "@uniswap=$(pwd)/node_modules/@uniswap"
+        working-directory: contracts
