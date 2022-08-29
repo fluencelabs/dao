@@ -12,4 +12,3 @@ COPY workdir/keys.bin /workdir/
 WORKDIR /
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/proof.sh"]
-

@@ -1,0 +1,39 @@
+name: Test reward sh scripts
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test-contracts:
+    name: Test reward sh scripts
+    runs-on: ubuntu-22.04
+    steps:
+      - run: sudo apt-get update
+      - run: sudo apt-get install xxd
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-v1-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-v1-node
+
+      - name: Setup Node.js 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Download sha3sum
+        run: wget https://gitlab.com/kurdy/sha3sum/uploads/95b6ec553428e3940b3841fc259d02d4/sha3sum-x86_64_Linux-1.1.0.tar.gz -O - | tar xvz
+      - run: cp sha3sum /usr/local/bin/
+      - name: Download age
+        run: wget https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-linux-amd64.tar.gz -O - | tar xvz
+      - run: cp age/age /usr/local/bin/
+      - name: Install merkle proof app
+        run: npm i
+        working-directory: ./reward/merkle_proof
+      - name: Run tests
+        run: ./test.sh
+        working-directory: ./reward
