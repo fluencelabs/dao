@@ -2,23 +2,24 @@
 import base64
 import csv
 import argparse
+import dataclasses
 import os
-from random import randint
 import subprocess
-from eth_account import Account
 import secrets
 import json
+from turtle import st
 from merkle import MerkleTree
-from dataclasses import dataclass
+from eth_account import Account
+from random import randint
+from common import Metadata
 
-
-@dataclass
+@dataclasses.dataclass
 class User:
     name: str
     pubKey: str
     
 outputDir = "output"
-outputFilePath = os.path.join(outputDir, "output.json")
+outputFilePath = os.path.join(outputDir, "metadata.json")
 shOutputFilePath = os.path.join(outputDir, "key.bin")
 
 def read_csv(filename):
@@ -42,7 +43,7 @@ def gen_eth_keys(users):
         
         privateKey = "0x" + secrets.token_hex(32)
         privateKeys[username] = privateKey
-        addresses.append(Account.from_key(privateKey).address)
+        addresses.append(Account.from_key(privateKey).address.lower())
         
     return addresses, privateKeys
 
@@ -66,15 +67,15 @@ def random_sort(addresses):
         addresses[bIndex] = c
 
 def encrypt_for_standart_output(users, privateKeys):
-    encryptedKeys = {}
+    encryptedKeys: dict[str, dict[str, str]] = {}
     for user in users:
         username = user.name
         sshPubKey = user.pubKey
         privateKey = privateKeys[username]
         if not username in encryptedKeys:
-            encryptedKeys[username] = []
+            encryptedKeys[username] = {}
         
-        encryptedKeys[username].append(encrypt_data_with_ssh(privateKey, sshPubKey))
+        encryptedKeys[username][sshPubKey] = encrypt_data_with_ssh(privateKey, sshPubKey)
     return encryptedKeys
 
 def encrypt_for_sh_output(tree, users, addresses, privateKeys):
@@ -88,7 +89,7 @@ def encrypt_for_sh_output(tree, users, addresses, privateKeys):
         username = user.name
         sshPubKey = user.pubKey
         privateKey = privateKeys[username]
-        address = Account.from_key(privateKeys[username]).address
+        address = Account.from_key(privateKeys[username]).address.lower()
         
         if not username in encryptedKeys:
             encryptedKeys[username] = []
@@ -103,14 +104,9 @@ def encrypt_for_sh_output(tree, users, addresses, privateKeys):
     return encryptedKeys
 
 def write_output(root, addresses, encryptedKeys):
-    result = {
-        "root": root,
-        "addresses": addresses,
-        "encryptedKeys": encryptedKeys
-    }
-
+    metadata = Metadata(root=root, addresses=addresses, encryptedKeys=encryptedKeys)
     with open(outputFilePath, 'w') as f:
-        json.dump(result, f, ensure_ascii=False, indent = 4)
+        json.dump(metadata.to_dict(), f, ensure_ascii=False, indent = 4)
 
 def write_output_for_sh_script(encryptedKeys):
     with open(shOutputFilePath, 'w') as f:
@@ -121,7 +117,7 @@ def write_output_for_sh_script(encryptedKeys):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', '-i', type=str, required=True)
+    parser.add_argument('input', type=str)
     
     if not os.path.exists(outputDir):
         os.mkdir(outputDir)
