@@ -7,7 +7,7 @@ RUN cp age/age /usr/local/bin/
 RUN apk add --no-cache bash tini openssl
 
 COPY proof.sh /usr/local/bin/
-COPY workdir/keys.bin /workdir/
+COPY output/metadata.bin /output/
 
 WORKDIR /
 
