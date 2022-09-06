@@ -1,11 +1,11 @@
-name: Test reward sh scripts
+name: Test reward scripts
 on:
   push:
   workflow_dispatch:
 
 jobs:
   test-contracts:
-    name: Test reward sh scripts
+    name: Test reward scripts
     runs-on: ubuntu-22.04
     steps:
       - run: sudo apt-get update
