@@ -18,6 +18,7 @@ jobs:
 
       - name: Pip installs deps
         run: pip install -r requirements.txt --require-hashes
+        working-directory: ./reward
 
       - name: Run merkle test
         run: python merkle_test.py
