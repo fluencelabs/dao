@@ -37,24 +37,30 @@ ask_ssh_key() {
     done
 }
 
-WORK_DIR="$(pwd)/workdir"
-KEYS_BIN="$WORK_DIR/keys.bin"
+WORK_DIR="$(pwd)/__sh_cache__"
 DECRYPTED_DATA="$WORK_DIR/decrypted.data"
 ETH_KEY_DER="$WORK_DIR/tmp_eth.key.der"
 ETH_KEY="$WORK_DIR/tmp_eth.key"
+OPENSSL_STDERR="$WORK_DIR/openssl.stderr"
+AGE_STDERR="$WORK_DIR/age.stderr"
 
-if [ ! -f "$KEYS_BIN" ]; then
-    echo "$KEYS_BIN doesn't exist"
-    exit 1
-fi
+mkdir -p $WORK_DIR
 
 # $# is the number of arguments
-if [ $# -gt 1 ]; then
+if [ $# -gt 2 ]; then
     GITHUB_USERNAME="$1"
     ETHEREUM_ADDRESS="$2"
+    METADATA_BIN="$3"
 else
     read -r -p "Enter your GitHub username: " GITHUB_USERNAME
     read -r -p "Enter your Ethereum address to claim tokens: " ETHEREUM_ADDRESS
+    read -r -p "Enter metadata path: " METADATA_BIN
+
+    if [ ! -f "$METADATA_BIN" ]; then
+        echo "$METADATA_BIN doesn't exist"
+        exit 1
+    fi
+
     STR_LENGTH=$(echo "$ETHEREUM_ADDRESS" | sed -e 's/^0x//' | awk '{ print length }')
     if [ "$STR_LENGTH" -ne 40 ]; then
         echo "$ETHEREUM_ADDRESS is not an Ethereum address. Must be of 40 or 42 (with 0x) characters, was $STR_LENGTH chars"
@@ -68,12 +74,12 @@ else
 fi
 
 KEY_ARG_PATH=''
-if [ $# -gt 2 ]; then
-    KEY_ARG_PATH="$3"
+if [ $# -gt 3 ]; then
+    KEY_ARG_PATH="$4"
 fi
 
 ENCRYPTED_KEYS=()
-while IFS='' read -r line; do ENCRYPTED_KEYS+=("$line"); done < <(grep "^${GITHUB_USERNAME}," "${KEYS_BIN}" || true)
+while IFS='' read -r line; do ENCRYPTED_KEYS+=("$line"); done < <(grep "^${GITHUB_USERNAME}," "${METADATA_BIN}" || true)
 
 # ${#ENCRYPTED_KEYS[@]} -- calculates number of elements in the array
 if [ ${#ENCRYPTED_KEYS[@]} -gt 1 ]; then
@@ -88,7 +94,7 @@ fi
 
 printf "\n\tNOTE: your SSH key is used ONLY LOCALLY to decrypt a message and generate Token Claim Proof."
 printf "\n\tScript will explicitly ask your consent before using the key."
-printf "\n\tIf you have any technical issues, take a look at openssl.stderr and age.stderr files and report to https://fluence.chat \n\n"
+printf "\n\tIf you have any technical issues, take a look at $OPENSSL_STDERR and $AGE_STDERR files and report to https://fluence.chat \n\n"
 
 printf "Which SSH key to use for decryption?\n"
 
@@ -127,7 +133,7 @@ while true; do
         ENCRYPTED_DATA=$(echo "$encrypted" | cut -d',' -f2)
 
         set +o errexit
-        echo "$ENCRYPTED_DATA" | xxd -r -p -c 1000 | age --decrypt --identity "$KEY_PATH" --output "$DECRYPTED_DATA" 2>age.stderr
+        echo "$ENCRYPTED_DATA" | xxd -r -p -c 1000 | age --decrypt --identity "$KEY_PATH" --output "$DECRYPTED_DATA" 2>$OPENSSL_STDERR
         exit_code=$?
         set -o errexit
 
@@ -144,7 +150,7 @@ while true; do
     else
         echo "Couldn't decrypt with that SSH key, please choose another one."
         echo "Possible cause is: "
-        cat age.stderr
+        cat $OPENSSL_STDERR
     fi
 done
 
@@ -164,14 +170,14 @@ cat "$DECRYPTED_DATA" | cut -d',' -f3 | xxd -r -p -c 118 >"$ETH_KEY_DER"
 ## Convert secp256k1 key from DER (binary) to textual representation
 
 set +o errexit
-openssl ec -inform der -in "$ETH_KEY_DER" 2>openssl.stderr >"$ETH_KEY"
+openssl ec -inform der -in "$ETH_KEY_DER" 2>$OPENSSL_STDERR >"$ETH_KEY"
 exit_code=$?
 set -o errexit
 
 if [ $exit_code -ne 0 ]; then
     echo "Failed to parse $ETH_KEY_DER with OpenSSL. Errors below may be relevant."
     echo "==="
-    cat "openssl.stderr"
+    cat $OPENSSL_STDERR
     echo "==="
     exit 1
 fi
