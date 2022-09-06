@@ -6,7 +6,7 @@ RUN wget https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-
 RUN cp age/age /usr/local/bin/
 RUN apk add --no-cache bash tini openssl
 
-COPY proof.sh /usr/local/bin/
+COPY ./proof-sh/proof.sh /usr/local/bin/
 COPY output/metadata.bin /output/
 
 WORKDIR /
