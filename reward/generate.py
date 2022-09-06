@@ -16,7 +16,7 @@ from helpers.common import Metadata
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 
-DEFAULT_OUTPUT_DIR = "output"
+DEFAULT_OUTPUT_DIR = os.path.join(os. getcwd(), "output")
 
 
 @dataclasses.dataclass

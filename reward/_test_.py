@@ -21,7 +21,7 @@ from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 
-TEST_FILES_PATH = "__test_cache__"
+TEST_FILES_PATH = os.path.join(os. getcwd(), "__test_cache__")
 CSV_TEST_PATH = os.path.join(TEST_FILES_PATH, "test.csv")
 USERS = ["user_1", "user_2", "user_3"]
 USERS_WITH_DOUBLE_KEYS = ["user_4"]
