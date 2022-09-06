@@ -33,7 +33,12 @@ def ask_user_info(metadata):
 
 
 def choose_ssh_key():
-    files = os.listdir(SSH_KEYS_DIR)
+    files = []
+    try:
+        files = os.listdir(SSH_KEYS_DIR)
+    except FileNotFoundError:
+        pass
+
     sshKeys = []
     for f in files:
         path = os.path.join(SSH_KEYS_DIR, f)
