@@ -39,10 +39,10 @@ class MerkleTree:
         leafs = []
         for i, account in enumerate(accounts):
             leaf = Web3.solidityKeccak(
-                ["uint256", "bytes32"],
+                ["uint32", "bytes20"],
                 [
                     i,
-                    "0x000000000000000000000000" + account.replace("0x", "")
+                    account
                 ]
             )
             leafs.append(leaf)

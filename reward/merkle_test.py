@@ -12,7 +12,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             tree.get_root(),
-            "0xe03d95e6572c9c3d1dc2f310b0148dca89d08d9b8b8459cdc2667344615994d0"
+            "0x65a7482ec1e10d14aabb46dce0681c14693fd27e99496b90b88d18d942e69827"
         )
 
     def test_gen_merkle_root_two(self):
@@ -25,7 +25,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             tree.get_root(),
-            "0x7d29796cd53c0443e4e879329070e45ee2b926c6ac4739540a0091b26c816215"
+            "0x887d282fcf9b1b18f5d5ad073add82bb1f9b5947074f17b049423c43c2edc5eb"
         )
 
     def test_gen_merkle_root_three(self):
@@ -39,7 +39,7 @@ class Test(unittest.TestCase):
         ])
         self.assertEqual(
             tree.get_root(),
-            "0x7af560a7d579b81a0d8058bdb07e0700e5fcc454dcc115c97732d644ae53311e"
+            "0x4c7b502da67f50d75e1ffdc8e9230f0766908a4f4bec41425c476992e175e539"
         )
 
     def test_gen_merkle_root_tour(self):
@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
         ])
         self.assertEqual(
             tree.get_root(),
-            "0xca22b62c1dec6b20d7fedfe1b9493820b37ae3a0d8ced44d8b1010f49cdc4ea4"
+            "0x3271eb7121b96c005fe3235f211b442a92f491c4c067e249e0ae0af655c96937"
         )
 
     def test_gen_merkle_root_tour(self):
@@ -71,43 +71,43 @@ class Test(unittest.TestCase):
         tree = MerkleTree(v)
         self.assertEqual(
             tree.get_root(),
-            "0xca22b62c1dec6b20d7fedfe1b9493820b37ae3a0d8ced44d8b1010f49cdc4ea4"
+            "0x3271eb7121b96c005fe3235f211b442a92f491c4c067e249e0ae0af655c96937"
         )
 
         proof = [
             [
-                '0xbc45a5a89dc36a3468c19b9a11ea32a3663bea50182b70bfd2520018ac5dcb87',
-                '0xa844d8f54d8dc953b9d13f43b95742b5cb0712443ba7c33bcfaa9c209f7cf19c',
-                '0xb080c317578e3a66a257cc14a7ea807b31f4f5ba0a8afefc9a3a9e4de7e2e02b'
+                '0x12c17dcd8b8eac48894f491746f44bf8c8bdeab97b0fb42780d032af6a9bae74',
+                '0x17a23e9275f7628e4fca74944437191dbe7a95cc9cefa865bfb3d54321ec7e00',
+                '0xf8cd45cad8572d8dd0300ec8dee54aa2a3dcf7565c0c875234c779a04370c686'
             ],
             [
-                '0xc4a503ecd6579087f0941171a61b494ff21fc3d3bd89b568b7f5fc515c30c9cf',
-                '0xa844d8f54d8dc953b9d13f43b95742b5cb0712443ba7c33bcfaa9c209f7cf19c',
-                '0xb080c317578e3a66a257cc14a7ea807b31f4f5ba0a8afefc9a3a9e4de7e2e02b'
+                '0x827ab251e8cf1433dd27f54b8a3d98174056749dd3ff67ecac0837e5f6cb3cd0',
+                '0x17a23e9275f7628e4fca74944437191dbe7a95cc9cefa865bfb3d54321ec7e00',
+                '0xf8cd45cad8572d8dd0300ec8dee54aa2a3dcf7565c0c875234c779a04370c686'
             ],
             [
-                '0x8947e7ab682c7d402e889271e9333fc051155de32cedef16a0741a8228dc5898',
-                '0xe03d95e6572c9c3d1dc2f310b0148dca89d08d9b8b8459cdc2667344615994d0',
-                '0xb080c317578e3a66a257cc14a7ea807b31f4f5ba0a8afefc9a3a9e4de7e2e02b'
+                '0x64c3d348b53464e4cd091fb28a52c2a9d9026fd7be0177e8a58c18e9a1dd2698',
+                '0x65a7482ec1e10d14aabb46dce0681c14693fd27e99496b90b88d18d942e69827',
+                '0xf8cd45cad8572d8dd0300ec8dee54aa2a3dcf7565c0c875234c779a04370c686'
             ],
             [
-                '0x96e4c59ff58c1dcff7a752e2bef32872dcf4483ee3f644712227b8bdea8e3728',
-                '0xe03d95e6572c9c3d1dc2f310b0148dca89d08d9b8b8459cdc2667344615994d0',
-                '0xb080c317578e3a66a257cc14a7ea807b31f4f5ba0a8afefc9a3a9e4de7e2e02b'
+                '0xe4207a74cd8eafd52a57d95be9c2397a1b33bcecba12442195705d441444b3a9',
+                '0x65a7482ec1e10d14aabb46dce0681c14693fd27e99496b90b88d18d942e69827',
+                '0xf8cd45cad8572d8dd0300ec8dee54aa2a3dcf7565c0c875234c779a04370c686'
             ],
             [
-                '0x0d320c659ea58a0484e165d72a74f14fb585b3392b8e710505189e53237333de',
-                '0x1df7016ec5c60da03645f1a7d903b14b22141f95f011985cb523bfced9192add',
-                '0x7d29796cd53c0443e4e879329070e45ee2b926c6ac4739540a0091b26c816215'
+                '0xed2f78721594402e6757f4d5d8b491cc6f06c10d6cd3a99803db3f8932d36c4d',
+                '0x8ac28980a9a848e172c74c57e2f7fff64e73c75799da7e619372ff3173c3be69',
+                '0x887d282fcf9b1b18f5d5ad073add82bb1f9b5947074f17b049423c43c2edc5eb'
             ],
             [
-                '0x5a3104971f7ca552ee2642261e3f07f1f4b8e3924aa57780b5073fbdb9c52a17',
-                '0x1df7016ec5c60da03645f1a7d903b14b22141f95f011985cb523bfced9192add',
-                '0x7d29796cd53c0443e4e879329070e45ee2b926c6ac4739540a0091b26c816215'
+                '0x2a06ae5e04fb1513e75d6fe541e3a39bfedca64b209a6c1016bc4af2cc3fa883',
+                '0x8ac28980a9a848e172c74c57e2f7fff64e73c75799da7e619372ff3173c3be69',
+                '0x887d282fcf9b1b18f5d5ad073add82bb1f9b5947074f17b049423c43c2edc5eb'
             ],
             [
-                '0x6b880130824f6949ea52dda329400da062b8db6ac376840cd144874be081bb53',
-                '0x7d29796cd53c0443e4e879329070e45ee2b926c6ac4739540a0091b26c816215'
+                '0xfc4778b67ab8597a9c5d25e5e0062db02ed226352720db0d70b19c06a333ddf7',
+                '0x887d282fcf9b1b18f5d5ad073add82bb1f9b5947074f17b049423c43c2edc5eb'
             ]
         ]
 
