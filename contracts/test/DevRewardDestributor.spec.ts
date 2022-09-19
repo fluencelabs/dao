@@ -13,8 +13,8 @@ const generateMerkleTree = (addresses: Array<string>): MerkleTree => {
   const leaves = addresses.map((v, index) =>
     ethers.utils.arrayify(
       ethers.utils.solidityPack(
-        ["uint32", "bytes32"],
-        [index, ethers.utils.zeroPad(ethers.utils.arrayify(v), 32)]
+        ["uint32", "address"],
+        [index, ethers.utils.arrayify(v)]
       )
     )
   );
@@ -155,11 +155,8 @@ describe("DevRewardDistributor", () => {
     );
     const account = tempDevAccounts[accountId];
     const leaf = ethers.utils.solidityKeccak256(
-      ["uint256", "bytes32"],
-      [
-        accountId,
-        ethers.utils.zeroPad(ethers.utils.arrayify(account.address), 32),
-      ]
+      ["uint32", "address"],
+      [accountId, account.address]
     );
 
     return {
