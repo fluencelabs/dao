@@ -125,7 +125,7 @@ contract DevRewardDistributor {
     ) external whenClaimingIs(true) {
         require(!isClaimed(userId), "Tokens already claimed");
 
-        bytes32 leaf = keccak256(abi.encode(userId, temporaryAddress));
+        bytes32 leaf = keccak256(abi.encodePacked(userId, temporaryAddress));
 
         require(
             MerkleProof.verify(merkleProof, merkleRoot, leaf),

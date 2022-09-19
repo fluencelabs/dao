@@ -13,7 +13,7 @@ const generateMerkleTree = (addresses: Array<string>): MerkleTree => {
   const leaves = addresses.map((v, index) =>
     ethers.utils.arrayify(
       ethers.utils.solidityPack(
-        ["uint256", "bytes32"],
+        ["uint32", "bytes32"],
         [index, ethers.utils.zeroPad(ethers.utils.arrayify(v), 32)]
       )
     )
