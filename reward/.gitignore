@@ -1,5 +1,10 @@
-merkle_proof/node_modules
-./rewarded_keys.csv
+python/__pycache__
+python/output
+test.csv
+__pycache__
+__test_cache__
+__sh_cache__
+
 age.stderr
 openssl.stderr
-/test_data
+test_data

@@ -1,0 +1,37 @@
+name: Test reward scripts
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test-contracts:
+    name: Test reward scripts
+    runs-on: ubuntu-22.04
+    steps:
+      - run: sudo apt-get update
+      - run: sudo apt-get install xxd
+
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install deps
+        run: pip install -r requirements.txt --require-hashes
+        working-directory: ./reward
+
+      - name: Install sha3sum
+        run: wget https://gitlab.com/kurdy/sha3sum/uploads/95b6ec553428e3940b3841fc259d02d4/sha3sum-x86_64_Linux-1.1.0.tar.gz -O - | tar xvz
+      - run: cp sha3sum /usr/local/bin/
+
+      - name: Install age
+        run: wget https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-linux-amd64.tar.gz -O - | tar xvz
+      - run: cp age/age /usr/local/bin/
+
+      - name: Run merkle test
+        run: python merkle_test.py
+        working-directory: ./reward
+
+      - name: Run tests
+        run: python _test_.py
+        working-directory: ./reward
