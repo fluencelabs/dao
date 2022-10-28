@@ -8,3 +8,4 @@ __sh_cache__
 age.stderr
 openssl.stderr
 test_data
+test-keys
