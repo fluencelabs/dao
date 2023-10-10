@@ -2,7 +2,7 @@ import chai, { expect } from "chai";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ethers, deployments, getNamedAccounts, waffle } from "hardhat";
 import { FluenceToken, VestingWithVoting } from "../typechain";
-import { BigNumber, Wallet } from "ethers";
+import { Wallet } from "ethers";
 import { MONTH } from "../utils/time";
 import { Config } from "../utils/config";
 import { ZERO_ADDRESS } from "../utils/consts";
