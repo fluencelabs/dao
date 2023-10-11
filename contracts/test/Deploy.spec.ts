@@ -10,7 +10,6 @@ import {
   Vesting,
   LPController,
   FluenceToken__factory,
-  IERC20,
   IERC20Metadata,
 } from "../typechain";
 import { Config, Vesting as VestingConfig } from "../utils/config";

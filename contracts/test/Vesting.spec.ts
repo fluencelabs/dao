@@ -1,10 +1,10 @@
-import chai, { expect, util } from "chai";
+import chai, { expect } from "chai";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ethers, deployments, getNamedAccounts, waffle } from "hardhat";
 import { FluenceToken, Vesting } from "../typechain";
 import { BigNumber, Wallet } from "ethers";
 import { THROW_ERROR_PREFIX, ZERO_ADDRESS } from "../utils/consts";
-import { DAY, MONTH } from "../utils/time";
+import { MONTH } from "../utils/time";
 import { Config } from "../utils/config";
 
 chai.use(waffle.solidity);
