@@ -2,7 +2,8 @@
 
 pragma solidity >=0.8.15;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "./FluenceToken.sol";
 import "./interfaces/IVestingERC20.sol";
 
@@ -12,7 +13,7 @@ import "./interfaces/IVestingERC20.sol";
  * @dev This contract implements the ERC20 standard. It is possible to add the contract to a wallet. Transferring to zero address is unlocking the released amount.
  */
 contract Vesting is IVestingERC20 {
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /**
      * @notice Returns the vesting token
@@ -200,7 +201,7 @@ contract Vesting is IVestingERC20 {
 
         _beforeBurn(from, amount);
 
-        IERC20(token).safeTransfer(from, amount);
+        IERC20Upgradeable(token).safeTransfer(from, amount);
 
         balanceOf[from] -= amount;
     }

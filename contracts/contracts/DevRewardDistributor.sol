@@ -6,14 +6,14 @@ import "./FluenceToken.sol";
 import "./Executor.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 /**
  * @title DevRewardDistributor
  * @notice Contract for managing developers reward
  */
 contract DevRewardDistributor {
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /**
      * @notice Reward token
@@ -143,7 +143,7 @@ contract DevRewardDistributor {
 
         uint256 amount = currentReward();
 
-        IERC20(token).safeTransfer(msg.sender, amount);
+        IERC20Upgradeable(token).safeTransfer(msg.sender, amount);
 
         emit Claimed(userId, msg.sender, amount, leaf);
     }
@@ -152,7 +152,7 @@ contract DevRewardDistributor {
      * @notice used to move any remaining tokens out of the contract after expiration
      **/
     function transferUnclaimed() external whenClaimingIs(false) {
-        IERC20 rewardToken = IERC20(token); //gas saving
+        IERC20Upgradeable rewardToken = IERC20Upgradeable(token); //gas saving
 
         uint256 remainingBalance = rewardToken.balanceOf(address(this));
         rewardToken.safeTransfer(address(executor), remainingBalance);
