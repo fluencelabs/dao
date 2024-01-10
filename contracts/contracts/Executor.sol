@@ -23,7 +23,7 @@ contract Executor is TimelockControllerUpgradeable, UUPSUpgradeable {
      **/
     function initialize(uint256 minDelay) public initializer {
         __UUPSUpgradeable_init();
-        __TimelockController_init(minDelay, new address[](0), new address[](1));
+        __TimelockController_init(minDelay, new address[](0), new address[](1), address(0));
     }
 
     function _authorizeUpgrade(
