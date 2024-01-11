@@ -10,7 +10,7 @@ import {
   Vesting,
   LPController,
   IERC20Metadata,
-    DevERC20__factory,
+  DevERC20__factory,
 } from "../typechain";
 import { Config, Vesting as VestingConfig } from "../utils/config";
 import { DAY, MONTH } from "../utils/time";
@@ -48,6 +48,8 @@ describe("Deploy script", () => {
 
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
+      await deployments.fixture([]);
+
       usdToken = await new DevERC20__factory(
         (
           await ethers.getSigners()
@@ -128,7 +130,6 @@ describe("Deploy script", () => {
 
       config = Config.get();
 
-      await deployments.fixture([]);
       await deployments.fixture();
 
       token = (await ethers.getContractAt(

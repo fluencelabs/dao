@@ -12,7 +12,8 @@ import {
   IBalancerVault__factory,
   IUniswapV3Pool__factory,
   IBalancerLBP__factory,
-  DevERC20__factory, IERC20Metadata__factory,
+  DevERC20__factory,
+  IERC20Metadata__factory,
 } from "../../typechain";
 import { BigNumber } from "ethers";
 import { DAY } from "../../utils/time";
@@ -107,7 +108,7 @@ const setupTest = deployments.createFixture(
   }
 );
 
-describe.only("LPController", () => {
+describe("LPController", () => {
   let config: Config;
   let lpController: LPController;
   let vault: IBalancerVault;
