@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesU
 import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/governance/extensions/GovernorTimelockControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "./VestingWithVoting.sol";
 import "./Executor.sol";
@@ -117,7 +116,9 @@ contract Governor is
     }
 
     /// @inheritdoc IGovernorUpgradeable
-    function quorum(uint256 blockNumber)
+    function quorum(
+        uint256 blockNumber
+    )
         public
         view
         override(IGovernorUpgradeable, GovernorVotesQuorumFractionUpgradeable)
@@ -127,7 +128,9 @@ contract Governor is
     }
 
     /// @inheritdoc GovernorUpgradeable
-    function state(uint256 proposalId)
+    function state(
+        uint256 proposalId
+    )
         public
         view
         override(GovernorUpgradeable, GovernorTimelockControlUpgradeable)
@@ -196,7 +199,9 @@ contract Governor is
     }
 
     /// @inheritdoc GovernorUpgradeable
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         override(GovernorUpgradeable, GovernorTimelockControlUpgradeable)

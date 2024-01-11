@@ -9,6 +9,8 @@ import "hardhat-tracer";
 import "hardhat-docgen";
 import { HardhatUserConfig, task } from "hardhat/config";
 import { Config } from "./utils/config";
+import "hardhat-contract-sizer";
+import "dotenv/config";
 import fs from "fs";
 import YAML from "yaml";
 
@@ -75,7 +77,7 @@ const hardhatConfig: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 20000,
+            runs: 1000,
           },
         },
       },

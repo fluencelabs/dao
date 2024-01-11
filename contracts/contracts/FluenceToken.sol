@@ -15,25 +15,17 @@ contract FluenceToken is ERC20, ERC20Permit, ERC20Votes {
         _mint(msg.sender, totalSupply_);
     }
 
-    function _afterTokenTransfer(
+    function _update(
         address from,
         address to,
-        uint256 amount
+        uint256 value
     ) internal override(ERC20, ERC20Votes) {
-        super._afterTokenTransfer(from, to, amount);
+        super._update(from, to, value);
     }
 
-    function _mint(address to, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._mint(to, amount);
-    }
-
-    function _burn(address account, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._burn(account, amount);
+    function nonces(
+        address owner
+    ) public view override(ERC20Permit, Nonces) returns (uint256) {
+        return super.nonces(owner);
     }
 }

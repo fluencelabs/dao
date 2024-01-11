@@ -43,7 +43,7 @@ contract LPController is Ownable {
         Executor _daoExecutor,
         IERC20 token0_,
         IERC20 token1_
-    ) {
+    ) Ownable(msg.sender) {
         balancerLBPFactory = _balancerLBPFactory;
         uniswapPositionManager = _uniswapPositionManager;
         balancerVault = _balancerVault;
@@ -109,10 +109,10 @@ contract LPController is Ownable {
         );
 
         token0.transferFrom(msg.sender, address(this), initBalances[0]);
-        token0.safeApprove(address(balancerVault), initBalances[0]);
+        token0.forceApprove(address(balancerVault), initBalances[0]);
 
         token1.transferFrom(msg.sender, address(this), initBalances[1]);
-        token1.safeApprove(address(balancerVault), initBalances[1]);
+        token1.forceApprove(address(balancerVault), initBalances[1]);
 
         IBalancerVault.JoinPoolRequest memory request = IBalancerVault
             .JoinPoolRequest({
@@ -217,8 +217,8 @@ contract LPController is Ownable {
 
         pool.initialize(sqrtPriceX96);
 
-        token0.safeApprove(address(uniswapPositionManager), balance0);
-        token1.safeApprove(address(uniswapPositionManager), balance1);
+        token0.forceApprove(address(uniswapPositionManager), balance0);
+        token1.forceApprove(address(uniswapPositionManager), balance1);
 
         IUniswapNFTManager.MintParams memory params = IUniswapNFTManager
             .MintParams({
