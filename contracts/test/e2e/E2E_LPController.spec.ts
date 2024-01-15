@@ -3,16 +3,17 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ethers, deployments, waffle, getNamedAccounts } from "hardhat";
 import {
   LPController,
-  FluenceToken__factory,
+  IERC20MetadataUpgradeable,
   IERC20Metadata,
   IBalancerLBPFactory,
   IBalancerLBPFactory__factory,
   IBalancerLBP,
   IBalancerVault,
   IBalancerVault__factory,
-  IERC20Metadata__factory,
   IUniswapV3Pool__factory,
   IBalancerLBP__factory,
+  DevERC20__factory,
+  IERC20Metadata__factory,
 } from "../../typechain";
 import { BigNumber } from "ethers";
 import { DAY } from "../../utils/time";
@@ -38,12 +39,12 @@ const setupTest = deployments.createFixture(
     hre: HardhatRuntimeEnvironment
   ): Promise<{
     lpController: LPController;
-    fltToken: IERC20Metadata;
+    fltToken: IERC20MetadataUpgradeable;
     usdToken: IERC20Metadata;
   }> => {
     await deployments.fixture([]);
 
-    const token = await new FluenceToken__factory(
+    const token = await new DevERC20__factory(
       (
         await ethers.getSigners()
       )[0]
@@ -102,7 +103,7 @@ const setupTest = deployments.createFixture(
         (
           await hre.deployments.get("FluenceToken")
         ).address
-      )) as IERC20Metadata,
+      )) as IERC20MetadataUpgradeable,
     };
   }
 );
@@ -115,7 +116,7 @@ describe("LPController", () => {
   let lbp: IBalancerLBP;
   let poolId: string;
   let params: Array<{
-    token: IERC20Metadata;
+    token: IERC20MetadataUpgradeable;
     weight: BigNumber;
     endWeight: BigNumber;
     initialAmount: BigNumber;

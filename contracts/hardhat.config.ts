@@ -7,6 +7,7 @@ import "solidity-coverage";
 import "hardhat-deploy";
 import "hardhat-tracer";
 import "hardhat-docgen";
+import "dotenv/config";
 import { HardhatUserConfig, task } from "hardhat/config";
 import { Config } from "./utils/config";
 import fs from "fs";
