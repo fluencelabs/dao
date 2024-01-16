@@ -43,7 +43,7 @@ const hardhatConfig: HardhatUserConfig = {
           config?.networks?.mainnet?.url == null
             ? process.env.MAINNET_ETHEREUM_URL!
             : config!.networks!.mainnet!.url,
-        blockNumber: 15218480,
+        blockNumber: 19021757,
       },
     },
     localhost: {

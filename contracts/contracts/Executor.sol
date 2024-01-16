@@ -26,7 +26,7 @@ contract Executor is TimelockControllerUpgradeable, UUPSUpgradeable {
             minDelay,
             new address[](0),
             new address[](1),
-            address(0)
+            msg.sender
         );
     }
 

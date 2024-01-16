@@ -37,7 +37,6 @@ describe("Deploy script", () => {
   let token: FluenceToken;
   let usdToken: IERC20Metadata;
   let executor: Executor;
-  let lpController: LPController;
   let devRewardDistributor: DevRewardDistributor;
   let investorsVesting: Vesting;
   let fluenceVesting: Vesting;
@@ -48,6 +47,7 @@ describe("Deploy script", () => {
 
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
+      await deployments.fixture([]);
       usdToken = await new FluenceToken__factory(
         (
           await ethers.getSigners()
@@ -128,7 +128,6 @@ describe("Deploy script", () => {
 
       config = Config.get();
 
-      await deployments.fixture([]);
       await deployments.fixture();
 
       token = (await ethers.getContractAt(
