@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1",
-    "@openzeppelin/contracts-upgradeable": "^4.9.2",
+    "@openzeppelin/contracts-upgradeable": "^5.0.1",
     "@uniswap/sdk": "^3.0.3",
     "@uniswap/v3-core": "^1.0.1",
     "csv-parse": "^5.2.1",

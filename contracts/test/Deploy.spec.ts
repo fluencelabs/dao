@@ -9,8 +9,8 @@ import {
   Governor,
   Vesting,
   LPController,
-  FluenceToken__factory,
   IERC20Metadata,
+  DevERC20__factory,
 } from "../typechain";
 import { Config, Vesting as VestingConfig } from "../utils/config";
 import { DAY, MONTH } from "../utils/time";
@@ -20,9 +20,7 @@ chai.use(waffle.solidity);
 const PROPOSER_ROLE = ethers.utils.keccak256(
   ethers.utils.toUtf8Bytes("PROPOSER_ROLE")
 );
-const TIMELOCK_ADMIN_ROLE = ethers.utils.keccak256(
-  ethers.utils.toUtf8Bytes("TIMELOCK_ADMIN_ROLE")
-);
+const DEFAULT_ADMIN_ROLE = ethers.utils.hexZeroPad([0], 32);
 const CANCELLER_ROLE = ethers.utils.keccak256(
   ethers.utils.toUtf8Bytes("CANCELLER_ROLE")
 );
@@ -38,6 +36,7 @@ describe("Deploy script", () => {
   let usdToken: IERC20Metadata;
   let executor: Executor;
   let devRewardDistributor: DevRewardDistributor;
+  let lpController: LPController;
   let investorsVesting: Vesting;
   let fluenceVesting: Vesting;
   let teamVesting: VestingWithVoting;
@@ -47,8 +46,7 @@ describe("Deploy script", () => {
 
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
-      await deployments.fixture([]);
-      usdToken = await new FluenceToken__factory(
+      usdToken = await new DevERC20__factory(
         (
           await ethers.getSigners()
         )[0]
@@ -128,7 +126,7 @@ describe("Deploy script", () => {
 
       config = Config.get();
 
-      await deployments.fixture();
+      await deployments.fixture([]);
 
       token = (await ethers.getContractAt(
         "FluenceToken",
@@ -273,8 +271,8 @@ describe("Deploy script", () => {
       config.deployment!.executor!.delayDays * DAY
     );
 
-    expect(await executor.hasRole(TIMELOCK_ADMIN_ROLE, deployer)).to.eq(false);
-    expect(await executor.hasRole(TIMELOCK_ADMIN_ROLE, executor.address)).to.eq(
+    expect(await executor.hasRole(DEFAULT_ADMIN_ROLE, deployer)).to.eq(false);
+    expect(await executor.hasRole(DEFAULT_ADMIN_ROLE, executor.address)).to.eq(
       true
     );
 

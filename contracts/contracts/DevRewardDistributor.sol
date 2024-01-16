@@ -191,7 +191,7 @@ contract DevRewardDistributor {
         }
 
         uint256 halveTimes = (block.timestamp - deployTime) / halvePeriod;
-        uint256 denominator = 2**halveTimes;
+        uint256 denominator = 2 ** halveTimes;
 
         return initialReward / denominator;
     }
