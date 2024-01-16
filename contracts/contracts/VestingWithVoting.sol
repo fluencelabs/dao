@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/governance/utils/Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./Vesting.sol";
 import "./FluenceToken.sol";
-import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 /**
  * @title Vesting with voting

@@ -347,19 +347,19 @@ describe("LPController", () => {
         BigNumber.from(1)
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+      'OwnableUnauthorizedAccount("0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65")'
     );
 
     await expect(
       lpControllerWithMainAccount.setSwapEnabledInBalancerLBP(false)
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+      `OwnableUnauthorizedAccount("0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65")`
     );
 
     await expect(
       lpControllerWithMainAccount.exitFromBalancerLBP()
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+      `OwnableUnauthorizedAccount("0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65")`
     );
 
     await expect(
@@ -369,7 +369,7 @@ describe("LPController", () => {
         BigNumber.from(1)
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+      `OwnableUnauthorizedAccount("0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65")`
     );
 
     await expect(
@@ -378,7 +378,7 @@ describe("LPController", () => {
         BigNumber.from(1000)
       )
     ).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Ownable: caller is not the owner'`
+      `OwnableUnauthorizedAccount("0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65")`
     );
   });
 });

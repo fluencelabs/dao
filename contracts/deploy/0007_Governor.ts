@@ -10,12 +10,10 @@ import { BigNumber } from "ethers";
 const RPROPOSER_ROLE = ethers.utils.keccak256(
   ethers.utils.toUtf8Bytes("PROPOSER_ROLE")
 );
-const TIMELOCK_ADMIN_ROLE = ethers.utils.keccak256(
-  ethers.utils.toUtf8Bytes("TIMELOCK_ADMIN_ROLE")
-);
 const CANCELLER_ROLE = ethers.utils.keccak256(
   ethers.utils.toUtf8Bytes("CANCELLER_ROLE")
 );
+const DEFAULT_ADMIN_ROLE = ethers.utils.hexZeroPad([0], 32);
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -73,9 +71,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       autoMine: true,
       waitConfirmations: 1,
     },
-    "revokeRole",
-    RPROPOSER_ROLE,
-    deployer
+    "grantRole",
+    CANCELLER_ROLE,
+    governorDeployment.address
   );
 
   await hre.deployments.execute(
@@ -100,7 +98,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       waitConfirmations: 1,
     },
     "revokeRole",
-    TIMELOCK_ADMIN_ROLE,
+    DEFAULT_ADMIN_ROLE,
     deployer
   );
 

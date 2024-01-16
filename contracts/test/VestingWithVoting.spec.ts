@@ -34,7 +34,6 @@ const setupTest = deployments.createFixture(
       }
     );
 
-    await deployments.fixture([]);
     await hre.deployments.fixture(["FluenceToken"]);
 
     const { deployer, mainAccount } = await hre.getNamedAccounts();

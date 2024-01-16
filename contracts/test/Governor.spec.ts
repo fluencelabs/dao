@@ -59,7 +59,6 @@ describe("Deploy script", () => {
 
       config = Config.get();
 
-      await deployments.fixture([]);
       await deployments.fixture([
         "FluenceToken",
         "TeamVesting",
@@ -254,8 +253,9 @@ describe("Deploy script", () => {
       ethers.provider.getSigner(account.address)
     ).deploy();
 
-    const data = (await governor.populateTransaction.upgradeTo(newImp.address))
-      .data!;
+    const data = (
+      await governor.populateTransaction.upgradeToAndCall(newImp.address, "0x")
+    ).data!;
 
     await createVoteAndWaitProposal([governor.address], [0], [data], "");
 
@@ -279,8 +279,9 @@ describe("Deploy script", () => {
       ethers.provider.getSigner(account.address)
     ).deploy();
 
-    const data = (await executor.populateTransaction.upgradeTo(newImp.address))
-      .data!;
+    const data = (
+      await executor.populateTransaction.upgradeToAndCall(newImp.address, "0x")
+    ).data!;
 
     await createVoteAndWaitProposal([executor.address], [0], [data], "");
 
@@ -304,7 +305,9 @@ describe("Deploy script", () => {
       ethers.provider.getSigner(account.address)
     ).deploy();
 
-    await expect(governor.upgradeTo(newImp.address)).to.be.revertedWith(
+    await expect(
+      governor.upgradeToAndCall(newImp.address, "0x")
+    ).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Only the executor contract can authorize an upgrade'`
     );
   });
@@ -317,7 +320,9 @@ describe("Deploy script", () => {
       ethers.provider.getSigner(account.address)
     ).deploy();
 
-    await expect(executor.upgradeTo(newImp.address)).to.be.revertedWith(
+    await expect(
+      executor.upgradeToAndCall(newImp.address, "0x")
+    ).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Only this contract can authorize an upgrade'`
     );
   });

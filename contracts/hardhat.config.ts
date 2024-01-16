@@ -10,6 +10,8 @@ import "hardhat-docgen";
 import "dotenv/config";
 import { HardhatUserConfig, task } from "hardhat/config";
 import { Config } from "./utils/config";
+import "hardhat-contract-sizer";
+import "dotenv/config";
 import fs from "fs";
 import YAML from "yaml";
 
@@ -42,7 +44,7 @@ const hardhatConfig: HardhatUserConfig = {
           config?.networks?.mainnet?.url == null
             ? process.env.MAINNET_ETHEREUM_URL!
             : config!.networks!.mainnet!.url,
-        blockNumber: 15218480,
+        blockNumber: 19021757,
       },
     },
     localhost: {
@@ -72,11 +74,11 @@ const hardhatConfig: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.15",
+        version: "0.8.20",
         settings: {
           optimizer: {
             enabled: true,
-            runs: 20000,
+            runs: 1000,
           },
         },
       },
