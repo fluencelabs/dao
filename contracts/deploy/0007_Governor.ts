@@ -76,18 +76,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     governorDeployment.address
   );
 
-  await hre.deployments.execute(
-    "Executor",
-    {
-      from: deployer,
-      log: true,
-      autoMine: true,
-      waitConfirmations: 1,
-    },
-    "grantRole",
-    CANCELLER_ROLE,
-    governorDeployment.address
-  );
+  // TODO: why we do not grant EXECUTOR_ROLE?
 
   await hre.deployments.execute(
     "Executor",

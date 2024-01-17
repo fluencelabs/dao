@@ -2,6 +2,89 @@
 
 This is solidity contracts for Fluence DAO.
 
+
+
+## Deploy & Role Delegation Flow
+Deploy Flow according to [deploy scripts](deploy).
+
+```mermaid
+sequenceDiagram
+    
+    actor deployer
+    box Fluence Contracts
+        participant FluenceToken
+        participant Executor as Executor (TimelockController)
+        participant LPController
+        participant Uniswap
+        participant DevRewardDistributor
+        participant FluenceVesting
+        participant InvestorsVesting
+        participant TeamVesting as Vesting with Voting
+        participant Governor
+    end
+    
+    alt 0000_FluenceToken.ts
+        deployer ->> FluenceToken: deploy (totalSupply)
+        Note over FluenceToken: Owner: deployer
+        FluenceToken -->> deployer: mint (totalSupply)
+    end
+    
+    alt 0001_Executor.ts
+        deployer ->> Executor: deploy (minDelay)
+        Note over Executor: Admin Role: deployer, Proposer Role: [0x0]
+    end
+        
+    alt 0002_LPController.ts
+        deployer ->>+ LPController: deploy (...Uniswap, balancer, Executor, FluenceToken, token, weights...)
+        Note over LPController: Owner: deployer, Withdraw address: Executor
+        LPController ->>- Uniswap: uniswapPositionManager.mint() 
+        Note over Uniswap: Recipient: Executor
+    end
+    
+    alt 0003_DevRewardDistributor.ts
+        deployer ->> DevRewardDistributor: deploy (FluenceToken, Executor, merkle root, halvePeriod, initialReward, claimingPeriod)
+        Note over DevRewardDistributor: unclaimed reward receiver: Executor
+        deployer ->>+ FluenceToken: transfer (totalRewards) to DevRewardDistributor
+        FluenceToken ->>- DevRewardDistributor: transfer (totalRewards)
+    end
+    
+    alt Vesting
+        alt 0004_FluenceVesting.ts
+            deployer ->> FluenceVesting: deploy (FluenceToken, cliffDuration , vestingDuration , accounts , amounts)
+            deployer ->>+ FluenceToken: transfer (totalAmounts) to FluenceVesting
+            FluenceToken ->>- FluenceVesting: transfer (totalAmounts)
+            Note over FluenceVesting: could transfer(0x00, amount) to release FluenceToken for accounts accordingly: accounts
+        end
+        
+        alt 0005_InvestorsVesting.ts
+            deployer ->> InvestorsVesting: deploy (FluenceToken, cliffDuration , vestingDuration , accounts , amounts)
+            deployer ->>+ FluenceToken: transfer (totalAmounts) to FluenceVesting
+            FluenceToken ->>- InvestorsVesting: transfer (totalAmounts)
+            Note over InvestorsVesting: could transfer(0x00, amount) to release FluenceToken for accounts accordingly: accounts
+        end
+        
+        alt 0006_TeamVesting.ts
+            deployer ->> TeamVesting: deploy (FluenceToken, cliffDuration , vestingDuration , accounts , amounts)
+            deployer ->>+ FluenceToken: transfer (totalAmounts) to FluenceVesting
+            FluenceToken ->>- TeamVesting: transfer (totalAmounts)
+            Note over TeamVesting: could transfer(0x00, amount) to release FluenceToken for accounts accordingly: accounts
+        end
+    end
+    
+    alt 0007_Governor.ts
+        deployer ->> Governor: deploy (FluenceToken, TeamVesting, Executor, quorum, initialVotingDelay, initialVotingPeriod, initialProposalThreshold)
+        
+        deployer ->> Executor: grantRole(RPROPOSER_ROLE, Governor)
+        deployer ->> Executor: grantRole(CANCELLER_ROLE, Governor)
+        deployer ->> Executor: revokeRole(ADMIN_ROLE, deployer)
+        deployer ->>+ FluenceToken: transfer (balance) to Governor
+        FluenceToken ->>- Governor: transfer (balance)
+        
+        
+        Note over Governor: Owner: Executor, Proposer Role: [Governor], Canceller Role: [Governor], Admin Role: [0x0]
+    end
+```
+
 ## Develop
 
 ### Install dep

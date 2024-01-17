@@ -39,7 +39,7 @@ contract Governor is
      * @param teamVesting_ - team
      * @param executor_ - DAO timelock contract
      * @param quorum_ - minimum percentage of quorum to accept a proposal
-     * @param initialVotingDelay - delay beetween the creation of a proposal and the start of voting
+     * @param initialVotingDelay - delay between the creation of a proposal and the start of voting
      * @param initialVotingPeriod - voting duration
      * @param initialProposalThreshold - tokens threshold for creating a proposal
      **/
