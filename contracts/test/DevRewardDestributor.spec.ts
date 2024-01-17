@@ -42,6 +42,9 @@ const setupTest = deployments.createFixture(
       devAccounts.map((x) => x.address)
     );
 
+    const hardhatSigners = await hre.ethers.getSigners();
+    const fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
+
     Config.reset(
       {
         etherscanApiKey: "",
@@ -63,7 +66,8 @@ const setupTest = deployments.createFixture(
           halvePeriodMonths: 1,
           claimingPeriodMonths: 3,
         },
-      }
+      },
+      fluenceMultisig.address
     );
 
     await hre.deployments.fixture([

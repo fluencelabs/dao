@@ -46,11 +46,12 @@ describe("Deploy script", () => {
 
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
+      const hardhatSigners = await hre.ethers.getSigners();
       usdToken = await new DevERC20__factory(
-        (
-          await ethers.getSigners()
-        )[0]
+        hardhatSigners[0]
       ).deploy("USD", "USD", ethers.utils.parseEther(String(lbpUSDAmount)));
+
+      const fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
 
       Config.reset(
         {
@@ -121,7 +122,8 @@ describe("Deploy script", () => {
             votingPeriodDays: 7,
             proposalThreshold: 12,
           },
-        }
+        },
+        fluenceMultisig.address
       );
 
       config = Config.get();

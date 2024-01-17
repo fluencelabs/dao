@@ -28,6 +28,8 @@ describe("Deploy script", () => {
 
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
+      const hardhatSigners = await hre.ethers.getSigners();
+      const fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
       Config.reset(
         {
           etherscanApiKey: "",
@@ -54,7 +56,8 @@ describe("Deploy script", () => {
             votingPeriodDays: 50 / 86400,
             proposalThreshold: 1,
           },
-        }
+        },
+        fluenceMultisig.address
       );
 
       config = Config.get();

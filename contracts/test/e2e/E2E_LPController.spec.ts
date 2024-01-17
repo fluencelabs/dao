@@ -43,12 +43,15 @@ const setupTest = deployments.createFixture(
     usdToken: IERC20Metadata;
   }> => {
     await deployments.fixture([]);
+    const hardhatSigners = await hre.ethers.getSigners();
 
-    const token = await new DevERC20__factory(
-      (
-        await ethers.getSigners()
-      )[0]
-    ).deploy("USD", "USD", ethers.utils.parseEther(String(lbpUSDAmount)));
+    const token = await new DevERC20__factory(hardhatSigners[0]).deploy(
+      "USD",
+      "USD",
+      ethers.utils.parseEther(String(lbpUSDAmount))
+    );
+
+    const fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
 
     Config.reset(
       {
@@ -84,7 +87,8 @@ const setupTest = deployments.createFixture(
         executor: {
           delayDays: 4,
         },
-      }
+      },
+      fluenceMultisig.address
     );
 
     await hre.deployments.fixture(["FluenceToken", "Executor", "LPController"]);

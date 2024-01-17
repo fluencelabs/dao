@@ -20,6 +20,8 @@ const setupTest = deployments.createFixture(
     token: FluenceToken;
     vesting: VestingWithVoting;
   }> => {
+    const hardhatSigners = await hre.ethers.getSigners();
+    const fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
     Config.reset(
       {
         etherscanApiKey: "",
@@ -31,7 +33,8 @@ const setupTest = deployments.createFixture(
         token: {
           totalSupply: 1000000,
         },
-      }
+      },
+      fluenceMultisig.address
     );
 
     await hre.deployments.fixture(["FluenceToken"]);
