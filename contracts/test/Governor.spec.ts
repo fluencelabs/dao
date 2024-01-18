@@ -108,7 +108,7 @@ describe("Deploy script", () => {
     }
   );
 
-  const createVoteAndWaitProposal = async (
+  const createVoteAndQueueProposal = async (
     targets: string[],
     values: BigNumberish[],
     calldatas: BytesLike[],
@@ -141,11 +141,6 @@ describe("Deploy script", () => {
       calldatas,
       ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
     );
-
-    delay = (await executor.getMinDelay()).toNumber();
-    for (let i = 0; i <= delay; i++) {
-      await ethers.provider.send("evm_mine", []);
-    }
   };
 
   before(async () => {
@@ -249,7 +244,7 @@ describe("Deploy script", () => {
     );
   });
 
-  it("It allows to cancel proposal by FluenceMultisig after voting (veto). Proposal can not been executed after.", async () => {
+  it("It allows to cancel proposal by FluenceMultisig (veto). Proposal can not been executed after.", async () => {
     // Check that role is granted.
     expect(
       await executor.hasRole(
@@ -258,7 +253,7 @@ describe("Deploy script", () => {
       )
     ).to.be.true;
 
-    // Create proposal.
+    // Compose proposal data.
     await teamVesting.delegate(account.address);
     await ethers.provider.send("evm_mine", []);
 
@@ -269,35 +264,13 @@ describe("Deploy script", () => {
     const data = (
       await governor.populateTransaction.upgradeToAndCall(newImp.address, "0x")
     ).data!;
-
-    // Propose
     const description = "";
-    console.log("TODO:1");
-    await governor.propose([governor.address], [0], [data], description);
-    let delay = (await governor.votingDelay()).toNumber();
-    for (let i = 0; i <= delay; i++) {
-      await ethers.provider.send("evm_mine", []);
-    }
-    const hash = await governor.hashProposal(
+
+    await createVoteAndQueueProposal(
       [governor.address],
       [0],
       [data],
-      ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
-    );
-
-    await governor.castVote(hash, 1);
-
-    delay = (await governor.votingPeriod()).toNumber();
-    for (let i = 0; i <= delay; i++) {
-      await ethers.provider.send("evm_mine", []);
-    }
-
-    // After someone queued proposal, executor creates timelockId.
-    await governor.queue(
-      [governor.address],
-      [0],
-      [data],
-      ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
+      description
     );
 
     // Preparation before FluenceMultisig will cancel the proposal from perspective of the TimeLock Contract.
@@ -334,8 +307,8 @@ describe("Deploy script", () => {
     // );
 
     // Check further that proposal is not executable any more.
-    delay = (await executor.getMinDelay()).toNumber();
-    for (let i = 0; i <= delay; i++) {
+    const executorMinDelay = (await executor.getMinDelay()).toNumber();
+    for (let i = 0; i <= executorMinDelay; i++) {
       await ethers.provider.send("evm_mine", []);
     }
 
@@ -350,11 +323,32 @@ describe("Deploy script", () => {
     //   `VM Exception while processing transaction: reverted with custom error
     //   'GovernorUnexpectedProposalState(...)'`
 
-    // Check that after veto other proposals can be executed.
-    await checkUpdateGovernor();
+    // Check that after veto other proposals can be executed, even the same one.
+    const newDescription = "New description";
+    await createVoteAndQueueProposal(
+      [governor.address],
+      [0],
+      [data],
+      newDescription
+    );
+
+    for (let i = 0; i <= executorMinDelay; i++) {
+      await ethers.provider.send("evm_mine", []);
+    }
+
+    await expect(
+      governor.execute(
+        [governor.address],
+        [0],
+        [data],
+        ethers.utils.keccak256(ethers.utils.toUtf8Bytes(newDescription))
+      )
+    )
+      .to.emit(governor, "Upgraded")
+      .withArgs(newImp.address);
   });
 
-  async function checkUpdateGovernor() {
+  it("Update governor", async () => {
     await teamVesting.delegate(account.address);
     await ethers.provider.send("evm_mine", []);
 
@@ -366,7 +360,12 @@ describe("Deploy script", () => {
       await governor.populateTransaction.upgradeToAndCall(newImp.address, "0x")
     ).data!;
 
-    await createVoteAndWaitProposal([governor.address], [0], [data], "");
+    await createVoteAndQueueProposal([governor.address], [0], [data], "");
+
+    const delay = (await executor.getMinDelay()).toNumber();
+    for (let i = 0; i <= delay; i++) {
+      await ethers.provider.send("evm_mine", []);
+    }
 
     await expect(
       governor.execute(
@@ -378,10 +377,6 @@ describe("Deploy script", () => {
     )
       .to.emit(governor, "Upgraded")
       .withArgs(newImp.address);
-  }
-
-  it("Update governor", async () => {
-    await checkUpdateGovernor();
   });
 
   it("Update executor", async () => {
@@ -396,7 +391,12 @@ describe("Deploy script", () => {
       await executor.populateTransaction.upgradeToAndCall(newImp.address, "0x")
     ).data!;
 
-    await createVoteAndWaitProposal([executor.address], [0], [data], "");
+    await createVoteAndQueueProposal([executor.address], [0], [data], "");
+
+    const delay = (await executor.getMinDelay()).toNumber();
+    for (let i = 0; i <= delay; i++) {
+      await ethers.provider.send("evm_mine", []);
+    }
 
     await expect(
       governor.execute(

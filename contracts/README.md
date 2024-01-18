@@ -23,7 +23,7 @@ sequenceDiagram
     end
     participant FluenceMultisig
     
-    user ->> Governor: propose (..., data, description)
+    user -->> Governor: propose (..., data, description)
     
     loop wait voting deplay
         Governor ->> Governor: wait for votingDelay()
@@ -37,18 +37,26 @@ sequenceDiagram
         Governor ->> Governor: wait for votingPeriod()
     end
     
-    user ->>+ Governor: queue (..., data, description)
+    user -->>+ Governor: queue (..., data, description)
     Governor ->>- Executor: scheduleBatch(..., data, salt [based on description])
     
     opt veto
-        FluenceMultisig ->> Executor: cancel (..., data, description)
+        FluenceMultisig -->> Executor: cancel (..., data, description)
     end
     
     loop wait minDelay
         Executor ->> Executor: wait for minDelay()
     end
     
-    user ->> Executor: governor.execute(..., data, description)
+    alt no veto
+        user -->>+ Governor: execute(..., data, description)
+        Governor ->>- Executor: check status
+    end
+    
+    alt veto
+        user -->>+ Governor: execute(..., data, description)
+        Governor -x- Executor: check status: cancelled
+    end
 ```
 
 ## Deploy & Role Delegation Flow
