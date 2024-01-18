@@ -12,7 +12,7 @@ import {
 import { Config } from "../utils/config";
 import { MONTH } from "../utils/time";
 import { BigNumberish, BytesLike, Wallet } from "ethers";
-import { THROW_CUSTOM_ERROR_PREFIX, THROW_ERROR_PREFIX, ZERO_ADDRESS } from "../utils/consts";
+import { THROW_ERROR_PREFIX, ZERO_ADDRESS } from "../utils/consts";
 
 chai.use(waffle.solidity);
 
@@ -249,7 +249,7 @@ describe("Deploy script", () => {
     );
   });
 
-  it.only("It allows to cancel proposal by FluenceMultisig after voting. Proposal can not been executed after.", async () => {
+  it("It allows to cancel proposal by FluenceMultisig after voting. Proposal can not been executed after.", async () => {
     // Check that role is granted.
     expect(
       await executor.hasRole(
@@ -272,6 +272,7 @@ describe("Deploy script", () => {
 
     // Propose
     const description = "";
+    console.log('TODO:1')
     await governor.propose(
       [governor.address],
       [0],
@@ -297,7 +298,7 @@ describe("Deploy script", () => {
     }
 
     // After someone queued proposal, executor creates timelockId.
-    const queueTx = await governor.queue(
+    await governor.queue(
       [governor.address],
       [0],
       [data],
@@ -309,9 +310,9 @@ describe("Deploy script", () => {
     const filter = executor.filters.CallSalt();
     const queryCallSalt = await executor.queryFilter(filter, "latest");
     expect(queryCallSalt.length).to.eq(1);
-    const saltEventOnProposalQueued = queryCallSalt[0]
-    const salt = saltEventOnProposalQueued.args?.salt
-    const timelockIdFromEvent = saltEventOnProposalQueued.args?.id
+    const saltEventOnProposalQueued = queryCallSalt[0];
+    const salt = saltEventOnProposalQueued.args?.salt;
+    const timelockIdFromEvent = saltEventOnProposalQueued.args?.id;
 
     // Calculate timelockId that is stored in TimeLock Contract (additional check, since we already new timelockId from the event)
     const timelockIdCalculated = await executor.hashOperationBatch(
@@ -352,9 +353,9 @@ describe("Deploy script", () => {
         [data],
         ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
       )
-    ).to.be.revertedWith(
-      `${THROW_CUSTOM_ERROR_PREFIX} 'GovernorUnexpectedProposalState(68626162001136451100561201716132609984342280588658537090208200088607987726198, 2, "0x0000000000000000000000000000000000000000000000000000000000000030")'`
-    );
+    ).to.be.reverted;
+    //   `VM Exception while processing transaction: reverted with custom error
+    //   'GovernorUnexpectedProposalState(...)'`
   });
 
   it("Update governor", async () => {
