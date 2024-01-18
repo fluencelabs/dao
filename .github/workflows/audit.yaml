@@ -35,5 +35,5 @@ jobs:
       - run: npm i
         working-directory: contracts
 
-      - run: mythx --config .mythx.yml --api-key ${{ secrets.MYTHX_API_KEY }} analyze --remap-import "@openzeppelin=$(pwd)/node_modules/@openzeppelin" --remap-import "@uniswap=$(pwd)/node_modules/@uniswap"
+      - run: mythx --solc-version 0.8.20 --config .mythx.yml --api-key ${{ secrets.MYTHX_API_KEY }} analyze --remap-import "@openzeppelin=$(pwd)/node_modules/@openzeppelin" --remap-import "@uniswap=$(pwd)/node_modules/@uniswap"
         working-directory: contracts
