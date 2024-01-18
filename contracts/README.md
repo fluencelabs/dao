@@ -11,7 +11,7 @@ This is solidity contracts for Fluence DAO. For DAO it uses OpenZeppelin contrac
 - [0003_DevRewardDistributor.ts](deploy%2F0003_DevRewardDistributor.ts) (TODO: write more precisely)
 - **FluenceToken** based on **ERC20VotesUpgradeable** (OpenZeppelin) for the DAO purposes.
 
-## DAO Proposal Life-Cycle
+## DAO Proposal Flow
 
 TODO: add other options like: threshold not reached, etc.
 ```mermaid
