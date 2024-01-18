@@ -249,7 +249,7 @@ describe("Deploy script", () => {
     );
   });
 
-  it("It allows to cancel proposal by FluenceMultisig after voting. Proposal can not been executed after.", async () => {
+  it("It allows to cancel proposal by FluenceMultisig after voting (veto). Proposal can not been executed after.", async () => {
     // Check that role is granted.
     expect(
       await executor.hasRole(
@@ -272,13 +272,8 @@ describe("Deploy script", () => {
 
     // Propose
     const description = "";
-    console.log('TODO:1')
-    await governor.propose(
-      [governor.address],
-      [0],
-      [data],
-      description
-    );
+    console.log("TODO:1");
+    await governor.propose([governor.address], [0], [data], description);
     let delay = (await governor.votingDelay()).toNumber();
     for (let i = 0; i <= delay; i++) {
       await ethers.provider.send("evm_mine", []);
@@ -323,14 +318,12 @@ describe("Deploy script", () => {
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       salt
     );
-    expect(timelockIdCalculated).to.eq(timelockIdFromEvent)
+    expect(timelockIdCalculated).to.eq(timelockIdFromEvent);
     const state = await executor.getOperationState(timelockIdFromEvent);
     expect(state).to.eq(1); // i.e. waiting.
 
     // The cancel action itself.
-    await executor
-      .connect(fluenceMultisig)
-      .cancel(timelockIdFromEvent);
+    await executor.connect(fluenceMultisig).cancel(timelockIdFromEvent);
 
     // Cancel from Governor prospective: does not work with GovernorUnexpectedProposalState.
     // await governor.connect(fluenceMultisig).cancel(
@@ -356,9 +349,12 @@ describe("Deploy script", () => {
     ).to.be.reverted;
     //   `VM Exception while processing transaction: reverted with custom error
     //   'GovernorUnexpectedProposalState(...)'`
+
+    // Check that after veto other proposals can be executed.
+    await checkUpdateGovernor();
   });
 
-  it("Update governor", async () => {
+  async function checkUpdateGovernor() {
     await teamVesting.delegate(account.address);
     await ethers.provider.send("evm_mine", []);
 
@@ -382,6 +378,10 @@ describe("Deploy script", () => {
     )
       .to.emit(governor, "Upgraded")
       .withArgs(newImp.address);
+  }
+
+  it("Update governor", async () => {
+    await checkUpdateGovernor();
   });
 
   it("Update executor", async () => {
