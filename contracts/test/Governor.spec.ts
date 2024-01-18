@@ -12,7 +12,7 @@ import {
 import { Config } from "../utils/config";
 import { MONTH } from "../utils/time";
 import { BigNumberish, BytesLike, Wallet } from "ethers";
-import { THROW_ERROR_PREFIX, ZERO_ADDRESS } from "../utils/consts";
+import { THROW_CUSTOM_ERROR_PREFIX, THROW_ERROR_PREFIX, ZERO_ADDRESS } from "../utils/consts";
 
 chai.use(waffle.solidity);
 
@@ -21,6 +21,7 @@ describe("Deploy script", () => {
   let executor: Executor;
   let teamVesting: VestingWithVoting;
   let governor: Governor;
+  let fluenceMultisig: ethers.Signer;
 
   let config: Config;
 
@@ -29,7 +30,7 @@ describe("Deploy script", () => {
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
       const hardhatSigners = await hre.ethers.getSigners();
-      const fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
+      fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
       Config.reset(
         {
           etherscanApiKey: "",
@@ -245,6 +246,114 @@ describe("Deploy script", () => {
 
     expect(await governor.getVotes(account.address, blockNumber)).to.eq(
       totalAmount
+    );
+  });
+
+  it.only("It allows to cancel proposal by FluenceMultisig after voting. Proposal can not been executed after.", async () => {
+    // Check that role is granted.
+    expect(
+      await executor.hasRole(
+        ethers.utils.keccak256(ethers.utils.toUtf8Bytes("CANCELLER_ROLE")),
+        fluenceMultisig.address
+      )
+    ).to.be.true;
+
+    // Create proposal.
+    await teamVesting.delegate(account.address);
+    await ethers.provider.send("evm_mine", []);
+
+    const newImp = await new Governor__factory(
+      ethers.provider.getSigner(account.address)
+    ).deploy();
+
+    const data = (
+      await governor.populateTransaction.upgradeToAndCall(newImp.address, "0x")
+    ).data!;
+
+    // Propose
+    const description = "";
+    await governor.propose(
+      [governor.address],
+      [0],
+      [data],
+      description
+    );
+    let delay = (await governor.votingDelay()).toNumber();
+    for (let i = 0; i <= delay; i++) {
+      await ethers.provider.send("evm_mine", []);
+    }
+    const hash = await governor.hashProposal(
+      [governor.address],
+      [0],
+      [data],
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
+    );
+
+    await governor.castVote(hash, 1);
+
+    delay = (await governor.votingPeriod()).toNumber();
+    for (let i = 0; i <= delay; i++) {
+      await ethers.provider.send("evm_mine", []);
+    }
+
+    // After someone queued proposal, executor creates timelockId.
+    const queueTx = await governor.queue(
+      [governor.address],
+      [0],
+      [data],
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
+    );
+
+    // Preparation before FluenceMultisig will cancel the proposal from perspective of the TimeLock Contract.
+    // Get salt that TimeLock contract emitted when propsal queued.
+    const filter = executor.filters.CallSalt();
+    const queryCallSalt = await executor.queryFilter(filter, "latest");
+    expect(queryCallSalt.length).to.eq(1);
+    const saltEventOnProposalQueued = queryCallSalt[0]
+    const salt = saltEventOnProposalQueued.args?.salt
+    const timelockIdFromEvent = saltEventOnProposalQueued.args?.id
+
+    // Calculate timelockId that is stored in TimeLock Contract (additional check, since we already new timelockId from the event)
+    const timelockIdCalculated = await executor.hashOperationBatch(
+      [governor.address],
+      [0],
+      [data],
+      // ref to `$._timelock.scheduleBatch(targets, values, calldatas, 0, salt, delay);` predecessor is 0.
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      salt
+    );
+    expect(timelockIdCalculated).to.eq(timelockIdFromEvent)
+    const state = await executor.getOperationState(timelockIdFromEvent);
+    expect(state).to.eq(1); // i.e. waiting.
+
+    // The cancel action itself.
+    await executor
+      .connect(fluenceMultisig)
+      .cancel(timelockIdFromEvent);
+
+    // Cancel from Governor prospective: does not work with GovernorUnexpectedProposalState.
+    // await governor.connect(fluenceMultisig).cancel(
+    //     [governor.address],
+    //     [0],
+    //     [data],
+    //     ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
+    // );
+
+    // Check further that proposal is not executable any more.
+    delay = (await executor.getMinDelay()).toNumber();
+    for (let i = 0; i <= delay; i++) {
+      await ethers.provider.send("evm_mine", []);
+    }
+
+    await expect(
+      governor.execute(
+        [governor.address],
+        [0],
+        [data],
+        ethers.utils.keccak256(ethers.utils.toUtf8Bytes(description))
+      )
+    ).to.be.revertedWith(
+      `${THROW_CUSTOM_ERROR_PREFIX} 'GovernorUnexpectedProposalState(68626162001136451100561201716132609984342280588658537090208200088607987726198, 2, "0x0000000000000000000000000000000000000000000000000000000000000030")'`
     );
   });
 
