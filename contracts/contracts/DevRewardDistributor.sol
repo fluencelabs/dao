@@ -26,6 +26,11 @@ contract DevRewardDistributor {
     Executor public immutable executor;
 
     /**
+     * @notice Canceler address (e.g. FluenceMultisig)
+     **/
+    address public immutable canceler;
+
+    /**
      * @notice Claiming end time
      **/
     uint256 public immutable claimingEndTime;
@@ -82,6 +87,7 @@ contract DevRewardDistributor {
      * @param _halvePeriod - period for dividing the reward
      * @param _initialReward - initial user reward
      * @param _claimingPeriod - claiming period
+     * @param _canceler - can cancel distribution, and withdraw to _executor.
      **/
     constructor(
         FluenceToken _token,
@@ -89,10 +95,12 @@ contract DevRewardDistributor {
         bytes32 _merkleRoot,
         uint256 _halvePeriod,
         uint256 _initialReward,
-        uint256 _claimingPeriod
+        uint256 _claimingPeriod,
+        address _canceler
     ) {
         token = _token;
         executor = _executor;
+        canceler = _canceler;
 
         merkleRoot = _merkleRoot;
         halvePeriod = _halvePeriod;
@@ -149,15 +157,18 @@ contract DevRewardDistributor {
     }
 
     /**
-     * @notice used to move any remaining tokens out of the contract after expiration
+     * @notice used to move any remaining tokens out of the contract to Executor after expiration
      **/
     function transferUnclaimed() external whenClaimingIs(false) {
-        IERC20 rewardToken = IERC20(token); //gas saving
+        _withdraw();
+    }
 
-        uint256 remainingBalance = rewardToken.balanceOf(address(this));
-        rewardToken.safeTransfer(address(executor), remainingBalance);
-
-        emit TransferUnclaimed(remainingBalance);
+    /**
+     * @notice used to move any remaining tokens out of the contract to Executor (DAO) in emergency situation.
+     **/
+    function withdraw() external {
+        require(msg.sender == canceler, "Only canceler can withdraw");
+        _withdraw();
     }
 
     /**
@@ -206,5 +217,14 @@ contract DevRewardDistributor {
         claimedBitMap[claimedWordIndex] =
             claimedBitMap[claimedWordIndex] |
             (1 << claimedBitIndex);
+    }
+
+    function _withdraw() private {
+        IERC20 rewardToken = IERC20(token); //gas saving
+
+        uint256 remainingBalance = rewardToken.balanceOf(address(this));
+        rewardToken.safeTransfer(address(executor), remainingBalance);
+
+        emit TransferUnclaimed(remainingBalance);
     }
 }
