@@ -7,7 +7,9 @@ This is solidity contracts for Fluence DAO. For DAO it uses OpenZeppelin contrac
 - everyone could **execute a proposal**
 - **veto power**: Finally CANCELLER_ROLE is granted to `Governor` contract & `Fluence Multisig`. Veto could be applied after proposal is queued to execute (before it is executed).
 - LBP Vesting with moving funds after specified time to Uniswap (TODO: write more precisely)
-- 3 Vesting Contract (TODO: write more precisely) 
+- 3 Vesting Contract with Delayed Start:
+  - 2 to use different configs between Fluence team and investors
+  - 1 with Voting
 - [0003_DevRewardDistributor.ts](deploy%2F0003_DevRewardDistributor.ts) (TODO: write more precisely)
 - **FluenceToken** based on **ERC20VotesUpgradeable** (OpenZeppelin) for the DAO purposes.
 
