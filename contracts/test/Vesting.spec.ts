@@ -10,10 +10,10 @@ import { Config } from "../utils/config";
 chai.use(waffle.solidity);
 
 const vestingAmount = ethers.utils.parseEther("100");
-const cliffDurationMonths = 3;
+const delayDurationMonths = 3;
 const vestingDurationMonths = 12;
 const amountBySec: BigNumber = vestingAmount.div(
-  BigNumber.from((cliffDurationMonths + vestingDurationMonths) * MONTH)
+  BigNumber.from(vestingDurationMonths * MONTH)
 );
 
 const setupTest = deployments.createFixture(
@@ -50,7 +50,7 @@ const setupTest = deployments.createFixture(
         tokenAddress,
         "TestVesting",
         "TV",
-        cliffDurationMonths * MONTH,
+        delayDurationMonths * MONTH,
         vestingDurationMonths * MONTH,
         [mainAccount],
         [vestingAmount],
@@ -81,10 +81,10 @@ describe("Vesting", () => {
   let vesting: Vesting;
   let token: FluenceToken;
   let receiverAccount: Wallet;
-  let startTime: number;
+  let vestingStartTime: number;
 
-  const setTimeAfterStart = async (time: number) => {
-    await ethers.provider.send("evm_setNextBlockTimestamp", [startTime + time]);
+  const setTimeAfterVestingStart = async (time: number) => {
+    await ethers.provider.send("evm_setNextBlockTimestamp", [vestingStartTime + time]);
     await ethers.provider.send("evm_mine", []);
   };
 
@@ -103,30 +103,33 @@ describe("Vesting", () => {
     const settings = await setupTest();
     vesting = settings.vesting;
     token = settings.token;
-    startTime = (await vesting.startTimestamp()).toNumber();
+    vestingStartTime = (await vesting.startTimestamp()).toNumber();
 
     vesting = vesting.connect(receiverAccount);
   });
 
-  it("when cliff is active #1", async () => {
+  it("when in delay period #1", async () => {
     await expect(vesting.transfer(ZERO_ADDRESS, 1)).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Not enough the release amount'`
     );
   });
 
-  it("when cliff is active #2", async () => {
-    await setTimeAfterStart(cliffDurationMonths * MONTH);
+  it("when in delay period #2", async () => {
+    await setTimeAfterVestingStart(0);
 
     expect(await vesting.getAvailableAmount(receiverAccount.address)).to.eq(
       BigNumber.from(0)
     );
   });
 
-  it("after cliff", async () => {
-    const time = cliffDurationMonths * MONTH + 1;
-    await setTimeAfterStart(time);
+  it("after delay period", async () => {
+    const vestingTimePassed = 1;
+    await setTimeAfterVestingStart(vestingTimePassed);
 
-    const expectedAmount = amountBySec.mul(BigNumber.from(time));
+    console.log('amountBySec', amountBySec)
+    console.log(MONTH);
+    const expectedAmount = amountBySec.mul(BigNumber.from(vestingTimePassed));
+    console.log('expectedAmount', expectedAmount)
 
     const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(expectedAmount);
@@ -147,11 +150,9 @@ describe("Vesting", () => {
   });
 
   it("after cliff with random time", async () => {
-    const time =
-      Math.floor(Math.random() * vestingDurationMonths * MONTH) +
-      cliffDurationMonths * MONTH;
+    const time = Math.floor(Math.random() * vestingDurationMonths * MONTH);
 
-    await setTimeAfterStart(time);
+    await setTimeAfterVestingStart(time);
     const amount = await vesting.getAvailableAmount(receiverAccount.address);
 
     const expectedAmount = amountBySec.mul(BigNumber.from(time));
@@ -172,9 +173,7 @@ describe("Vesting", () => {
   });
 
   it("all balance #1", async () => {
-    await setTimeAfterStart(
-      (vestingDurationMonths + cliffDurationMonths) * MONTH
-    );
+    await setTimeAfterVestingStart(vestingDurationMonths * MONTH);
 
     const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
@@ -192,9 +191,7 @@ describe("Vesting", () => {
   });
 
   it("all balance #2", async () => {
-    await setTimeAfterStart(
-      (vestingDurationMonths + cliffDurationMonths) * 3 * MONTH
-    );
+    await setTimeAfterVestingStart(vestingDurationMonths * 3 * MONTH);
 
     const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);
@@ -226,9 +223,7 @@ describe("Vesting", () => {
   });
 
   it("transferFrom full", async () => {
-    await setTimeAfterStart(
-      (vestingDurationMonths + cliffDurationMonths) * 3 * MONTH
-    );
+    await setTimeAfterVestingStart(vestingDurationMonths * 3 * MONTH);
 
     const amount = await vesting.getAvailableAmount(receiverAccount.address);
     expect(amount).to.eq(vestingAmount);

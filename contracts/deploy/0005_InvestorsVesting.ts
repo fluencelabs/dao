@@ -43,7 +43,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       "Investors Vesting",
       "FLTIV",
       Math.floor(
-        config.deployment!.investorsVesting!.cliffDurationMonths * MONTH
+        config.deployment!.investorsVesting!.delayDurationMonths * MONTH
       ),
       Math.floor(
         config.deployment!.investorsVesting!.vestingDurationMonths * MONTH

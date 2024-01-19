@@ -104,14 +104,14 @@ type DevRewardDistributor = {
 
 type Vesting = {
   csvFile?: string;
-  cliffDurationMonths: number;
+  delayDurationMonths: number;
   vestingDurationMonths: number;
   accounts: Array<string>;
   amounts: Array<number>;
 };
 
 type FluenceVesting = {
-  cliffDurationMonths: number;
+  delayDurationMonths: number;
   vestingDurationMonths: number;
   account: string;
   amount: number;
