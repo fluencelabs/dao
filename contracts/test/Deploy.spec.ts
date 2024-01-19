@@ -41,16 +41,18 @@ describe("Deploy script", () => {
   let fluenceVesting: Vesting;
   let teamVesting: VestingWithVoting;
   let governor: Governor;
+  let fluenceMultisig: ethers.Signer;
 
   let config: Config;
 
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
+      const hardhatSigners = await hre.ethers.getSigners();
       usdToken = await new DevERC20__factory(
-        (
-          await ethers.getSigners()
-        )[0]
+        hardhatSigners[0]
       ).deploy("USD", "USD", ethers.utils.parseEther(String(lbpUSDAmount)));
+
+      fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
 
       Config.reset(
         {
@@ -121,7 +123,8 @@ describe("Deploy script", () => {
             votingPeriodDays: 7,
             proposalThreshold: 12,
           },
-        }
+        },
+        fluenceMultisig.address
       );
 
       config = Config.get();
@@ -264,7 +267,7 @@ describe("Deploy script", () => {
     //TODO: veify balancer
   });
 
-  it("executor is correct", async () => {
+  it("executor roles are correct", async () => {
     const { deployer } = await getNamedAccounts();
 
     expect(await executor.getMinDelay()).to.eq(
@@ -290,6 +293,8 @@ describe("Deploy script", () => {
         "0x0000000000000000000000000000000000000000"
       )
     ).to.eq(true);
+    
+    expect(await executor.hasRole(CANCELLER_ROLE, fluenceMultisig.address)).to.eq(true);
   });
 
   it("DevRewardDistributor is correct", async () => {

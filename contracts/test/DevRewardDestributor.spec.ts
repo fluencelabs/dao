@@ -33,6 +33,7 @@ const setupTest = deployments.createFixture(
     devAccounts: Array<Wallet>;
     token: FluenceToken;
     executor: Executor;
+    fluenceMultisig: ethers.Signer;
   }> => {
     const devAccounts = Array(100)
       .fill(1)
@@ -41,6 +42,9 @@ const setupTest = deployments.createFixture(
     const merkleTree = await generateMerkleTree(
       devAccounts.map((x) => x.address)
     );
+
+    const hardhatSigners = await hre.ethers.getSigners();
+    const fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
 
     Config.reset(
       {
@@ -63,7 +67,8 @@ const setupTest = deployments.createFixture(
           halvePeriodMonths: 1,
           claimingPeriodMonths: 3,
         },
-      }
+      },
+      fluenceMultisig.address
     );
 
     await hre.deployments.fixture([
@@ -95,6 +100,7 @@ const setupTest = deployments.createFixture(
           await hre.deployments.get("Executor")
         ).address
       )) as Executor,
+      fluenceMultisig: fluenceMultisig,
     };
   }
 );
@@ -119,6 +125,7 @@ describe("DevRewardDistributor", () => {
   let tree: MerkleTree;
 
   let developerAccount: Wallet;
+  let fluenceMultisig: ethers.Signer;
 
   before(async () => {
     const { mainAccount } = await getNamedAccounts();
@@ -137,6 +144,7 @@ describe("DevRewardDistributor", () => {
     tree = settings.merkleTree;
     token = settings.token;
     executor = settings.executor;
+    fluenceMultisig = settings.fluenceMultisig;
 
     rewardDistributor = settings.rewardDistributor.connect(developerAccount);
   });
@@ -324,6 +332,24 @@ describe("DevRewardDistributor", () => {
     );
   });
 
+  async function _isTransferedToExecutor(
+    transaction: any,
+    amountBefore: BigNumber
+  ) {
+    await expect(transaction)
+      .to.emit(rewardDistributor, "TransferUnclaimed")
+      .withArgs(amountBefore);
+
+    await expect(transaction)
+      .to.emit(token, "Transfer")
+      .withArgs(rewardDistributor.address, executor.address, amountBefore);
+
+    expect(await token.balanceOf(executor.address)).to.eq(amountBefore);
+    expect(await token.balanceOf(rewardDistributor.address)).to.eq(
+      BigNumber.from(0)
+    );
+  }
+
   it("transfer unclaimed when claiming is not active", async () => {
     const period = await rewardDistributor.claimingEndTime();
 
@@ -333,17 +359,19 @@ describe("DevRewardDistributor", () => {
     const amount = await token.balanceOf(rewardDistributor.address);
 
     const tx = await rewardDistributor.transferUnclaimed();
-    await expect(tx)
-      .to.emit(rewardDistributor, "TransferUnclaimed")
-      .withArgs(amount);
+    await _isTransferedToExecutor(tx, amount);
+  });
 
-    await expect(tx)
-      .to.emit(token, "Transfer")
-      .withArgs(rewardDistributor.address, executor.address, amount);
+  it("transfer unclaimed when fluence multisig used (#withdraw)", async () => {
+    const amount = await token.balanceOf(rewardDistributor.address);
 
-    expect(await token.balanceOf(executor.address)).to.eq(amount);
-    expect(await token.balanceOf(rewardDistributor.address)).to.eq(
-      BigNumber.from(0)
+    const tx = await rewardDistributor.connect(fluenceMultisig).withdraw();
+    await _isTransferedToExecutor(tx, amount);
+  });
+
+  it("throw when transfer unclaimed not from multisig", async () => {
+    await expect(rewardDistributor.withdraw()).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Only canceler can withdraw'`
     );
   });
 });

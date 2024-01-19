@@ -69,3 +69,5 @@ deployment:
     votingDelayDays: 1
     votingPeriodDays: 1
     proposalThreshold: 100
+
+fluenceMultisig: "0x0000000000000000000000000000000000000000"

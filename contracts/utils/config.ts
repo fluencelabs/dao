@@ -3,27 +3,31 @@ class Config {
 
   readonly networks: Networks | null;
   readonly deployment: Deployment | null;
+  readonly fluenceMultisig: string | null = null;
 
-  constructor(_networks: Networks, _deployment: Deployment) {
+  constructor(_networks: Networks, _deployment: Deployment, _fluenceMultisig: string) {
     this.deployment = _deployment;
     this.networks = _networks;
+    this.fluenceMultisig = _fluenceMultisig;
   }
 
   public static get(
     _networks: Networks | null = null,
-    _deployment: Deployment | null = null
+    _deployment: Deployment | null = null,
+    _fluenceMultisig: string | null = null,
   ): Config {
     if (this._config === null || this._config == undefined) {
-      this._config = new Config(_networks!, _deployment!);
+      this._config = new Config(_networks!, _deployment!, _fluenceMultisig!);
     }
     return this._config;
   }
 
   public static reset(
     _networks: Networks | null = null,
-    _deployment: Deployment | null = null
+    _deployment: Deployment | null = null,
+    _fluenceMultisig: string | null = null
   ) {
-    this._config = new Config(_networks!, _deployment!);
+    this._config = new Config(_networks!, _deployment!, _fluenceMultisig!);
   }
 
   public static isInited(): boolean {

@@ -19,7 +19,7 @@ let config: Config | null = null;
 try {
   const file = fs.readFileSync("./config.yaml", "utf8");
   const c = YAML.parse(file);
-  config = Config.get(c.networks, c.deployment);
+  config = Config.get(c.networks, c.deployment, c.fluenceMultisig);
 } catch (e) {
   console.log("No config file found");
 }

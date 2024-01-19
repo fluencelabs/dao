@@ -76,6 +76,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     governorDeployment.address
   );
 
+  // Grant role of proposal canceller to the Fluence multisig.
   await hre.deployments.execute(
     "Executor",
     {
@@ -86,7 +87,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
     "grantRole",
     CANCELLER_ROLE,
-    governorDeployment.address
+    config.fluenceMultisig!
   );
 
   await hre.deployments.execute(
