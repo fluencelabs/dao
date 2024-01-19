@@ -46,7 +46,7 @@ describe("Deploy script", () => {
             delayDays: 50 / 86400,
           },
           teamVesting: {
-            cliffDurationMonths: 2,
+            delayDurationMonths: 2,
             vestingDurationMonths: 3,
             accounts: [account.address],
             amounts: [1_000_000],
@@ -182,7 +182,7 @@ describe("Deploy script", () => {
 
     await ethers.provider.send("evm_setNextBlockTimestamp", [
       (await ethers.provider.getBlock("latest")).timestamp +
-        (config.deployment!.teamVesting!.cliffDurationMonths * MONTH + 1),
+        (config.deployment!.teamVesting!.delayDurationMonths * MONTH + 1),
     ]);
     await ethers.provider.send("evm_mine", []);
 
@@ -213,7 +213,7 @@ describe("Deploy script", () => {
 
     await ethers.provider.send("evm_setNextBlockTimestamp", [
       (await ethers.provider.getBlock("latest")).timestamp +
-        ((config.deployment!.teamVesting!.cliffDurationMonths +
+        ((config.deployment!.teamVesting!.delayDurationMonths +
           config.deployment!.teamVesting!.vestingDurationMonths) *
           MONTH +
           1),

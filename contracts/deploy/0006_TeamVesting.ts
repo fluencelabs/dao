@@ -42,7 +42,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       (await hre.deployments.get("FluenceToken")).address,
       "Team Vesting",
       "FLTTV",
-      Math.floor(config.deployment!.teamVesting!.cliffDurationMonths * MONTH),
+      Math.floor(config.deployment!.teamVesting!.delayDurationMonths * MONTH),
       Math.floor(config.deployment!.teamVesting!.vestingDurationMonths * MONTH),
       accounts,
       amounts,

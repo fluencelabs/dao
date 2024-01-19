@@ -94,13 +94,13 @@ describe("Deploy script", () => {
             claimingPeriodMonths: 5,
           },
           fluenceVesting: {
-            cliffDurationMonths: 2,
+            delayDurationMonths: 2,
             vestingDurationMonths: 3,
             account: "0x0000000000000000000000000000000000000001",
             amount: 1,
           },
           investorsVesting: {
-            cliffDurationMonths: 2,
+            delayDurationMonths: 2,
             vestingDurationMonths: 3,
             accounts: [
               "0x0000000000000000000000000000000000000002",
@@ -109,7 +109,7 @@ describe("Deploy script", () => {
             amounts: [2, 3],
           },
           teamVesting: {
-            cliffDurationMonths: 2,
+            delayDurationMonths: 2,
             vestingDurationMonths: 3,
             accounts: [
               "0x0000000000000000000000000000000000000003",
@@ -340,8 +340,8 @@ describe("Deploy script", () => {
           break;
         case fluenceVesting.address:
           cfg = {
-            cliffDurationMonths:
-              config.deployment!.fluenceVesting!.cliffDurationMonths,
+            delayDurationMonths:
+              config.deployment!.fluenceVesting!.delayDurationMonths,
             vestingDurationMonths:
               config.deployment!.fluenceVesting!.vestingDurationMonths,
             accounts: [config.deployment!.fluenceVesting!.account],
@@ -359,14 +359,7 @@ describe("Deploy script", () => {
       expect(await vesting.decimals()).to.eq(18);
 
       expect(await vesting.token()).to.eq(token.address);
-      expect(await vesting.cliffEndTimestamp()).to.eq(
-        startTimestamp.add(cfg.cliffDurationMonths * MONTH)
-      );
-
-      expect(await vesting.totalLockedTime()).to.eq(
-        (cfg.cliffDurationMonths + cfg.vestingDurationMonths) * MONTH
-      );
-
+      expect(await vesting.vestingDuration()).to.eq(cfg.vestingDurationMonths * MONTH);
       const accounts = cfg.accounts;
       const amounts = cfg.amounts;
       for (let i = 0; i < accounts.length; i++) {

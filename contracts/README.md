@@ -198,18 +198,18 @@ sequenceDiagram
         claimingPeriodMonths: {claim period in months}
     
       investorsVesting:
-        cliffDurationMonths: 1
+        delayDurationMonths: 1
         vestingDurationMonths: 1
         csvFile: {csv file with investors addresses and tokens}
     
       fluenceVesting:
-        cliffDurationMonths: 1
+        delayDurationMonths: 1
         vestingDurationMonths: 1
         account: {fluence account}
         amount: 10
     
       teamVesting:
-        cliffDurationMonths: 1
+        delayDurationMonths: 1
         vestingDurationMonths: 1
         csvFile: {csv file with team members addresses and tokens}
     

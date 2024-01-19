@@ -42,7 +42,7 @@ deployment:
     claimingPeriodMonths: 1
 
   investorsVesting:
-    cliffDurationMonths: 1
+    delayDurationMonths: 1
     vestingDurationMonths: 1
     csvFile: "table.csv"
     accounts:
@@ -51,13 +51,13 @@ deployment:
       - 10
 
   fluenceVesting:
-    cliffDurationMonths: 1
+    delayDurationMonths: 1
     vestingDurationMonths: 1
     account: "0x0000000000000000000000000000000000000000"
     amount: 10
 
   teamVesting:
-    cliffDurationMonths: 1
+    delayDurationMonths: 1
     vestingDurationMonths: 1
     csvFile: "table.csv"
     accounts:

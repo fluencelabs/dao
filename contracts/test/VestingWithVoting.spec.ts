@@ -10,7 +10,7 @@ import { ZERO_ADDRESS } from "../utils/consts";
 chai.use(waffle.solidity);
 
 const vestingAmount = ethers.utils.parseEther("100");
-const cliffDurationMonths = 3;
+const delayDurationMonths = 3;
 const vestingDurationMonths = 12;
 
 const setupTest = deployments.createFixture(
@@ -48,7 +48,7 @@ const setupTest = deployments.createFixture(
         tokenAddress,
         "Test Vesting With Votes",
         "TVV",
-        cliffDurationMonths * MONTH,
+        delayDurationMonths * MONTH,
         vestingDurationMonths * MONTH,
         [mainAccount],
         [vestingAmount],
@@ -116,7 +116,7 @@ describe("Vesting with voting", () => {
   it("get votes after release", async () => {
     await vesting.delegate(receiverAccount.address);
 
-    const time = cliffDurationMonths * MONTH + 100;
+    const time = delayDurationMonths * MONTH + 100;
     await setTimeAfterStart(time);
 
     const amount = await vesting.getAvailableAmount(receiverAccount.address);

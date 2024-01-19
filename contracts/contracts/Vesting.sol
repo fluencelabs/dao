@@ -7,8 +7,8 @@ import "./FluenceToken.sol";
 import "./interfaces/IVestingERC20.sol";
 
 /**
- * @title Vesting
- * @notice Vesting fluence token contract
+ * @title Vesting with Delayed Start
+ * @notice Vesting Fluence token contract
  * @dev This contract implements the ERC20 standard. It is possible to add the contract to a wallet. Transferring to zero address is unlocking the released amount.
  */
 contract Vesting is IVestingERC20 {
@@ -25,15 +25,9 @@ contract Vesting is IVestingERC20 {
     uint256 public immutable startTimestamp;
 
     /**
-     * @notice Returns the end vesting time
+     * @notice Returns the vesting duration since vesting start
      **/
-    uint256 public immutable cliffEndTimestamp;
-
-    /**
-     * @notice Returns the total locked time
-     * @dev total locked time = vesting period + clif period
-     **/
-    uint256 public immutable totalLockedTime;
+    uint256 public immutable vestingDuration;
 
     /**
      * @notice Returns the vesting contract decimals
@@ -63,7 +57,7 @@ contract Vesting is IVestingERC20 {
      * @param token_ - vesting token address
      * @param name_ - vesting contract name
      * @param symbol_ - vesting contract symbol
-     * @param _cliffDuration - cliff duration
+     * @param _vestingDelay - delay before vesting start
      * @param _vestingDuration - vesting duration
      * @param accounts - vesting accounts
      * @param amounts - vesting amounts of accounts
@@ -72,7 +66,7 @@ contract Vesting is IVestingERC20 {
         FluenceToken token_,
         string memory name_,
         string memory symbol_,
-        uint256 _cliffDuration,
+        uint256 _vestingDelay,
         uint256 _vestingDuration,
         address[] memory accounts,
         uint256[] memory amounts
@@ -85,12 +79,9 @@ contract Vesting is IVestingERC20 {
         require(bytes(name_).length <= 31, "invalid name length");
         require(bytes(symbol_).length <= 31, "invalid symbol length");
 
-        startTimestamp = block.timestamp;
+        startTimestamp = block.timestamp + _vestingDelay;
 
-        uint256 cliffDuration = _cliffDuration;
-        cliffEndTimestamp = block.timestamp + cliffDuration;
-
-        totalLockedTime = _vestingDuration + cliffDuration;
+        vestingDuration = _vestingDuration;
 
         token = token_;
 
@@ -137,11 +128,11 @@ contract Vesting is IVestingERC20 {
      * @return available amount
      **/
     function getAvailableAmount(address account) public view returns (uint256) {
-        if (block.timestamp <= cliffEndTimestamp) {
+        if (block.timestamp <= startTimestamp) {
             return 0;
         }
 
-        uint256 totalTime = totalLockedTime;
+        uint256 totalTime = vestingDuration;
         uint256 locked = lockedBalances[account];
         uint256 released = locked - balanceOf[account];
 

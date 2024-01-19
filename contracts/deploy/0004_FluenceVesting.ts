@@ -18,7 +18,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       "Fluence Vesting",
       "FLTFV",
       Math.floor(
-        config.deployment!.fluenceVesting!.cliffDurationMonths * MONTH
+        config.deployment!.fluenceVesting!.delayDurationMonths * MONTH
       ),
       Math.floor(
         config.deployment!.fluenceVesting!.vestingDurationMonths * MONTH
