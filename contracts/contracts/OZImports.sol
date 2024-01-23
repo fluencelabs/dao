@@ -9,3 +9,7 @@ pragma solidity >=0.8.15;
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 // To use typechains in tests.
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
+// TODO: need it for solidity-coverage, but they are not used in code.
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
