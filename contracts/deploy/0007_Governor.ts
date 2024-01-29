@@ -14,6 +14,7 @@ const CANCELLER_ROLE = ethers.utils.keccak256(
   ethers.utils.toUtf8Bytes("CANCELLER_ROLE")
 );
 const DEFAULT_ADMIN_ROLE = ethers.utils.hexZeroPad([0], 32);
+const DEFAULT_WAIT_CONFIRMATIONS = 1;
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -47,7 +48,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
     log: true,
     autoMine: true,
-    waitConfirmations: 1,
+    waitConfirmations: DEFAULT_WAIT_CONFIRMATIONS,
   });
 
   await hre.deployments.execute(
@@ -56,7 +57,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       from: deployer,
       log: true,
       autoMine: true,
-      waitConfirmations: 1,
+      waitConfirmations: DEFAULT_WAIT_CONFIRMATIONS,
     },
     "grantRole",
     RPROPOSER_ROLE,
@@ -69,7 +70,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       from: deployer,
       log: true,
       autoMine: true,
-      waitConfirmations: 1,
+      waitConfirmations: DEFAULT_WAIT_CONFIRMATIONS,
     },
     "grantRole",
     CANCELLER_ROLE,
@@ -83,7 +84,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       from: deployer,
       log: true,
       autoMine: true,
-      waitConfirmations: 1,
+      waitConfirmations: DEFAULT_WAIT_CONFIRMATIONS,
     },
     "grantRole",
     CANCELLER_ROLE,
@@ -96,13 +97,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       from: deployer,
       log: true,
       autoMine: true,
-      waitConfirmations: 1,
+      waitConfirmations: DEFAULT_WAIT_CONFIRMATIONS,
     },
     "revokeRole",
     DEFAULT_ADMIN_ROLE,
     deployer
   );
 
+  // Send all tokens to Executor and announce ownership to Executor.
   const balance: BigNumber = await hre.deployments.read(
     "FluenceToken",
     {
@@ -119,15 +121,25 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         from: deployer,
         log: true,
         autoMine: true,
-        waitConfirmations: 1,
+        waitConfirmations: DEFAULT_WAIT_CONFIRMATIONS,
       },
       "transfer",
-      (
-        await hre.deployments.get("Executor")
-      ).address,
+      executorAddress,
       balance
     );
   }
+
+  await hre.deployments.execute(
+    "FluenceToken",
+    {
+      from: deployer,
+      log: true,
+      autoMine: true,
+      waitConfirmations: DEFAULT_WAIT_CONFIRMATIONS,
+    },
+    "transferOwnership",
+    executorAddress
+  );
 };
 
 export default func;

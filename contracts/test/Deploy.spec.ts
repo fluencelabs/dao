@@ -48,9 +48,11 @@ describe("Deploy script", () => {
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
       const hardhatSigners = await hre.ethers.getSigners();
-      usdToken = await new DevERC20__factory(
-        hardhatSigners[0]
-      ).deploy("USD", "USD", ethers.utils.parseEther(String(lbpUSDAmount)));
+      usdToken = await new DevERC20__factory(hardhatSigners[0]).deploy(
+        "USD",
+        "USD",
+        ethers.utils.parseEther(String(lbpUSDAmount))
+      );
 
       fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
 
@@ -201,6 +203,8 @@ describe("Deploy script", () => {
     expect(await token.totalSupply()).to.eq(
       ethers.utils.parseEther(String(config.deployment!.token!.totalSupply))
     );
+
+    expect(await token.owner()).to.eq(executor.address);
   });
 
   it("token balances are correct", async () => {
@@ -264,7 +268,7 @@ describe("Deploy script", () => {
 
     expect(await token.balanceOf(governor.address)).to.eq(0);
 
-    //TODO: veify balancer
+    // TODO: veify balancer
   });
 
   it("executor roles are correct", async () => {
@@ -293,8 +297,10 @@ describe("Deploy script", () => {
         "0x0000000000000000000000000000000000000000"
       )
     ).to.eq(true);
-    
-    expect(await executor.hasRole(CANCELLER_ROLE, fluenceMultisig.address)).to.eq(true);
+
+    expect(
+      await executor.hasRole(CANCELLER_ROLE, fluenceMultisig.address)
+    ).to.eq(true);
   });
 
   it("DevRewardDistributor is correct", async () => {
