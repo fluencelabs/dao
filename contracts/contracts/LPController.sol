@@ -18,13 +18,10 @@ import "./Executor.sol";
 contract LPController is Ownable {
     using SafeERC20 for IERC20;
 
-    uint24 private constant _UNISWAP_FEE = 3000;
-
     IBalancerLBPFactory public immutable balancerLBPFactory;
     IUniswapV3Factory public immutable uniswapFactory;
     IUniswapNFTManager public immutable uniswapPositionManager;
     IBalancerVault public immutable balancerVault;
-    IBalancerHelper public immutable balancerHelper;
     Executor public immutable daoExecutor;
 
     IERC20 public immutable token0;
@@ -39,7 +36,6 @@ contract LPController is Ownable {
         IUniswapV3Factory _uniswapFactory,
         IUniswapNFTManager _uniswapPositionManager,
         IBalancerVault _balancerVault,
-        IBalancerHelper _balancerHelper,
         Executor _daoExecutor,
         IERC20 token0_,
         IERC20 token1_
@@ -47,7 +43,6 @@ contract LPController is Ownable {
         balancerLBPFactory = _balancerLBPFactory;
         uniswapPositionManager = _uniswapPositionManager;
         balancerVault = _balancerVault;
-        balancerHelper = _balancerHelper;
         daoExecutor = _daoExecutor;
         uniswapFactory = _uniswapFactory;
 
@@ -64,7 +59,8 @@ contract LPController is Ownable {
      * @param initBalances - initial balances
      * @param lbpPoolDuration - duration pool working
      * @param swapFeePercentage - swapping fee in percentage
-     **/
+     *
+     */
     function createBalancerLBP(
         uint256[] calldata weights,
         uint256[] calldata endWeights,
@@ -72,117 +68,75 @@ contract LPController is Ownable {
         uint256 lbpPoolDuration,
         uint256 swapFeePercentage
     ) external onlyOwner {
-        require(
-            address(liquidityBootstrappingPool) == address(0),
-            "LBP already exists"
-        );
+        require(address(liquidityBootstrappingPool) == address(0), "LBP already exists");
 
         require(
-            weights.length == 2 ||
-                endWeights.length == 2 ||
-                initBalances.length == 2,
+            weights.length == 2 && endWeights.length == 2 && initBalances.length == 2,
             "Length for weights, endWeights and initBalances must be 2"
         );
+
+        IBalancerVault vault = balancerVault;
 
         IERC20[] memory assets = new IERC20[](2);
         assets[0] = token0;
         assets[1] = token1;
 
         IBalancerLBP lbp = IBalancerLBP(
-            balancerLBPFactory.create(
-                "Fluence LBP",
-                "FLTLBP",
-                assets,
-                weights,
-                swapFeePercentage,
-                address(this),
-                true
-            )
+            balancerLBPFactory.create("Fluence LBP", "FLTLBP", assets, weights, swapFeePercentage, address(this), false)
         );
+        liquidityBootstrappingPool = lbp;
+        lbp.updateWeightsGradually(block.timestamp, block.timestamp + lbpPoolDuration, endWeights);
+
+        assets[0].safeTransferFrom(msg.sender, address(this), initBalances[0]);
+        assets[0].forceApprove(address(vault), initBalances[0]);
+
+        assets[1].safeTransferFrom(msg.sender, address(this), initBalances[1]);
+        assets[1].forceApprove(address(vault), initBalances[1]);
 
         bytes32 _lbpPoolId = lbp.getPoolId();
-
-        lbp.updateWeightsGradually(
-            block.timestamp,
-            block.timestamp + lbpPoolDuration,
-            endWeights
-        );
-
-        token0.transferFrom(msg.sender, address(this), initBalances[0]);
-        token0.forceApprove(address(balancerVault), initBalances[0]);
-
-        token1.transferFrom(msg.sender, address(this), initBalances[1]);
-        token1.forceApprove(address(balancerVault), initBalances[1]);
-
-        IBalancerVault.JoinPoolRequest memory request = IBalancerVault
-            .JoinPoolRequest({
-                assets: assets,
-                maxAmountsIn: initBalances,
-                userData: abi.encode(0, initBalances),
-                fromInternalBalance: false
-            });
-
-        balancerVault.joinPool(
-            _lbpPoolId,
-            address(this),
-            address(this),
-            request
-        );
-
+        IBalancerVault.JoinPoolRequest memory request = IBalancerVault.JoinPoolRequest({
+            assets: assets,
+            maxAmountsIn: initBalances,
+            userData: abi.encode(0, initBalances),
+            fromInternalBalance: false
+        });
+        vault.joinPool(_lbpPoolId, address(this), address(this), request);
         lbpPoolId = _lbpPoolId;
-        liquidityBootstrappingPool = lbp;
     }
 
     /**
      * @notice Set pool status
-     **/
+     *
+     */
     function setSwapEnabledInBalancerLBP(bool swapEnabled) external onlyOwner {
         liquidityBootstrappingPool.setSwapEnabled(swapEnabled);
     }
 
     /**
      * @notice Exit from the balancer LBP
-     **/
-    function exitFromBalancerLBP() external onlyOwner {
-        uint256 bptBalance = IERC20(address(liquidityBootstrappingPool))
-            .balanceOf(address(this));
+     * @param amountsOut - minimum amounts of tokens from queryExit
+     */
+    function exitFromBalancerLBP(uint256[] calldata amountsOut) external onlyOwner {
+        IBalancerLBP lbp = liquidityBootstrappingPool;
 
+        uint256 bptBalance = IERC20(address(lbp)).balanceOf(address(this));
         require(bptBalance > 0, "No BPT balance");
 
-        IERC20(address(liquidityBootstrappingPool)).approve(
-            address(balancerVault),
-            bptBalance
-        );
+        liquidityBootstrappingPool.setSwapEnabled(false);
+
+        IERC20(address(lbp)).approve(address(balancerVault), bptBalance);
 
         IERC20[] memory assets = new IERC20[](2);
         assets[0] = token0;
         assets[1] = token1;
 
-        IBalancerVault.ExitPoolRequest memory request = IBalancerVault
-            .ExitPoolRequest({
-                assets: assets,
-                minAmountsOut: new uint256[](2),
-                userData: abi.encode(1, bptBalance),
-                toInternalBalance: false
-            });
-
-        (, uint256[] memory amountsOut) = balancerHelper.queryExit(
-            lbpPoolId,
-            address(this),
-            address(this),
-            request
-        );
-
-        request.minAmountsOut = amountsOut;
-
-        balancerVault.exitPool(
-            lbpPoolId,
-            address(this),
-            payable(address(this)),
-            request
-        );
-
-        liquidityBootstrappingPool.setSwapEnabled(false);
+        IBalancerVault.ExitPoolRequest memory request = IBalancerVault.ExitPoolRequest({
+            assets: assets,
+            minAmountsOut: amountsOut,
+            userData: abi.encode(1, bptBalance),
+            toInternalBalance: false
+        });
+        balancerVault.exitPool(lbpPoolId, address(this), payable(address(this)), request);
     }
 
     /**
@@ -190,59 +144,59 @@ contract LPController is Ownable {
      * @param tickLower - the minimum derivative price of position
      * @param tickLower - the maximum derivative price of position
      * @param sqrtPriceX96 - sqrt from initial price (Q64.96 format)
-     **/
+     * @param swapFee - swap fee
+     * @param token0Amount - amount of token0
+     * @param token1Amount - amount of token1
+     * @param amount0Min - minimum amount of token0
+     * @param amount1Min - minimum amount of token1
+     */
     function createUniswapLP(
         int24 tickLower,
         int24 tickUpper,
-        uint160 sqrtPriceX96
+        uint160 sqrtPriceX96,
+        uint24 swapFee,
+        uint256 token0Amount,
+        uint256 token1Amount,
+        uint256 amount0Min,
+        uint256 amount1Min
     ) external onlyOwner {
-        require(
-            address(uniswapPool) == address(0),
-            "Uniswap pool already exists"
-        );
+        require(address(uniswapPool) == address(0), "Uniswap pool already exists");
 
-        uint256 balance0 = token0.balanceOf(address(this));
-        uint256 balance1 = token1.balanceOf(address(this));
+        require(token0Amount != 0, "Invalid amount of token0");
+        require(token1Amount != 0, "Invalid amount of token1");
 
-        require(balance0 != 0, "Invalid balance of token0");
-        require(balance1 != 0, "Invalid balance of token1");
+        address _token0 = address(token0);
+        address _token1 = address(token1);
 
-        IUniswapV3Pool pool = IUniswapV3Pool(
-            uniswapFactory.createPool(
-                address(token0),
-                address(token1),
-                _UNISWAP_FEE
-            )
-        );
-
-        pool.initialize(sqrtPriceX96);
-
-        token0.forceApprove(address(uniswapPositionManager), balance0);
-        token1.forceApprove(address(uniswapPositionManager), balance1);
-
-        IUniswapNFTManager.MintParams memory params = IUniswapNFTManager
-            .MintParams({
-                token0: address(token0),
-                token1: address(token1),
-                fee: _UNISWAP_FEE,
-                tickLower: tickLower,
-                tickUpper: tickUpper,
-                amount0Desired: balance0,
-                amount1Desired: balance1,
-                amount0Min: 0,
-                amount1Min: 0,
-                recipient: address(daoExecutor),
-                deadline: block.timestamp
-            });
-
-        uniswapPositionManager.mint(params);
-
+        IUniswapNFTManager positionManager = uniswapPositionManager;
+        IUniswapV3Pool pool =
+            IUniswapV3Pool(positionManager.createAndInitializePoolIfNecessary(_token0, _token1, swapFee, sqrtPriceX96));
         uniswapPool = pool;
+
+        IERC20(_token0).forceApprove(address(positionManager), token0Amount);
+        IERC20(_token1).forceApprove(address(positionManager), token1Amount);
+
+        IUniswapNFTManager.MintParams memory params = IUniswapNFTManager.MintParams({
+            token0: _token0,
+            token1: _token1,
+            fee: swapFee,
+            tickLower: tickLower,
+            tickUpper: tickUpper,
+            amount0Desired: token0Amount,
+            amount1Desired: token1Amount,
+            amount0Min: amount0Min,
+            amount1Min: amount1Min,
+            recipient: address(daoExecutor),
+            deadline: block.timestamp
+        });
+
+        positionManager.mint(params);
     }
 
     /**
      * @notice Withdraw token from this contract to the DAO executor
-     **/
+     *
+     */
     function withdraw(IERC20 token, uint256 amount) external onlyOwner {
         require(token.balanceOf(address(this)) != 0, "Invalid balance");
 

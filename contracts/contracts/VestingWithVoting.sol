@@ -19,22 +19,11 @@ contract VestingWithVoting is Vesting, Votes {
         FluenceToken token_,
         string memory name_,
         string memory symbol_,
-        uint256 _cliffDuration,
-        uint256 _vestingDuration,
+        uint256 vestingDelay_,
+        uint256 vestingDuration_,
         address[] memory accounts,
         uint256[] memory amounts
-    )
-        Vesting(
-            token_,
-            name_,
-            symbol_,
-            _cliffDuration,
-            _vestingDuration,
-            accounts,
-            amounts
-        )
-        EIP712(name_, "1")
-    {
+    ) Vesting(token_, name_, symbol_, vestingDelay_, vestingDuration_, accounts, amounts) EIP712(name_, "1") {
         for (uint256 i = 0; i < accounts.length; i++) {
             address account = accounts[i];
             _transferVotingUnits(address(0x00), account, amounts[i]);
@@ -47,14 +36,7 @@ contract VestingWithVoting is Vesting, Votes {
         return _getTotalSupply();
     }
 
-    function _addTotalSupply(uint256 amount) internal override {}
-
-    function _getVotingUnits(address account)
-        internal
-        view
-        override
-        returns (uint256)
-    {
+    function _getVotingUnits(address account) internal view override returns (uint256) {
         return balanceOf[account];
     }
 

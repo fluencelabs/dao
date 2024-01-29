@@ -3,35 +3,39 @@
 pragma solidity >=0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./FluenceToken.sol";
-import "./interfaces/IVestingERC20.sol";
 
 /**
  * @title Vesting with Delayed Start
  * @notice Vesting Fluence token contract
  * @dev This contract implements the ERC20 standard. It is possible to add the contract to a wallet. Transferring to zero address is unlocking the released amount.
  */
-contract Vesting is IVestingERC20 {
+contract Vesting is IERC20 {
     using SafeERC20 for IERC20;
 
     /**
      * @notice Returns the vesting token
-     **/
+     *
+     */
     FluenceToken public immutable token;
 
     /**
      * @notice Returns the  start vesting time
-     **/
+     *
+     */
     uint256 public immutable startTimestamp;
 
     /**
      * @notice Returns the vesting duration since vesting start
-     **/
+     *
+     */
     uint256 public immutable vestingDuration;
 
     /**
      * @notice Returns the vesting contract decimals
-     **/
+     *
+     */
     uint8 public immutable decimals;
 
     bytes32 private immutable _name;
@@ -42,12 +46,14 @@ contract Vesting is IVestingERC20 {
 
     /**
      * @notice Returns the locked vesting user's balance
-     **/
+     *
+     */
     mapping(address => uint256) public lockedBalances;
 
     /**
      * @notice Returns the current vesting user's balance
-     **/
+     *
+     */
     mapping(address => uint256) public balanceOf;
 
     uint256 private _totalSupply;
@@ -61,7 +67,8 @@ contract Vesting is IVestingERC20 {
      * @param _vestingDuration - vesting duration
      * @param accounts - vesting accounts
      * @param amounts - vesting amounts of accounts
-     **/
+     *
+     */
     constructor(
         FluenceToken token_,
         string memory name_,
@@ -71,10 +78,7 @@ contract Vesting is IVestingERC20 {
         address[] memory accounts,
         uint256[] memory amounts
     ) {
-        require(
-            accounts.length == amounts.length,
-            "accounts and amounts must have the same length"
-        );
+        require(accounts.length == amounts.length, "accounts and amounts must have the same length");
 
         require(bytes(name_).length <= 31, "invalid name length");
         require(bytes(symbol_).length <= 31, "invalid symbol length");
@@ -97,13 +101,14 @@ contract Vesting is IVestingERC20 {
             uint256 amount = amounts[i];
             lockedBalances[accounts[i]] = amount;
             balanceOf[accounts[i]] = amount;
-            _addTotalSupply(amount);
+            _totalSupply += amount;
         }
     }
 
     /**
      * @notice Returns vesting contract name
-     **/
+     *
+     */
     function name() external view returns (string memory n) {
         n = string(abi.encodePacked(_name));
         uint256 length = _nameLength;
@@ -114,7 +119,8 @@ contract Vesting is IVestingERC20 {
 
     /**
      * @notice Returns vesting contract symbol
-     **/
+     *
+     */
     function symbol() external view returns (string memory s) {
         s = string(abi.encodePacked(_symbol));
         uint256 length = _symbolLength;
@@ -126,7 +132,8 @@ contract Vesting is IVestingERC20 {
     /**
      * @notice Get a available amount by user
      * @return available amount
-     **/
+     *
+     */
     function getAvailableAmount(address account) public view returns (uint256) {
         if (block.timestamp <= startTimestamp) {
             return 0;
@@ -150,15 +157,29 @@ contract Vesting is IVestingERC20 {
     }
 
     /**
+     * @notice Unsupported operation
+     *
+     */
+    function allowance(address owner, address spender) external view returns (uint256) {
+        return 0;
+    }
+
+    /**
+     * @notice Returns total locked amount
+     *
+     */
+    function totalSupply() external view virtual override returns (uint256) {
+        return _totalSupply;
+    }
+
+    /**
      * @notice Returns released amount
      * @param to - always address 0x00
      * @param amount - the full released amount or part of it
-     **/
+     *
+     */
     function transfer(address to, uint256 amount) external returns (bool) {
-        require(
-            to == address(0x00),
-            "Transfer allowed only to the zero address"
-        );
+        require(to == address(0x00), "Transfer allowed only to the zero address");
 
         address sender = msg.sender;
         _burn(sender, amount);
@@ -168,14 +189,19 @@ contract Vesting is IVestingERC20 {
     }
 
     /**
-     * @notice Returns total locked amount
-     **/
-    function totalSupply() external view virtual override returns (uint256) {
-        return _totalSupply;
+     * @notice Unsupported operation
+     *
+     */
+    function transferFrom(address from, address to, uint256 value) external returns (bool) {
+        revert("Unsupported operation");
     }
 
-    function _addTotalSupply(uint256 amount) internal virtual {
-        _totalSupply += amount;
+    /**
+     * @notice Unsupported operation
+     *
+     */
+    function approve(address spender, uint256 amount) external returns (bool) {
+        revert("Unsupported operation");
     }
 
     function _burn(address from, uint256 amount) internal {
@@ -191,9 +217,10 @@ contract Vesting is IVestingERC20 {
 
         _beforeBurn(from, amount);
 
-        IERC20(token).safeTransfer(from, amount);
-
         balanceOf[from] -= amount;
+        _totalSupply -= amount;
+
+        IERC20(token).safeTransfer(from, amount);
     }
 
     function _beforeBurn(address from, uint256 amount) internal virtual {}

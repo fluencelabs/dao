@@ -21,34 +21,25 @@ contract FluenceToken is
         _disableInitializers();
     }
 
-    function initialize(
-        string memory name_,
-        string memory symbol_,
-        uint256 totalSupply_
-    ) public initializer {
+    function initialize(string memory name_, string memory symbol_, uint256 totalSupply_) public initializer {
         __ERC20_init(name_, symbol_);
+        __ERC20Permit_init(name_);
+        __ERC20Votes_init();
+
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _mint(msg.sender, totalSupply_);
     }
 
-    function _update(
-        address from,
-        address to,
-        uint256 value
-    ) internal override(ERC20Upgradeable, ERC20VotesUpgradeable) {
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20Upgradeable, ERC20VotesUpgradeable)
+    {
         super._update(from, to, value);
     }
 
-    function nonces(
-        address owner
-    )
-        public
-        view
-        override(ERC20PermitUpgradeable, NoncesUpgradeable)
-        returns (uint256)
-    {
+    function nonces(address owner) public view override(ERC20PermitUpgradeable, NoncesUpgradeable) returns (uint256) {
         return super.nonces(owner);
     }
 

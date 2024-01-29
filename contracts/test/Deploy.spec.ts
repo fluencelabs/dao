@@ -48,9 +48,11 @@ describe("Deploy script", () => {
   const setupTest = deployments.createFixture(
     async (hre: HardhatRuntimeEnvironment) => {
       const hardhatSigners = await hre.ethers.getSigners();
-      usdToken = await new DevERC20__factory(
-        hardhatSigners[0]
-      ).deploy("USD", "USD", ethers.utils.parseEther(String(lbpUSDAmount)));
+      usdToken = await new DevERC20__factory(hardhatSigners[0]).deploy(
+        "USD",
+        "USD",
+        ethers.utils.parseEther(String(lbpUSDAmount))
+      );
 
       fluenceMultisig = hardhatSigners[hardhatSigners.length - 1];
 
@@ -293,8 +295,10 @@ describe("Deploy script", () => {
         "0x0000000000000000000000000000000000000000"
       )
     ).to.eq(true);
-    
-    expect(await executor.hasRole(CANCELLER_ROLE, fluenceMultisig.address)).to.eq(true);
+
+    expect(
+      await executor.hasRole(CANCELLER_ROLE, fluenceMultisig.address)
+    ).to.eq(true);
   });
 
   it("DevRewardDistributor is correct", async () => {
@@ -359,7 +363,9 @@ describe("Deploy script", () => {
       expect(await vesting.decimals()).to.eq(18);
 
       expect(await vesting.token()).to.eq(token.address);
-      expect(await vesting.vestingDuration()).to.eq(cfg.vestingDurationMonths * MONTH);
+      expect(await vesting.vestingDuration()).to.eq(
+        cfg.vestingDurationMonths * MONTH
+      );
       const accounts = cfg.accounts;
       const amounts = cfg.amounts;
       for (let i = 0; i < accounts.length; i++) {
