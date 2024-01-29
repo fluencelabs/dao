@@ -17,47 +17,56 @@ contract DevRewardDistributor {
 
     /**
      * @notice Reward token
-     **/
+     *
+     */
     FluenceToken public immutable token;
 
     /**
      * @notice DAO timelock contract address
-     **/
+     *
+     */
     Executor public immutable executor;
 
     /**
      * @notice Canceler address (e.g. FluenceMultisig)
-     **/
+     *
+     */
     address public immutable canceler;
 
     /**
      * @notice Claiming end time
-     **/
+     *
+     */
     uint256 public immutable claimingEndTime;
 
     /**
      * @notice Time when this contract was deployed
-     **/
+     *
+     */
     uint256 public immutable deployTime;
 
     /**
      * @notice Merkle root from rewards tree
-     **/
+     *
+     */
     bytes32 public immutable merkleRoot;
 
     /**
      * @notice Period for dividing the reward
-     **/
+     *
+     */
     uint256 public immutable halvePeriod;
 
     /**
      * @notice Initial user's reward
-     **/
+     *
+     */
     uint256 public immutable initialReward;
 
     /**
      * @notice Bitmap with claimed users ids
-     **/
+     *
+     */
     mapping(uint256 => uint256) private claimedBitMap;
 
     /**
@@ -66,18 +75,15 @@ contract DevRewardDistributor {
      * @param account - reward account
      * @param amount - reward amount
      * @param leaf - leaf with user's info in reward tree
-     **/
-    event Claimed(
-        uint256 userId,
-        address account,
-        uint256 amount,
-        bytes32 leaf
-    );
+     *
+     */
+    event Claimed(uint256 indexed userId, address account, uint256 amount, bytes32 leaf);
 
     /**
      * @notice Emitted when claiming period is ended and tokens transfer to the executor
      * @param amount - remainder balance
-     **/
+     *
+     */
     event TransferUnclaimed(uint256 amount);
 
     /**
@@ -88,7 +94,8 @@ contract DevRewardDistributor {
      * @param _initialReward - initial user reward
      * @param _claimingPeriod - claiming period
      * @param _canceler - can cancel distribution, and withdraw to _executor.
-     **/
+     *
+     */
     constructor(
         FluenceToken _token,
         Executor _executor,
@@ -111,10 +118,7 @@ contract DevRewardDistributor {
     }
 
     modifier whenClaimingIs(bool isActive) {
-        require(
-            isClaimingActive() == isActive,
-            "Claiming status is not as expected"
-        );
+        require(isClaimingActive() == isActive, "Claiming status is not as expected");
         _;
     }
 
@@ -124,7 +128,8 @@ contract DevRewardDistributor {
      * @param merkleProof - merkle proof for leaf
      * @param temporaryAddress - temporary Ethereum address that's used only for signing
      * @param signature - signature of temporary Ethereum address
-     **/
+     *
+     */
     function claimTokens(
         uint32 userId,
         bytes32[] calldata merkleProof,
@@ -135,14 +140,9 @@ contract DevRewardDistributor {
 
         bytes32 leaf = keccak256(abi.encodePacked(userId, temporaryAddress));
 
-        require(
-            MerkleProof.verify(merkleProof, merkleRoot, leaf),
-            "Valid proof required"
-        );
+        require(MerkleProof.verify(merkleProof, merkleRoot, leaf), "Valid proof required");
 
-        bytes32 msgHash = keccak256(
-            abi.encodePacked("\x19Ethereum Signed Message:\n20", msg.sender)
-        );
+        bytes32 msgHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n20", msg.sender));
 
         address signer = ECDSA.recover(msgHash, signature);
         require(signer == temporaryAddress, "Invalid signature");
@@ -158,14 +158,16 @@ contract DevRewardDistributor {
 
     /**
      * @notice used to move any remaining tokens out of the contract to Executor after expiration
-     **/
+     *
+     */
     function transferUnclaimed() external whenClaimingIs(false) {
         _withdraw();
     }
 
     /**
      * @notice used to move any remaining tokens out of the contract to Executor (DAO) in emergency situation.
-     **/
+     *
+     */
     function withdraw() external {
         require(msg.sender == canceler, "Only canceler can withdraw");
         _withdraw();
@@ -175,7 +177,8 @@ contract DevRewardDistributor {
      * @notice checks claimed bitMap for userId
      * @dev fork from uniswap merkle distributor, unmodified
      * @return - boolean
-     **/
+     *
+     */
     function isClaimed(uint256 index) public view returns (bool) {
         uint256 claimedWordIndex = index / 256;
         uint256 claimedBitIndex = index % 256;
@@ -187,7 +190,8 @@ contract DevRewardDistributor {
     /**
      * @notice Checking if claiming is active
      * @return - boolean
-     **/
+     *
+     */
     function isClaimingActive() public view returns (bool) {
         return block.timestamp < claimingEndTime;
     }
@@ -195,7 +199,8 @@ contract DevRewardDistributor {
     /**
      * @notice Get current user's reward
      * @return - boolean
-     **/
+     *
+     */
     function currentReward() public view returns (uint256) {
         if (!isClaimingActive()) {
             return 0;
@@ -210,13 +215,12 @@ contract DevRewardDistributor {
     /**
      * @notice Sets a given user by index to claimed
      * @dev taken from uniswap merkle distributor, unmodified
-     **/
+     *
+     */
     function _setClaimed(uint256 index) private {
         uint256 claimedWordIndex = index / 256;
         uint256 claimedBitIndex = index % 256;
-        claimedBitMap[claimedWordIndex] =
-            claimedBitMap[claimedWordIndex] |
-            (1 << claimedBitIndex);
+        claimedBitMap[claimedWordIndex] = claimedBitMap[claimedWordIndex] | (1 << claimedBitIndex);
     }
 
     function _withdraw() private {

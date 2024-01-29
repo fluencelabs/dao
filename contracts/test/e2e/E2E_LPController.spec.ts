@@ -14,6 +14,8 @@ import {
   IBalancerLBP__factory,
   DevERC20__factory,
   IERC20Metadata__factory,
+  IBalancerHelper,
+  IERC20__factory,
 } from "../../typechain";
 import { BigNumber } from "ethers";
 import { DAY } from "../../utils/time";
@@ -41,6 +43,7 @@ const setupTest = deployments.createFixture(
     lpController: LPController;
     fltToken: IERC20MetadataUpgradeable;
     usdToken: IERC20Metadata;
+    balancerHelper: IBalancerHelper;
   }> => {
     await deployments.fixture([]);
     const hardhatSigners = await hre.ethers.getSigners();
@@ -108,6 +111,10 @@ const setupTest = deployments.createFixture(
           await hre.deployments.get("FluenceToken")
         ).address
       )) as IERC20MetadataUpgradeable,
+      balancerHelper: (await ethers.getContractAt(
+        "IBalancerHelper",
+        "0x5aDDCCa35b7A0D07C74063c48700C8590E87864E"
+      )) as IBalancerHelper,
     };
   }
 );
@@ -118,6 +125,7 @@ describe("LPController", () => {
   let vault: IBalancerVault;
   let lbpFactory: IBalancerLBPFactory;
   let lbp: IBalancerLBP;
+  let balancerHelper: IBalancerHelper;
   let poolId: string;
   let params: Array<{
     token: IERC20MetadataUpgradeable;
@@ -145,6 +153,7 @@ describe("LPController", () => {
       await settings.lpController.liquidityBootstrappingPool(),
       signer
     );
+    balancerHelper = settings.balancerHelper;
 
     params = new Array(
       {
@@ -204,7 +213,7 @@ describe("LPController", () => {
     const lbpPoolDurationDays =
       config.deployment!.pool!.lbpPoolDurationDays * DAY;
 
-    expect(await lbp.getSwapEnabled()).to.eq(true);
+    expect(await lbp.getSwapEnabled()).to.eq(false);
     expect(await lbp.getSwapFeePercentage()).to.eq(
       ethers.utils.parseUnits(
         String(config.deployment!.pool!.swapFeePercentage),
@@ -246,15 +255,38 @@ describe("LPController", () => {
   });
 
   it("setSwapEnabledInBalancerLBP", async () => {
-    await lpController.setSwapEnabledInBalancerLBP(false);
-    expect(await lbp.getSwapEnabled()).to.eq(false);
-
     await lpController.setSwapEnabledInBalancerLBP(true);
     expect(await lbp.getSwapEnabled()).to.eq(true);
+
+    await lpController.setSwapEnabledInBalancerLBP(false);
+    expect(await lbp.getSwapEnabled()).to.eq(false);
   });
 
   it("exit from lbp", async () => {
-    const tx = await lpController.exitFromBalancerLBP();
+    const userData = ethers.utils.defaultAbiCoder.encode(
+      ["uint256", "uint256"],
+      [
+        1,
+        await IERC20__factory.connect(
+          await lpController.liquidityBootstrappingPool(),
+          await ethers.provider.getSigner()
+        ).balanceOf(lpController.address),
+      ]
+    );
+
+    const queryExitRes = await balancerHelper.callStatic.queryExit(
+      await lpController.lbpPoolId(),
+      lpController.address,
+      lpController.address,
+      {
+        assets: [await lpController.token0(), await lpController.token1()],
+        minAmountsOut: new Array(2).fill(0),
+        userData: userData,
+        toInternalBalance: false,
+      }
+    );
+
+    const tx = await lpController.exitFromBalancerLBP(queryExitRes[1]);
     await tx.wait();
     expect(
       await IERC20Metadata__factory.connect(
@@ -305,7 +337,12 @@ describe("LPController", () => {
     await lpController.createUniswapLP(
       nearestUsableTick(-887272, spacings),
       nearestUsableTick(887272, spacings),
-      price.toString()
+      price.toString(),
+      3000,
+      token0Balance,
+      token1Balance,
+      0,
+      0
     );
 
     const pool = await lpController.uniswapPool();
@@ -361,13 +398,18 @@ describe("LPController", () => {
     );
 
     await expect(
-      lpControllerWithMainAccount.exitFromBalancerLBP()
+      lpControllerWithMainAccount.exitFromBalancerLBP([0, 0])
     ).to.be.revertedWith(
       `OwnableUnauthorizedAccount("0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65")`
     );
 
     await expect(
       lpControllerWithMainAccount.createUniswapLP(
+        BigNumber.from(1),
+        BigNumber.from(1),
+        BigNumber.from(1),
+        BigNumber.from(1),
+        BigNumber.from(1),
         BigNumber.from(1),
         BigNumber.from(1),
         BigNumber.from(1)
