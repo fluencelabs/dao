@@ -203,6 +203,8 @@ describe("Deploy script", () => {
     expect(await token.totalSupply()).to.eq(
       ethers.utils.parseEther(String(config.deployment!.token!.totalSupply))
     );
+
+    expect(await token.owner()).to.eq(executor.address);
   });
 
   it("token balances are correct", async () => {
@@ -266,7 +268,7 @@ describe("Deploy script", () => {
 
     expect(await token.balanceOf(governor.address)).to.eq(0);
 
-    //TODO: veify balancer
+    // TODO: veify balancer
   });
 
   it("executor roles are correct", async () => {

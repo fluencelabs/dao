@@ -137,9 +137,11 @@ sequenceDiagram
         deployer ->> Executor: grantRole(CANCELLER_ROLE, FluenceMultisig)
         deployer ->> Executor: revokeRole(ADMIN_ROLE, deployer)
         deployer ->>+ FluenceToken: transfer (balance) to Governor
-        FluenceToken ->>- Governor: transfer (balance)
+        FluenceToken ->>- Executor: transfer (balance)
+        FluenceToken ->> Executor: transferOwnership(Executor)
         
         Note over Governor: Owner: Executor
+        Note over FluenceToken: Owner: Executor
         Note over Executor: Admin Role: [0x0]
         Note over Executor: Proposer Role: [Governor]
         Note over Executor: Canceller Role: [Governor, FluenceMultisig]
