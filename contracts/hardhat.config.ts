@@ -1,17 +1,12 @@
-import "@nomiclabs/hardhat-etherscan";
-import "@nomiclabs/hardhat-waffle";
-import "@nomiclabs/hardhat-solhint";
-import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "hardhat-deploy";
-import "hardhat-tracer";
 import "hardhat-docgen";
 import "dotenv/config";
+import "@openzeppelin/hardhat-upgrades";
 import { HardhatUserConfig, task } from "hardhat/config";
 import { Config } from "./utils/config";
 import "hardhat-contract-sizer";
-import "dotenv/config";
 import fs from "fs";
 import YAML from "yaml";
 
@@ -37,6 +32,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 const hardhatConfig: HardhatUserConfig = {
+  defender: {
+    apiKey: process.env.DEFENDER_KEY as string,
+    apiSecret: process.env.DEFENDER_SECRET as string,
+  },
   networks: {
     hardhat: {
       forking: {
@@ -61,6 +60,16 @@ const hardhatConfig: HardhatUserConfig = {
       accounts: config?.networks?.testnet?.privateKey
         ? [config.networks.testnet?.privateKey]
         : [],
+    },
+    sepolia: {
+      url: "https://ethereum-sepolia.publicnode.com",
+      chainId: 11155111,
+      accounts: [process.env.PRIVATE_KEY as string],
+    },
+  },
+  verify: {
+    etherscan: {
+      apiKey: process.env.ETHERSCAN_API_KEY,
     },
   },
   namedAccounts: {
