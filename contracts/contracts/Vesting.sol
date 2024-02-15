@@ -102,6 +102,7 @@ contract Vesting is IERC20 {
             lockedBalances[accounts[i]] = amount;
             balanceOf[accounts[i]] = amount;
             _totalSupply += amount;
+            emit Transfer(address(0x00), accounts[i], amount);
         }
     }
 
