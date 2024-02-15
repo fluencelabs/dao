@@ -2,28 +2,22 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
-import { Config } from "../utils/config";
-import { ethers } from "ethers";
+import { DAY } from "../../utils/time";
+import { Config } from "../../utils/config";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
 
   const config = Config.get();
 
-  await hre.deployments.deploy("FluenceToken", {
+  await hre.deployments.deploy("Executor", {
     from: deployer,
     proxy: {
       proxyContract: "ERC1967Proxy",
       proxyArgs: ["{implementation}", "{data}"],
       execute: {
         methodName: "initialize",
-        args: [
-          "Fluence Token",
-          "FLT",
-          ethers.utils.parseEther(
-            String(config.deployment!.token!.totalSupply)
-          ),
-        ],
+        args: [(config.deployment!.executor!.delayDays ?? 0) * DAY],
       },
     },
     log: true,
@@ -33,4 +27,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["FluenceToken"];
+func.tags = ["Executor", "testnet"];

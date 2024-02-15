@@ -3,8 +3,8 @@ import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { ethers } from "hardhat";
-import { DAY } from "../utils/time";
-import { Config } from "../utils/config";
+import { DAY } from "../../utils/time";
+import { Config } from "../../utils/config";
 import { BigNumber } from "ethers";
 
 const RPROPOSER_ROLE = ethers.utils.keccak256(
@@ -143,5 +143,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["Governor"];
+func.tags = ["Governor", "testnet"];
 module.exports.dependencies = ["FluenceToken", "TeamVesting", "Executor"];

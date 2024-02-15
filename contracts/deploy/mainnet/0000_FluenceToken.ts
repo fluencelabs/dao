@@ -1,30 +1,28 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
-import "@nomiclabs/hardhat-ethers";
-import { DAY } from "../utils/time";
-import { Config } from "../utils/config";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployer } = await hre.getNamedAccounts();
+  console.log("Deploying Fluence Token...");
 
-  const config = Config.get();
+  const deployer = (await ethers.getSigners())[0].address;
 
-  await hre.deployments.deploy("Executor", {
+  const deployResult = await hre.deployments.deploy("FluenceToken", {
     from: deployer,
     proxy: {
       proxyContract: "ERC1967Proxy",
       proxyArgs: ["{implementation}", "{data}"],
       execute: {
         methodName: "initialize",
-        args: [(config.deployment!.executor!.delayDays ?? 0) * DAY],
+        args: ["Fluence", "FLT", ethers.parseEther("1000000000")],
       },
     },
-    log: true,
-    autoMine: true,
     waitConfirmations: 1,
   });
+
+  console.log(`FLT token deployed to ${deployResult.address}\n`);
 };
 
 export default func;
-func.tags = ["Executor"];
+func.tags = ["FluenceToken", "mainnet"];

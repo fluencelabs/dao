@@ -2,8 +2,8 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
-import { MONTH } from "../utils/time";
-import { Config } from "../utils/config";
+import { MONTH } from "../../utils/time";
+import { Config } from "../../utils/config";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -52,5 +52,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["FluenceVesting"];
+func.tags = ["FluenceVesting", "testnet"];
 module.exports.dependencies = ["FluenceToken"];
