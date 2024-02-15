@@ -55,6 +55,10 @@ const hardhatConfig: HardhatUserConfig = {
         ? [config.networks.mainnet?.privateKey]
         : [],
     },
+    polygon: {
+      url: "https://polygon-mainnet.infura.io/v3/0f778ddd63a942a6bfdb713f85482055",
+      accounts: [process.env.PRIVATE_KEY as string],
+    },
     testnet: {
       url: config?.networks?.testnet?.url ?? "",
       accounts: config?.networks?.testnet?.privateKey

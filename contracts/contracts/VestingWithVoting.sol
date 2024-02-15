@@ -23,22 +23,12 @@ contract VestingWithVoting is Vesting, Votes {
         uint256 _vestingDuration,
         address[] memory accounts,
         uint256[] memory amounts
-    )
-        Vesting(
-            token_,
-            name_,
-            symbol_,
-            _cliffDuration,
-            _vestingDuration,
-            accounts,
-            amounts
-        )
-        EIP712(name_, "1")
-    {
+    ) Vesting(token_, name_, symbol_, _cliffDuration, _vestingDuration, accounts, amounts) EIP712(name_, "1") {
         for (uint256 i = 0; i < accounts.length; i++) {
             address account = accounts[i];
             _transferVotingUnits(address(0x00), account, amounts[i]);
             _delegate(account, account);
+            emit Transfer(address(0), accounts[i], amount);
         }
     }
 
@@ -49,12 +39,7 @@ contract VestingWithVoting is Vesting, Votes {
 
     function _addTotalSupply(uint256 amount) internal override {}
 
-    function _getVotingUnits(address account)
-        internal
-        view
-        override
-        returns (uint256)
-    {
+    function _getVotingUnits(address account) internal view override returns (uint256) {
         return balanceOf[account];
     }
 

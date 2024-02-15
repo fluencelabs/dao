@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import { parseVestingAddresses } from "../utils/utils";
-import { YEAR } from "../utils/time";
+import { HOURS, MINUTES } from "../utils/time";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log("\nDeploying Investors Vesting #1...");
@@ -21,8 +21,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       token.address,
       "Fluence Investors Vesting",
       "IVFLT",
-      YEAR,
-      YEAR,
+      10 * MINUTES,
+      1 * HOURS,
       accounts,
       amounts,
     ],

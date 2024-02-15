@@ -16,22 +16,26 @@ contract Vesting is IVestingERC20 {
 
     /**
      * @notice Returns the vesting token
-     **/
+     *
+     */
     FluenceToken public immutable token;
 
     /**
      * @notice Returns the  start vesting time
-     **/
+     *
+     */
     uint256 public immutable startTimestamp;
 
     /**
      * @notice Returns the vesting duration since vesting start
-     **/
+     *
+     */
     uint256 public immutable vestingDuration;
 
     /**
      * @notice Returns the vesting contract decimals
-     **/
+     *
+     */
     uint8 public immutable decimals;
 
     bytes32 private immutable _name;
@@ -42,12 +46,14 @@ contract Vesting is IVestingERC20 {
 
     /**
      * @notice Returns the locked vesting user's balance
-     **/
+     *
+     */
     mapping(address => uint256) public lockedBalances;
 
     /**
      * @notice Returns the current vesting user's balance
-     **/
+     *
+     */
     mapping(address => uint256) public balanceOf;
 
     uint256 private _totalSupply;
@@ -61,7 +67,8 @@ contract Vesting is IVestingERC20 {
      * @param _vestingDuration - vesting duration
      * @param accounts - vesting accounts
      * @param amounts - vesting amounts of accounts
-     **/
+     *
+     */
     constructor(
         FluenceToken token_,
         string memory name_,
@@ -71,10 +78,7 @@ contract Vesting is IVestingERC20 {
         address[] memory accounts,
         uint256[] memory amounts
     ) {
-        require(
-            accounts.length == amounts.length,
-            "accounts and amounts must have the same length"
-        );
+        require(accounts.length == amounts.length, "accounts and amounts must have the same length");
 
         require(bytes(name_).length <= 31, "invalid name length");
         require(bytes(symbol_).length <= 31, "invalid symbol length");
@@ -98,12 +102,14 @@ contract Vesting is IVestingERC20 {
             lockedBalances[accounts[i]] = amount;
             balanceOf[accounts[i]] = amount;
             _addTotalSupply(amount);
+            emit Transfer(address(0), accounts[i], amount);
         }
     }
 
     /**
      * @notice Returns vesting contract name
-     **/
+     *
+     */
     function name() external view returns (string memory n) {
         n = string(abi.encodePacked(_name));
         uint256 length = _nameLength;
@@ -114,7 +120,8 @@ contract Vesting is IVestingERC20 {
 
     /**
      * @notice Returns vesting contract symbol
-     **/
+     *
+     */
     function symbol() external view returns (string memory s) {
         s = string(abi.encodePacked(_symbol));
         uint256 length = _symbolLength;
@@ -126,7 +133,8 @@ contract Vesting is IVestingERC20 {
     /**
      * @notice Get a available amount by user
      * @return available amount
-     **/
+     *
+     */
     function getAvailableAmount(address account) public view returns (uint256) {
         if (block.timestamp <= startTimestamp) {
             return 0;
@@ -153,12 +161,10 @@ contract Vesting is IVestingERC20 {
      * @notice Returns released amount
      * @param to - always address 0x00
      * @param amount - the full released amount or part of it
-     **/
+     *
+     */
     function transfer(address to, uint256 amount) external returns (bool) {
-        require(
-            to == address(0x00),
-            "Transfer allowed only to the zero address"
-        );
+        require(to == address(0x00), "Transfer allowed only to the zero address");
 
         address sender = msg.sender;
         _burn(sender, amount);
@@ -169,7 +175,8 @@ contract Vesting is IVestingERC20 {
 
     /**
      * @notice Returns total locked amount
-     **/
+     *
+     */
     function totalSupply() external view virtual override returns (uint256) {
         return _totalSupply;
     }

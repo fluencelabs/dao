@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import { parseVestingAddresses } from "../utils/utils";
-import { DAY, YEAR } from "../utils/time";
+import { DAY, MINUTES, YEAR } from "../utils/time";
 import { ethers } from "hardhat";
 
 const SAFE_ADDRESS = "0x198691769280d07706a9c85B30565E928F8A9025";
@@ -40,8 +40,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
           teamVesting.address,
           deployExecutorResult.address,
           1,
-          Math.floor((1 * DAY) / 12),
-          Math.floor((1 * DAY) / 12),
+          Math.floor((24 * 60 * MINUTES) / 12),
+          Math.floor((24 * 60 * MINUTES) / 12),
           1,
         ],
       },
