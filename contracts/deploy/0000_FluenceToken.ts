@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
-import { Config } from "../../utils/config";
+import { Config } from "../utils/config";
 import { ethers } from "ethers";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {

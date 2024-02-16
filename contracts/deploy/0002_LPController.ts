@@ -3,8 +3,8 @@ import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { ethers } from "hardhat";
-import { DAY } from "../../utils/time";
-import { Config } from "../../utils/config";
+import { DAY } from "../utils/time";
+import { Config } from "../utils/config";
 import { BigNumber } from "ethers";
 import { IERC20Metadata__factory } from "../typechain";
 

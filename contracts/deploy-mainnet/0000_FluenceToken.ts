@@ -15,7 +15,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       proxyArgs: ["{implementation}", "{data}"],
       execute: {
         methodName: "initialize",
-        args: ["Fluence", "FLT", ethers.parseEther("1000000000")],
+        args: ["Fluence", "FLT", ethers.utils.parseEther("1000000000")],
       },
     },
     waitConfirmations: 1,

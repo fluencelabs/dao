@@ -51,20 +51,16 @@ const hardhatConfig: HardhatUserConfig = {
       url: "http://127.0.0.1:8545/",
     },
     mainnet: {
-      url: config?.networks?.mainnet?.url ?? "",
-      accounts: config?.networks?.mainnet?.privateKey
-        ? [config.networks.mainnet?.privateKey]
-        : [],
-    },
-    polygon: {
-      url: "https://polygon-mainnet.infura.io/v3/0f778ddd63a942a6bfdb713f85482055",
+      url: "https://mainnet.infura.io/v3/",
       accounts: [process.env.PRIVATE_KEY as string],
     },
-    testnet: {
-      url: config?.networks?.testnet?.url ?? "",
-      accounts: config?.networks?.testnet?.privateKey
-        ? [config.networks.testnet?.privateKey]
-        : [],
+    polygon: {
+      url: "https://polygon-mainnet.infura.io/v3/",
+      accounts: [process.env.PRIVATE_KEY as string],
+    },
+    sepolia: {
+      url: "https://gateway.tenderly.co/public/sepolia",
+      accounts: [process.env.PRIVATE_KEY as string],
     },
   },
   namedAccounts: {
@@ -94,6 +90,11 @@ const hardhatConfig: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: config?.networks?.etherscanApiKey ?? "",
+  },
+  verify: {
+    etherscan: {
+      apiKey: process.env.ETHERSCAN_API_KEY,
+    },
   },
 };
 

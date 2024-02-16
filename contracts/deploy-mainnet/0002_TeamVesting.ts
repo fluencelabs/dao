@@ -2,10 +2,11 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import { parseVestingAddresses } from "../utils/utils";
-import { YEAR, HOURS, MINUTES } from "../utils/time";
+import { HOURS, MINUTES } from "../utils/time";
+import { ethers } from "hardhat";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log("\nDeploying Investors Vesting #1...");
+  console.log("\nDeploying Team Vesting...");
   const deployer = (await ethers.getSigners())[0].address;
 
   const { accounts, amounts, totalAmount } =
@@ -20,8 +21,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       token.address,
       "Fluence Token (Locked, Voting)",
       "FLT-LV",
-      10 * MINUTES,
-      1 * HOURS,
+      MINUTES,
+      20 * HOURS,
       accounts,
       amounts,
     ],

@@ -5,7 +5,7 @@ import { parseVestingAddresses } from "../utils/utils";
 import { DAY, MINUTES, YEAR } from "../utils/time";
 import { ethers } from "hardhat";
 
-const SAFE_ADDRESS = "0x198691769280d07706a9c85B30565E928F8A9025";
+const SAFE_ADDRESS = "0xA8643fbd072dD597e3d7890DF7Ac70DeAC768f76";
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log("\nDeploying DAO...");
   const deployer = (await ethers.getSigners())[0].address;
@@ -60,7 +60,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log(
     "Remaining balance of deployer: ",
-    ethers.formatEther(value.toString())
+    ethers.utils.formatEther(value.toString())
   );
 
   await hre.deployments.execute(

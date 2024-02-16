@@ -2,11 +2,11 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
-import { MONTH } from "../../utils/time";
-import { Config } from "../../utils/config";
+import { Config } from "../utils/config";
 import { parse } from "csv-parse/sync";
 import { BigNumber, BigNumberish, ethers } from "ethers";
 import fs from "fs";
+import { MONTH } from "../utils/time";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -16,9 +16,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let accounts: Array<string> = [];
   let amounts: Array<BigNumber> = [];
 
-  if (config!.deployment?.teamVesting?.csvFile != null) {
+  if (config!.deployment?.investorsVesting?.csvFile != null) {
     const file = fs.readFileSync(
-      config!.deployment!.teamVesting!.csvFile,
+      config!.deployment!.investorsVesting!.csvFile,
       "utf8"
     );
 
@@ -29,21 +29,25 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     accounts = records.map((r: any) => r[0]);
     amounts = records.map((r: any) => ethers.utils.parseEther(r[1]));
   } else {
-    accounts = config!.deployment!.teamVesting!.accounts;
-    amounts = config!.deployment!.teamVesting!.amounts.map((a) =>
+    accounts = config!.deployment!.investorsVesting!.accounts;
+    amounts = config!.deployment!.investorsVesting!.amounts.map((a) =>
       ethers.utils.parseEther(String(a))
     );
   }
 
-  const vesting = await hre.deployments.deploy("TeamVesting", {
+  const vesting = await hre.deployments.deploy("InvestorsVesting", {
     from: deployer,
-    contract: "VestingWithVoting",
+    contract: "Vesting",
     args: [
       (await hre.deployments.get("FluenceToken")).address,
-      "Team Vesting",
-      "FLTTV",
-      Math.floor(config.deployment!.teamVesting!.delayDurationMonths * MONTH),
-      Math.floor(config.deployment!.teamVesting!.vestingDurationMonths * MONTH),
+      "Investors Vesting",
+      "FLTIV",
+      Math.floor(
+        config.deployment!.investorsVesting!.delayDurationMonths * MONTH
+      ),
+      Math.floor(
+        config.deployment!.investorsVesting!.vestingDurationMonths * MONTH
+      ),
       accounts,
       amounts,
     ],
@@ -75,5 +79,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["TeamVesting", "testnet"];
+func.tags = ["InvestorsVesting", "testnet"];
 module.exports.dependencies = ["FluenceToken"];

@@ -4,7 +4,7 @@ import { ethers, deployments, getNamedAccounts, waffle } from "hardhat";
 import { DevRewardDistributor, Executor, FluenceToken } from "../typechain";
 import { MerkleTree } from "merkletreejs";
 import { BigNumber, Wallet } from "ethers";
-import { ZERO_ADDRESS, THROW_ERROR_PREFIX } from "../utils/consts";
+import {  THROW_ERROR_PREFIX } from "../utils/consts";
 import { Config } from "../utils/config";
 
 chai.use(waffle.solidity);
