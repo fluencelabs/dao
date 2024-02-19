@@ -27,6 +27,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         Math.floor(
           config.deployment!.devRewardDistributor!.halvePeriodMonths * MONTH
         ),
+        config.deployment!.devRewardDistributor!.lockupPeriod * MONTH,
         initialReward,
         Math.floor(
           config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH

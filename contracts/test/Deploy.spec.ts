@@ -92,6 +92,7 @@ describe("Deploy script", () => {
               "0x1000000000000000000000000000000000000000000000000000000000000001",
             initialReward: 1,
             totalRewards: 100,
+            lockupPeriod: 1,
             halvePeriodMonths: 3,
             claimingPeriodMonths: 5,
           },

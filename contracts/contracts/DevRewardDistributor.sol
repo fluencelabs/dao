@@ -15,6 +15,11 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 contract DevRewardDistributor {
     using SafeERC20 for IERC20;
 
+    struct LockedBalance {
+        uint256 amount;
+        uint256 unlockTime;
+    }
+
     /**
      * @notice Reward token
      *
@@ -63,11 +68,17 @@ contract DevRewardDistributor {
      */
     uint256 public immutable initialReward;
 
+    uint256 public immutable lockupPeriod;
+
+    uint256 private _totalSupply;
+
     /**
      * @notice Bitmap with claimed users ids
      *
      */
     mapping(uint256 => uint256) private claimedBitMap;
+
+    mapping(address => LockedBalance) public lockedBalances;
 
     /**
      * @notice Emitted when user claims reward
@@ -87,6 +98,14 @@ contract DevRewardDistributor {
     event TransferUnclaimed(uint256 amount);
 
     /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
      * @param _token - reward token
      * @param _executor - DAO timelock contract
      * @param _merkleRoot - merkle root from rewards tree
@@ -101,6 +120,7 @@ contract DevRewardDistributor {
         Executor _executor,
         bytes32 _merkleRoot,
         uint256 _halvePeriod,
+        uint256 _lockupPeriod,
         uint256 _initialReward,
         uint256 _claimingPeriod,
         address _canceler
@@ -111,6 +131,7 @@ contract DevRewardDistributor {
 
         merkleRoot = _merkleRoot;
         halvePeriod = _halvePeriod;
+        lockupPeriod = _lockupPeriod;
         initialReward = _initialReward;
 
         deployTime = block.timestamp;
@@ -120,6 +141,33 @@ contract DevRewardDistributor {
     modifier whenClaimingIs(bool isActive) {
         require(isClaimingActive() == isActive, "Claiming status is not as expected");
         _;
+    }
+
+    function name() external view returns (string memory) {
+        return "Fluence Drop";
+    }
+
+    function symbol() external view returns (string memory) {
+        return "FLT-DROP";
+    }
+
+    function totalSupply() external view returns (uint256) {
+        return _totalSupply;
+    }
+
+    function balanceOf(address account) external view returns (uint256) {
+        return lockedBalances[account].amount;
+    }
+
+    function transfer(address to, uint256 value) external returns (bool) {
+        require(lockedBalances[msg.sender].amount == value, "Invalid amount");
+        require(block.timestamp > lockedBalances[msg.sender].unlockTime, "Tokens are locked");
+
+        lockedBalances[msg.sender].amount = 0;
+        IERC20(token).safeTransfer(msg.sender, value);
+        emit Transfer(msg.sender, address(0x00), value);
+
+        return true;
     }
 
     /**
@@ -150,18 +198,10 @@ contract DevRewardDistributor {
         _setClaimed(userId);
 
         uint256 amount = currentReward();
+        lockedBalances[msg.sender] = LockedBalance({amount: amount, unlockTime: block.timestamp + lockupPeriod});
 
-        IERC20(token).safeTransfer(msg.sender, amount);
-
+        emit Transfer(address(0x00), msg.sender, amount);
         emit Claimed(userId, msg.sender, amount, leaf);
-    }
-
-    /**
-     * @notice used to move any remaining tokens out of the contract to Executor after expiration
-     *
-     */
-    function transferUnclaimed() external whenClaimingIs(false) {
-        _withdraw();
     }
 
     /**
@@ -169,8 +209,14 @@ contract DevRewardDistributor {
      *
      */
     function withdraw() external {
-        require(msg.sender == canceler, "Only canceler can withdraw");
-        _withdraw();
+        require(!isClaimingActive() || msg.sender == canceler, "Claiming is still active or you are not the canceler");
+
+        IERC20 rewardToken = IERC20(token); //gas saving
+
+        uint256 remainingBalance = rewardToken.balanceOf(address(this));
+        rewardToken.safeTransfer(address(executor), remainingBalance);
+
+        emit TransferUnclaimed(remainingBalance);
     }
 
     /**
@@ -221,14 +267,5 @@ contract DevRewardDistributor {
         uint256 claimedWordIndex = index / 256;
         uint256 claimedBitIndex = index % 256;
         claimedBitMap[claimedWordIndex] = claimedBitMap[claimedWordIndex] | (1 << claimedBitIndex);
-    }
-
-    function _withdraw() private {
-        IERC20 rewardToken = IERC20(token); //gas saving
-
-        uint256 remainingBalance = rewardToken.balanceOf(address(this));
-        rewardToken.safeTransfer(address(executor), remainingBalance);
-
-        emit TransferUnclaimed(remainingBalance);
     }
 }

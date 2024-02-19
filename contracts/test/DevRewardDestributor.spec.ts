@@ -4,7 +4,7 @@ import { ethers, deployments, getNamedAccounts, waffle } from "hardhat";
 import { DevRewardDistributor, Executor, FluenceToken } from "../typechain";
 import { MerkleTree } from "merkletreejs";
 import { BigNumber, Wallet } from "ethers";
-import {  THROW_ERROR_PREFIX } from "../utils/consts";
+import { THROW_ERROR_PREFIX } from "../utils/consts";
 import { Config } from "../utils/config";
 
 chai.use(waffle.solidity);
@@ -64,6 +64,7 @@ const setupTest = deployments.createFixture(
           merkleRoot: merkleTree.getHexRoot(),
           totalRewards: 100,
           initialReward: 1,
+          lockupPeriod: 1,
           halvePeriodMonths: 1,
           claimingPeriodMonths: 3,
         },
@@ -178,19 +179,12 @@ describe("DevRewardDistributor", () => {
   });
 
   it("claim reward", async () => {
-    const reward = await rewardDistributor.currentReward();
-
     let lastId = -1;
     for (let i = 0; i < 2; i++) {
       const info = getRandomAccountInfo(lastId);
       lastId = info.accountId;
 
-      const accountSnapshotBalance = await token.balanceOf(
-        developerAccount.address
-      );
-      const contractSnapshotBalance = await token.balanceOf(
-        rewardDistributor.address
-      );
+      const reward = await rewardDistributor.currentReward();
 
       const tx = await rewardDistributor.claimTokens(
         info.accountId,
@@ -202,18 +196,119 @@ describe("DevRewardDistributor", () => {
       );
 
       await expect(tx)
-        .to.emit(token, "Transfer")
-        .withArgs(rewardDistributor.address, developerAccount.address, reward);
+        .to.emit(rewardDistributor, "Transfer")
+        .withArgs(
+          ethers.constants.AddressZero,
+          developerAccount.address,
+          reward
+        );
 
-      await expect(await token.balanceOf(developerAccount.address)).to.eq(
-        accountSnapshotBalance.add(reward)
+      await expect(
+        await rewardDistributor.balanceOf(developerAccount.address)
+      ).to.eq(reward);
+
+      const lockedBalance = await rewardDistributor.lockedBalances(
+        developerAccount.address
       );
-      await expect(await token.balanceOf(rewardDistributor.address)).to.eq(
-        contractSnapshotBalance.sub(reward)
+
+      const txReceipt = await tx.wait();
+      const block = await ethers.provider.getBlock(txReceipt.blockNumber);
+
+      expect(lockedBalance.amount).to.eq(reward);
+      expect(lockedBalance.unlockTime).to.eq(
+        (await rewardDistributor.lockupPeriod()).add(block.timestamp)
       );
 
       expect(await rewardDistributor.isClaimed(info.accountId)).to.be.true;
     }
+  });
+
+  it("transfer after lockup period", async () => {
+    let lastId = -1;
+    const info = getRandomAccountInfo(lastId);
+    lastId = info.accountId;
+
+    const reward = await rewardDistributor.currentReward();
+
+    const tx = await rewardDistributor.claimTokens(
+      info.accountId,
+      tree.getHexProof(info.leaf),
+      info.account.address,
+      await info.account.signMessage(
+        ethers.utils.arrayify(developerAccount.address)
+      )
+    );
+
+    const txReceipt = await tx.wait();
+    const block = await ethers.provider.getBlock(txReceipt.blockNumber);
+    const unlockTime = (await rewardDistributor.lockupPeriod()).add(
+      block.timestamp
+    );
+
+    const accountSnapshotBalance = await token.balanceOf(
+      developerAccount.address
+    );
+    const contractSnapshotBalance = await token.balanceOf(
+      rewardDistributor.address
+    );
+
+    await ethers.provider.send("evm_increaseTime", [unlockTime.toNumber()]);
+
+    const transferTx = await rewardDistributor.transfer(
+      developerAccount.address,
+      reward
+    );
+
+    await expect(transferTx)
+      .to.emit(token, "Transfer")
+      .withArgs(rewardDistributor.address, developerAccount.address, reward);
+
+    await expect(await token.balanceOf(developerAccount.address)).to.eq(
+      accountSnapshotBalance.add(reward)
+    );
+    await expect(await token.balanceOf(rewardDistributor.address)).to.eq(
+      contractSnapshotBalance.sub(reward)
+    );
+  });
+
+  it("try transfer before lockup period", async () => {
+    let lastId = -1;
+    const info = getRandomAccountInfo(lastId);
+    lastId = info.accountId;
+
+    const reward = await rewardDistributor.currentReward();
+
+    await rewardDistributor.claimTokens(
+      info.accountId,
+      tree.getHexProof(info.leaf),
+      info.account.address,
+      await info.account.signMessage(
+        ethers.utils.arrayify(developerAccount.address)
+      )
+    );
+    await await expect(
+      rewardDistributor.transfer(developerAccount.address, reward)
+    ).to.to.be.revertedWith(`${THROW_ERROR_PREFIX} 'Tokens are locked'`);
+  });
+
+  it("try transfer with invalid value", async () => {
+    let lastId = -1;
+    const info = getRandomAccountInfo(lastId);
+    lastId = info.accountId;
+
+    const reward = await rewardDistributor.currentReward();
+
+    await rewardDistributor.claimTokens(
+      info.accountId,
+      tree.getHexProof(info.leaf),
+      info.account.address,
+      await info.account.signMessage(
+        ethers.utils.arrayify(developerAccount.address)
+      )
+    );
+    await await expect(
+      rewardDistributor.transfer(developerAccount.address, 100)
+    ).to.to.be.revertedWith(`${THROW_ERROR_PREFIX} 'Invalid amount'`);
   });
 
   it("try claim for claimed user", async () => {
@@ -327,8 +422,8 @@ describe("DevRewardDistributor", () => {
   });
 
   it("transfer unclaimed when claiming is active", async () => {
-    await expect(rewardDistributor.transferUnclaimed()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Claiming status is not as expected'`
+    await expect(rewardDistributor.withdraw()).to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Claiming is still active or you are not the canceler'`
     );
   });
 
@@ -358,7 +453,7 @@ describe("DevRewardDistributor", () => {
 
     const amount = await token.balanceOf(rewardDistributor.address);
 
-    const tx = await rewardDistributor.transferUnclaimed();
+    const tx = await rewardDistributor.withdraw();
     await _isTransferedToExecutor(tx, amount);
   });
 
@@ -371,7 +466,7 @@ describe("DevRewardDistributor", () => {
 
   it("throw when transfer unclaimed not from multisig", async () => {
     await expect(rewardDistributor.withdraw()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Only canceler can withdraw'`
+      `${THROW_ERROR_PREFIX} 'Claiming is still active or you are not the canceler'`
     );
   });
 });
