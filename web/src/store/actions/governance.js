@@ -77,7 +77,6 @@ const WRONG_CHAIN_MESSAGE = `Looks like the contract does not support the curren
 
 export const claim = (
     userId,
-    delegateTo,
     merkleProof,
     tmpEthAddr,
     senderSignatureHex,
@@ -90,7 +89,7 @@ export const claim = (
             let contract = new Contract(governanceContracts[network].devRewardDistributor, abis.DevRewardDistributor.abi, w3provider);
             let signed = await contract.connect(signer);
             try {
-                console.log("claiming with", { userId, delegateTo, merkleProof, tmpEthAddr, senderSignatureHex })
+                console.log("claiming with", { userId, merkleProof, tmpEthAddr, senderSignatureHex })
                 const tx = await signed.claimTokens(
                     userId,
                     merkleProof,

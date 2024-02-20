@@ -16,7 +16,7 @@ import styles from './proof-page.module.css';
 import { hideString } from '../../utils';
 
 import { checkHasClaimed, storeProof } from '../../store/actions/governance';
-import { ROUTE_CLAIMED, ROUTE_DELEGATION } from '../../constants/routes';
+import { ROUTE_CLAIMED, ROUTE_DONE } from '../../constants/routes';
 import { toast } from 'react-toastify';
 import { MerkleTree } from 'merkletreejs';
 import keccak256 from 'keccak256';
@@ -117,7 +117,7 @@ const ProofPage = () => {
 
     useEffect(() => {
         if (haveProof & !hasClaimed?.claimed & hasClaimed?.checked) {
-            navigate(ROUTE_DELEGATION)
+            navigate(ROUTE_DONE)
         }
     }, [haveProof, hasClaimed])
 

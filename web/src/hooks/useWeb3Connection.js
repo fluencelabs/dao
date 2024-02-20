@@ -6,7 +6,6 @@ import Web3 from 'web3'
 import Web3Modal from 'web3modal'
 import supportedChains from '../constants/chains'
 import { toast } from 'react-toastify'
-import { setError } from '../store/actions/governance'
 import {
     resetWeb3Provider,
     setAddress,

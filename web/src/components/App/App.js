@@ -13,25 +13,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import PageBegin from '../../pages/begin-page/begin-page';
 import FirstStepPage from '../../pages/step1-page/step1-page';
 import ProofPage from '../../pages/proof-page/proof-page';
-import DelegationPage from '../../pages/delegation-page/delegation-page';
 import DonePage from '../../pages/done-page/done-page';
 import ClaimedPage from '../../pages/claimed-page/claimed-page';
 import AccountNotFound from '../../pages/not-found-account-page/not-found-account-page';
-import LandingPage from '../../pages/landing-page/landing-page';
 import FinishPage from '../../pages/finish-page/finish-page';
 import ConnectWallet from '../ConnectWallet/ConnectWallet';
 import { getNetworkName } from '../../store/actions/wallet';
 import { ToastContainer, toast } from 'react-toastify';
 import { useWeb3Connection } from '../../hooks/useWeb3Connection';
-import { theGraphEndpoints } from '../../constants/endpoints';
+import { theGraphEndpoints } from '../../constants';
 import { reduxCleanup } from '../../store/actions/common';
 import {
-  ROUTE_FLUENCE,
   ROUTE_INDEX,
   ROUTE_WALLET,
   ROUTE_CONNECT,
   ROUTE_PROOF,
-  ROUTE_DELEGATION,
   ROUTE_DONE,
   ROUTE_FINISH,
   ROUTE_NOT_FOUND,
@@ -121,12 +117,10 @@ function App() {
       <div className="App">
         <ToastContainer autoClose={false}/>
         <Routes>
-          <Route exact path={ROUTE_FLUENCE} element={<LandingPage />} />
           <Route exact path={ROUTE_INDEX} element={<PageBegin/>} />
           <Route exact path={ROUTE_WALLET} element={<FirstStepPage/>} />
           <Route exact path={ROUTE_CONNECT} element={<ConnectWallet />} />
           <Route exact path={ROUTE_PROOF} element={<ProofPage/>} />
-          <Route exact path={ROUTE_DELEGATION} element={<DelegationPage/>} />
           <Route exact path={ROUTE_DONE} element={<DonePage/>} />
           <Route exact path={ROUTE_FINISH} element={<FinishPage />} />
           <Route exact path={ROUTE_NOT_FOUND} element={<AccountNotFound />} />
