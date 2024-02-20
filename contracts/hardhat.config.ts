@@ -50,18 +50,6 @@ const hardhatConfig: HardhatUserConfig = {
     localhost: {
       url: "http://127.0.0.1:8545/",
     },
-    mainnet: {
-      url: "https://mainnet.infura.io/v3/",
-      accounts: [process.env.PRIVATE_KEY as string],
-    },
-    polygon: {
-      url: "https://polygon-mainnet.infura.io/v3/",
-      accounts: [process.env.PRIVATE_KEY as string],
-    },
-    sepolia: {
-      url: "https://gateway.tenderly.co/public/sepolia",
-      accounts: [process.env.PRIVATE_KEY as string],
-    },
   },
   namedAccounts: {
     deployer: {
