@@ -164,6 +164,7 @@ contract DevRewardDistributor {
         require(block.timestamp > lockedBalances[msg.sender].unlockTime, "Tokens are locked");
 
         lockedBalances[msg.sender].amount = 0;
+        _totalSupply -= value;
         IERC20(token).safeTransfer(msg.sender, value);
         emit Transfer(msg.sender, address(0x00), value);
 
@@ -199,6 +200,7 @@ contract DevRewardDistributor {
 
         uint256 amount = currentReward();
         lockedBalances[msg.sender] = LockedBalance({amount: amount, unlockTime: block.timestamp + lockupPeriod});
+        _totalSupply += amount;
 
         emit Transfer(address(0x00), msg.sender, amount);
         emit Claimed(userId, msg.sender, amount, leaf);

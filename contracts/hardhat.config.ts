@@ -50,6 +50,10 @@ const hardhatConfig: HardhatUserConfig = {
     localhost: {
       url: "http://127.0.0.1:8545/",
     },
+    sepolia: {
+      url: "https://sepolia.infura.io/v3/0f778ddd63a942a6bfdb713f85482055",
+      accounts: [process.env.PRIVATE_KEY as string],
+    },
   },
   namedAccounts: {
     deployer: {
