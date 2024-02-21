@@ -181,7 +181,6 @@ describe("DevRewardDistributor", () => {
   it("claim reward", async () => {
     let lastId = -1;
     for (let i = 0; i < 2; i++) {
-      const totalClaimed = await rewardDistributor.totalClaimed();
       const initTotalSupply = await rewardDistributor.totalSupply();
 
       const info = getRandomAccountInfo(lastId);
@@ -227,8 +226,6 @@ describe("DevRewardDistributor", () => {
       expect(await rewardDistributor.totalSupply()).to.eq(
         initTotalSupply.add(reward)
       );
-
-      expect(await rewardDistributor.totalClaimed()).to.eq(totalClaimed.add(1));
     }
   });
 
@@ -442,10 +439,14 @@ describe("DevRewardDistributor", () => {
   });
 
   it("try to claim more then max", async () => {
-    const maxClaim = await rewardDistributor.maxClaimed();
+    const maxTotalSupply = await rewardDistributor.maxTotalSupply();
 
     let lastId = -1;
-    for (let i = 0; i < Number(maxClaim.toBigInt()); i++) {
+    for (
+      let i = 0;
+      i < Number(maxTotalSupply.div(await rewardDistributor.initialReward()));
+      i++
+    ) {
       const info = getRandomAccountInfo(lastId);
       lastId = info.accountId;
 
@@ -469,7 +470,9 @@ describe("DevRewardDistributor", () => {
           ethers.utils.arrayify(developerAccount.address)
         )
       )
-    ).to.to.be.revertedWith(`${THROW_ERROR_PREFIX} 'All tokens are claimed'`);
+    ).to.to.be.revertedWith(
+      `${THROW_ERROR_PREFIX} 'Total supply exceeded max limit`
+    );
   });
 
   async function _isTransferedToExecutor(
