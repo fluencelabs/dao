@@ -76,9 +76,9 @@ contract DevRewardDistributor {
 
     uint256 public immutable lockupPeriod;
 
-    uint256 public immutable maxClaims;
+    uint256 public immutable maxClaimed;
 
-    uint256 public totalClaims;
+    uint256 public totalClaimed;
 
     uint256 private _totalSupply;
 
@@ -134,7 +134,7 @@ contract DevRewardDistributor {
         uint256 _initialReward,
         uint256 _claimingPeriod,
         address _canceler,
-        uint256 _maxClaims
+        uint256 _maxClaimed
     ) {
         token = _token;
         executor = _executor;
@@ -148,7 +148,7 @@ contract DevRewardDistributor {
         deployTime = block.timestamp;
         claimingEndTime = block.timestamp + _claimingPeriod;
 
-        maxClaims = _maxClaims;
+        maxClaimed = _maxClaimed;
 
         decimals = _token.decimals();
     }
@@ -203,7 +203,7 @@ contract DevRewardDistributor {
     ) external whenClaimingIs(true) {
         require(!isClaimed(userId), "Tokens already claimed");
 
-        require(totalClaims < maxClaims, "All tokens are claimed");
+        require(totalClaimed < maxClaimed, "All tokens are claimed");
 
         bytes32 leaf = keccak256(abi.encodePacked(userId, temporaryAddress));
 
@@ -219,7 +219,7 @@ contract DevRewardDistributor {
         uint256 amount = currentReward();
         lockedBalances[msg.sender] = LockedBalance({amount: amount, unlockTime: block.timestamp + lockupPeriod});
         _totalSupply += amount;
-        totalClaims++;
+        totalClaimed++;
 
         emit Transfer(address(0x00), msg.sender, amount);
         emit Claimed(userId, msg.sender, amount, leaf);

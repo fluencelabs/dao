@@ -33,7 +33,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
           config.deployment!.devRewardDistributor!.claimingPeriodMonths * MONTH
         ),
         config.fluenceMultisig!,
-        10,
+        3,
       ],
       log: true,
       autoMine: true,

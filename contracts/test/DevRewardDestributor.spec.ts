@@ -181,6 +181,7 @@ describe("DevRewardDistributor", () => {
   it("claim reward", async () => {
     let lastId = -1;
     for (let i = 0; i < 2; i++) {
+      const totalClaimed = await rewardDistributor.totalClaimed();
       const initTotalSupply = await rewardDistributor.totalSupply();
 
       const info = getRandomAccountInfo(lastId);
@@ -226,6 +227,8 @@ describe("DevRewardDistributor", () => {
       expect(await rewardDistributor.totalSupply()).to.eq(
         initTotalSupply.add(reward)
       );
+
+      expect(await rewardDistributor.totalClaimed()).to.eq(totalClaimed.add(1));
     }
   });
 
@@ -436,6 +439,37 @@ describe("DevRewardDistributor", () => {
     await expect(rewardDistributor.withdraw()).to.be.revertedWith(
       `${THROW_ERROR_PREFIX} 'Claiming is still active or you are not the canceler'`
     );
+  });
+
+  it("try to claim more then max", async () => {
+    const maxClaim = await rewardDistributor.maxClaimed();
+
+    let lastId = -1;
+    for (let i = 0; i < Number(maxClaim.toBigInt()); i++) {
+      const info = getRandomAccountInfo(lastId);
+      lastId = info.accountId;
+
+      await rewardDistributor.claimTokens(
+        info.accountId,
+        tree.getHexProof(info.leaf),
+        info.account.address,
+        await info.account.signMessage(
+          ethers.utils.arrayify(developerAccount.address)
+        )
+      );
+    }
+
+    const info = getRandomAccountInfo(lastId);
+    await expect(
+      rewardDistributor.claimTokens(
+        info.accountId,
+        tree.getHexProof(info.leaf),
+        info.account.address,
+        await info.account.signMessage(
+          ethers.utils.arrayify(developerAccount.address)
+        )
+      )
+    ).to.to.be.revertedWith(`${THROW_ERROR_PREFIX} 'All tokens are claimed'`);
   });
 
   async function _isTransferedToExecutor(
