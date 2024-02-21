@@ -160,6 +160,7 @@ contract DevRewardDistributor {
     }
 
     function transfer(address to, uint256 value) external returns (bool) {
+        require(value > 0, "Value is 0");
         require(lockedBalances[msg.sender].amount == value, "Invalid amount");
         require(block.timestamp > lockedBalances[msg.sender].unlockTime, "Tokens are locked");
 

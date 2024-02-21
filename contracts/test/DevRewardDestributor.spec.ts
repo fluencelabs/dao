@@ -181,6 +181,8 @@ describe("DevRewardDistributor", () => {
   it("claim reward", async () => {
     let lastId = -1;
     for (let i = 0; i < 2; i++) {
+      const initTotalSupply = await rewardDistributor.totalSupply();
+
       const info = getRandomAccountInfo(lastId);
       lastId = info.accountId;
 
@@ -220,6 +222,10 @@ describe("DevRewardDistributor", () => {
       );
 
       expect(await rewardDistributor.isClaimed(info.accountId)).to.be.true;
+
+      expect(await rewardDistributor.totalSupply()).to.eq(
+        initTotalSupply.add(reward)
+      );
     }
   });
 
@@ -254,9 +260,14 @@ describe("DevRewardDistributor", () => {
 
     await ethers.provider.send("evm_increaseTime", [unlockTime.toNumber()]);
 
+    const totalSupply = await rewardDistributor.totalSupply();
     const transferTx = await rewardDistributor.transfer(
       developerAccount.address,
       reward
+    );
+
+    expect(await rewardDistributor.totalSupply()).to.eq(
+      totalSupply.sub(reward)
     );
 
     await expect(transferTx)
