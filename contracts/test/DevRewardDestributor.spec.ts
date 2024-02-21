@@ -182,6 +182,7 @@ describe("DevRewardDistributor", () => {
     let lastId = -1;
     for (let i = 0; i < 2; i++) {
       const initTotalSupply = await rewardDistributor.totalSupply();
+      const claimedSupply = await rewardDistributor.claimedSupply();
 
       const info = getRandomAccountInfo(lastId);
       lastId = info.accountId;
@@ -226,6 +227,9 @@ describe("DevRewardDistributor", () => {
       expect(await rewardDistributor.totalSupply()).to.eq(
         initTotalSupply.add(reward)
       );
+      expect(await rewardDistributor.claimedSupply()).to.eq(
+        claimedSupply.add(reward)
+      );
     }
   });
 
@@ -261,6 +265,7 @@ describe("DevRewardDistributor", () => {
     await ethers.provider.send("evm_increaseTime", [unlockTime.toNumber()]);
 
     const totalSupply = await rewardDistributor.totalSupply();
+    const claimedSupply = await rewardDistributor.claimedSupply();
     const transferTx = await rewardDistributor.transfer(
       developerAccount.address,
       reward
@@ -280,6 +285,7 @@ describe("DevRewardDistributor", () => {
     await expect(await token.balanceOf(rewardDistributor.address)).to.eq(
       contractSnapshotBalance.sub(reward)
     );
+    expect(await rewardDistributor.claimedSupply()).to.eq(claimedSupply);
   });
 
   it("try transfer before lockup period", async () => {
@@ -439,12 +445,12 @@ describe("DevRewardDistributor", () => {
   });
 
   it("try to claim more then max", async () => {
-    const maxTotalSupply = await rewardDistributor.maxTotalSupply();
+    const maxClaimedSupply = await rewardDistributor.maxClaimedSupply();
 
     let lastId = -1;
     for (
       let i = 0;
-      i < Number(maxTotalSupply.div(await rewardDistributor.initialReward()));
+      i < Number(maxClaimedSupply.div(await rewardDistributor.initialReward()));
       i++
     ) {
       const info = getRandomAccountInfo(lastId);
@@ -471,7 +477,7 @@ describe("DevRewardDistributor", () => {
         )
       )
     ).to.to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Total supply exceeded max limit`
+      `${THROW_ERROR_PREFIX} 'Total claimed exceeded max limit`
     );
   });
 
