@@ -78,7 +78,7 @@ contract DevRewardDistributor {
 
     uint256 public immutable maxClaims;
 
-    uint256 public immutable totalClaims;
+    uint256 public totalClaims;
 
     uint256 private _totalSupply;
 
@@ -133,7 +133,8 @@ contract DevRewardDistributor {
         uint256 _lockupPeriod,
         uint256 _initialReward,
         uint256 _claimingPeriod,
-        address _canceler
+        address _canceler,
+        uint256 _maxClaims
     ) {
         token = _token;
         executor = _executor;
@@ -146,6 +147,8 @@ contract DevRewardDistributor {
 
         deployTime = block.timestamp;
         claimingEndTime = block.timestamp + _claimingPeriod;
+
+        maxClaims = _maxClaims;
 
         decimals = _token.decimals();
     }
