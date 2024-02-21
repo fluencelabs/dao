@@ -76,6 +76,10 @@ contract DevRewardDistributor {
 
     uint256 public immutable lockupPeriod;
 
+    uint256 public immutable maxClaims;
+
+    uint256 public immutable totalClaims;
+
     uint256 private _totalSupply;
 
     /**
@@ -196,6 +200,8 @@ contract DevRewardDistributor {
     ) external whenClaimingIs(true) {
         require(!isClaimed(userId), "Tokens already claimed");
 
+        require(totalClaims < maxClaims, "All tokens are claimed");
+
         bytes32 leaf = keccak256(abi.encodePacked(userId, temporaryAddress));
 
         require(MerkleProof.verify(merkleProof, merkleRoot, leaf), "Valid proof required");
@@ -210,6 +216,7 @@ contract DevRewardDistributor {
         uint256 amount = currentReward();
         lockedBalances[msg.sender] = LockedBalance({amount: amount, unlockTime: block.timestamp + lockupPeriod});
         _totalSupply += amount;
+        totalClaims++;
 
         emit Transfer(address(0x00), msg.sender, amount);
         emit Claimed(userId, msg.sender, amount, leaf);
