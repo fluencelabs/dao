@@ -1,11 +1,6 @@
-import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useMemo, useState, memo } from 'react';
-import {
-  Chains,
-  TheGraphProvider,
-  useCreateSubgraph
-} from "thegraph-react";
+import { memo, useEffect, useState } from 'react';
 
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,22 +14,20 @@ import AccountNotFound from '../../pages/not-found-account-page/not-found-accoun
 import FinishPage from '../../pages/finish-page/finish-page';
 import ConnectWallet from '../ConnectWallet/ConnectWallet';
 import { getNetworkName } from '../../store/actions/wallet';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { useWeb3Connection } from '../../hooks/useWeb3Connection';
-import { theGraphEndpoints } from '../../constants';
 import { reduxCleanup } from '../../store/actions/common';
 import {
-  ROUTE_INDEX,
-  ROUTE_WALLET,
+  ROUTE_CLAIMED,
   ROUTE_CONNECT,
-  ROUTE_PROOF,
   ROUTE_DONE,
   ROUTE_FINISH,
+  ROUTE_INDEX,
   ROUTE_NOT_FOUND,
-  ROUTE_CLAIMED
+  ROUTE_PROOF,
+  ROUTE_WALLET
 } from '../../constants/routes'
 import { catchError } from '../../utils';
-import { setFluenceSubgraph, setDistributorSubgraph } from '../../store/actions/graph';
 import { setCurrentRoute } from '../../store/actions/routes';
 import { fetchCurrentAward, fetchMerkleRoot, fetchNextHalvePeriod } from '../../store/actions/distributor';
 import { useVh } from '../../hooks/useVh';
@@ -83,20 +76,6 @@ function App() {
     }
   }, [address])
 
-  const fluence = useCreateSubgraph({
-    [Chains.KOVAN]: theGraphEndpoints.fluence['kovan'],
-  });
-
-  const distributor = useCreateSubgraph({
-    [Chains.KOVAN]: theGraphEndpoints.distributor['kovan'],
-  });
-
-  const subgraphs = useMemo(() => {
-    dispatch(setFluenceSubgraph(fluence))
-    dispatch(setDistributorSubgraph(distributor))
-    return [fluence, distributor];
-  }, [fluence, distributor]);
-
   useEffect(() => {
     window.scrollTo(0, 0)
     dispatch(setCurrentRoute(location.pathname))
@@ -113,25 +92,23 @@ function App() {
   }, [error])
 
   return (
-    <TheGraphProvider chain={Chains.KOVAN} subgraphs={subgraphs}>
       <div className="App">
         <ToastContainer autoClose={false}/>
         <Routes>
-          <Route exact path={ROUTE_INDEX} element={<PageBegin/>} />
-          <Route exact path={ROUTE_WALLET} element={<FirstStepPage/>} />
-          <Route exact path={ROUTE_CONNECT} element={<ConnectWallet />} />
-          <Route exact path={ROUTE_PROOF} element={<ProofPage/>} />
-          <Route exact path={ROUTE_DONE} element={<DonePage/>} />
-          <Route exact path={ROUTE_FINISH} element={<FinishPage />} />
-          <Route exact path={ROUTE_NOT_FOUND} element={<AccountNotFound />} />
-          <Route exact path={ROUTE_CLAIMED} element={<ClaimedPage />} />
+          <Route exact path={ROUTE_INDEX} element={<PageBegin/>}/>
+          <Route exact path={ROUTE_WALLET} element={<FirstStepPage/>}/>
+          <Route exact path={ROUTE_CONNECT} element={<ConnectWallet/>}/>
+          <Route exact path={ROUTE_PROOF} element={<ProofPage/>}/>
+          <Route exact path={ROUTE_DONE} element={<DonePage/>}/>
+          <Route exact path={ROUTE_FINISH} element={<FinishPage/>}/>
+          <Route exact path={ROUTE_NOT_FOUND} element={<AccountNotFound/>}/>
+          <Route exact path={ROUTE_CLAIMED} element={<ClaimedPage/>}/>
           <Route
               path="*"
-              element={<Navigate to="/" />}
+              element={<Navigate to="/"/>}
           />
         </Routes>
       </div>
-    </TheGraphProvider>
   );
 }
 

@@ -25,16 +25,6 @@ import { Buffer } from "buffer";
 import { validateASN1Signature } from '../../utils/asn1';
 import { ethers } from 'ethers';
 
-
-function isBase64(str) {
-    if (str === '' || str.trim() ===''){ return false; }
-    try {
-        return btoa(atob(str)) === str;
-    } catch (err) {
-        return false;
-    }
-}
-
 const ProofPage = () => {
     const { address, web3Provider, networkName } = useSelector(state => state.wallet)
     const { proof } = useSelector(state => state.governance.values)

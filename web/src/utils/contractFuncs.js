@@ -38,21 +38,6 @@ export async function delegates(w3provider, address, network) {
  *
  */
 
-export async function getProposalDetails(w3provider, proposalId, network) {
-  let contract = new Contract(
-    governanceContracts[network].alpha,
-    abis.GovernorAlpha.abi,
-    w3provider
-  );
-  let proposals;
-  try {
-    proposals = await contract.proposals(proposalId);
-  } catch (error) {
-    proposals = error.message;
-  }
-  return proposals;
-}
-
 export async function propose(
   w3provider,
   targets,
@@ -140,21 +125,6 @@ export async function getActions(w3provider, proposalId, network) {
     actions = catchError(error);
   }
   return actions;
-}
-
-export async function getDescription(w3provider, proposalId, network) {
-  let contract = new Contract(
-    governanceContracts[network].alpha,
-    abis.GovernorAlpha.abi,
-    w3provider
-  );
-  let description;
-  try {
-    description = await contract.getDescription(proposalId);
-  } catch (error) {
-    description = catchError(error);
-  }
-  return description;
 }
 
 export async function castVote(
@@ -251,36 +221,4 @@ export async function refund(w3provider, proposalId, network) {
     refund = catchError(error);
   }
   return refund;
-}
-
-export async function getQuorum(w3provider, network) {
-  let contract = new Contract(
-    governanceContracts[network].alpha,
-    abis.GovernorAlpha.abi,
-    w3provider
-  );
-  let quorum;
-  try {
-    quorum = await contract.quorumVotes();
-  } catch (error) {
-    console.error(error.message);
-    quorum = null;
-  }
-  return quorum;
-}
-
-export async function getProposalThreshold(w3provider, network) {
-  let contract = new Contract(
-    governanceContracts[network].alpha,
-    abis.GovernorAlpha.abi,
-    w3provider
-  );
-  let proposalThreshold;
-  try {
-    proposalThreshold = await contract.proposalThreshold();
-  } catch (error) {
-    console.error(error.message);
-    proposalThreshold = null;
-  }
-  return proposalThreshold;
 }
