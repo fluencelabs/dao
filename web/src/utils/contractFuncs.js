@@ -13,7 +13,7 @@ export async function getNetworkName(w3provider) {
     case "rinkeby":
       return "rinkeby";
     default:
-      throw "getNetworkName error: Unknwon network " + network.name;
+      throw new Error("getNetworkName error: Unknwon network " + network.name);
   }
 }
 

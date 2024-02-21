@@ -38,22 +38,6 @@ export const useWeb3Connection = () => {
   const dispatch = useDispatch();
   const { provider, web3Provider, address, chainId } = state;
 
-  function initWeb3(provider) {
-    const web3 = new Web3(provider);
-
-    web3.eth.extend({
-      methods: [
-        {
-          name: "chainId",
-          call: "eth_chainId",
-          outputFormatter: web3.utils.hexToNumber,
-        },
-      ],
-    });
-
-    return web3;
-  }
-
   function sendTransaction(_tx) {
     return new Promise((resolve, reject) => {
       web3.eth
@@ -63,7 +47,7 @@ export const useWeb3Connection = () => {
     });
   }
 
-  const web3 = initWeb3(provider);
+  const web3 = new Web3(provider);
 
   const connect = useCallback(async () => {
     const provider = await web3Modal.connect();

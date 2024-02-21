@@ -50,7 +50,7 @@ export const fetchCurrentAward = (network) => {
   return async (dispatch) => {
     try {
       const award = await contract.methods.currentReward().call();
-      const formattedAward = web3.utils.fromWei(award);
+      const formattedAward = web3.utils.fromWei(award, 'ether');
       dispatch(setCurrentAward(formattedAward));
     } catch (error) {
       console.log(error);
@@ -72,8 +72,8 @@ export const fetchNextHalvePeriod = (network) => {
 
   return async (dispatch) => {
     try {
-      const period = await contract.methods.nextHalvePeriod().call();
-      dispatch(setNextHalvePeriod(period * 1000));
+      const period = await contract.methods.halvePeriod().call();
+      dispatch(setNextHalvePeriod(Number(period * 1000n)));
     } catch (error) {
       console.log(error);
     }
