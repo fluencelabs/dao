@@ -58,7 +58,7 @@ function App() {
 
   useEffect(() => {
     console.log("nerwork: " + network)
-    if (!merkleRootFetched && network) {
+    if (!merkleRootFetched && network && network !== "unknown") {
       dispatch(fetchMerkleRoot(network))
       dispatch(fetchCurrentAward(network))
       dispatch(fetchNextHalvePeriod(network))

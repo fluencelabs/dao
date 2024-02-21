@@ -67,7 +67,10 @@ export const useWeb3Connection = () => {
 
   const connect = useCallback(async () => {
     const provider = await web3Modal.connect();
-    const web3Provider = new providers.Web3Provider(provider);
+    const web3Provider = new providers.Web3Provider(provider, {
+      name: "sepolia",
+      chainId: 11155111,
+    });
     const signer = web3Provider.getSigner();
     const address = await signer.getAddress();
     const network = await web3Provider.getNetwork();

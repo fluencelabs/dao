@@ -13,7 +13,8 @@ export const setWeb3Provider = (provider, web3Provider, address, network) => ({
         provider,
         web3Provider,
         address,
-        chainId: network.chainId
+        chainId: network.chainId,
+        network: network.name
     }
 })
 
