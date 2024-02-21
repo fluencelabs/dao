@@ -63,6 +63,12 @@ contract DevRewardDistributor {
     uint256 public immutable halvePeriod;
 
     /**
+     * @notice Returns the vesting contract decimals
+     *
+     */
+    uint8 public immutable decimals;
+
+    /**
      * @notice Initial user's reward
      *
      */
@@ -136,6 +142,8 @@ contract DevRewardDistributor {
 
         deployTime = block.timestamp;
         claimingEndTime = block.timestamp + _claimingPeriod;
+
+        decimals = _token.decimals();
     }
 
     modifier whenClaimingIs(bool isActive) {
