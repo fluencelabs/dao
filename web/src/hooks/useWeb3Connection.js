@@ -1,17 +1,11 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { providers } from "ethers";
-import { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
 import supportedChains from "../constants/chains";
 import { toast } from "react-toastify";
-import {
-  resetWeb3Provider,
-  setAddress,
-  setPrevAddress,
-  setWeb3Provider,
-} from "../store/actions/wallet";
 
 const { REACT_APP_INFURA_KEY: INFURA_ID } = process.env;
 
@@ -33,42 +27,44 @@ if (typeof window !== "undefined") {
   });
 }
 
-export const useWeb3Connection = () => {
-  const state = useSelector((state) => state.wallet);
-  const dispatch = useDispatch();
-  const { provider, web3Provider, address, chainId } = state;
+const defaultProvider = new providers.JsonRpcProvider(supportedChains[0].rpc_url, {
+  name: supportedChains[0].network,
+  chainId: supportedChains[0].chain_id
+});
 
-  function sendTransaction(_tx) {
-    return new Promise((resolve, reject) => {
-      web3.eth
-        .sendTransaction(_tx)
-        .once("transactionHash", (txHash) => resolve(txHash))
-        .catch((err) => reject(err));
-    });
+export const useWeb3Connection = () => {
+  const dispatch = useDispatch();
+  const [provider, setProvider] = useState(defaultProvider);
+  const [address, setAddress] = useState(null);
+  const network = provider.network;
+
+  async function sendTransaction(_tx) {
+    return provider.sendTransaction(_tx).then(tx => tx.hash);
   }
 
-  const web3 = new Web3(provider);
-
   const connect = useCallback(async () => {
-    const provider = await web3Modal.connect();
-    const web3Provider = new providers.Web3Provider(provider, {
-      name: "sepolia",
-      chainId: 11155111,
+    const modal = await web3Modal.connect();
+    const networkData = supportedChains.find(chain => chain.network_id === Number(modal.networkVersion));
+    const web3Provider = new providers.Web3Provider(await web3Modal.connect(), {
+      name: networkData.network,
+      chainId: networkData.chain_id
     });
+
     const signer = web3Provider.getSigner();
     const address = await signer.getAddress();
-    const network = await web3Provider.getNetwork();
-
-    dispatch(setWeb3Provider(provider, web3Provider, address, network));
-  }, [dispatch]);
+    console.log(address, web3Provider.network);
+    setAddress(address)
+    setProvider(web3Provider);
+  }, []);
 
   const disconnect = useCallback(
     async function () {
       await web3Modal.clearCachedProvider();
+      setProvider(defaultProvider);
+      setAddress(null);
       if (provider?.disconnect && typeof provider.disconnect === "function") {
         await provider.disconnect();
       }
-      dispatch(resetWeb3Provider());
     },
     [provider, dispatch]
   );
@@ -82,16 +78,14 @@ export const useWeb3Connection = () => {
   useEffect(() => {
     if (provider?.on) {
       const handleAccountsChanged = (accounts) => {
-        dispatch(setPrevAddress(address));
         console.log("accountsChanged", accounts);
-        dispatch(setAddress(accounts));
       };
 
       const handleChainChanged = (_hexChainId) => {
         let chainSupported = false;
 
         supportedChains.forEach((chain) => {
-          if (web3.utils.hexToNumber(_hexChainId) === chain.chain_id) {
+          if (Web3.utils.hexToNumber(_hexChainId) === chain.chain_id) {
             chainSupported = true;
           }
         });
@@ -127,10 +121,8 @@ export const useWeb3Connection = () => {
     connect,
     disconnect,
     provider,
-    web3Provider,
     address,
-    chainId,
-    web3,
+    network,
     sendTransaction,
   };
 };

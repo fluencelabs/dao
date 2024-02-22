@@ -13,7 +13,6 @@ import ClaimedPage from '../../pages/claimed-page/claimed-page';
 import AccountNotFound from '../../pages/not-found-account-page/not-found-account-page';
 import FinishPage from '../../pages/finish-page/finish-page';
 import ConnectWallet from '../ConnectWallet/ConnectWallet';
-import { getNetworkName } from '../../store/actions/wallet';
 import { toast, ToastContainer } from 'react-toastify';
 import { useWeb3Connection } from '../../hooks/useWeb3Connection';
 import { reduxCleanup } from '../../store/actions/common';
@@ -33,12 +32,12 @@ import { fetchCurrentAward, fetchMerkleRoot, fetchNextHalvePeriod } from '../../
 import { useVh } from '../../hooks/useVh';
 
 function App() {
-  const { web3Provider } = useWeb3Connection()
+  const { network, address } = useWeb3Connection()
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { error } = useSelector(state => state.error)
-  const { network, address, prevAddress } = useSelector(state => state.wallet)
+  const [prevAddress, setPrevAddress] = useState(null);
   const { username } = useSelector(state => state.user)
   const { currentRoute } = useSelector(state => state.routes)
   const location = useLocation()
@@ -57,33 +56,33 @@ function App() {
   }, [currentRoute])
 
   useEffect(() => {
-    console.log("nerwork: " + network)
-    if (!merkleRootFetched && network && network !== "unknown") {
-      dispatch(fetchMerkleRoot(network))
-      dispatch(fetchCurrentAward(network))
-      dispatch(fetchNextHalvePeriod(network))
+    console.log("nerwork: " + network.name)
+    if (!merkleRootFetched && network?.name && network.name !== "unknown") {
+      dispatch(fetchMerkleRoot(network.name))
+      dispatch(fetchCurrentAward(network.name))
+      dispatch(fetchNextHalvePeriod(network.name))
       setMerkleRootFetched(true)
     } 
   }, [network])
-  
+
   useEffect(() => {
-    if (address && prevAddress && (address !== prevAddress)) {
-      dispatch(reduxCleanup())
-      navigate(ROUTE_INDEX)
-      dispatch(setCurrentRoute(ROUTE_INDEX))
-    } else if (!address && !web3Provider && username) {
-      navigate(ROUTE_WALLET)
+    if (address) {
+      if (prevAddress && address !== prevAddress) {
+        dispatch(reduxCleanup())
+        navigate(ROUTE_INDEX)
+        dispatch(setCurrentRoute(ROUTE_INDEX))
+      } else if (!address && username) {
+        navigate(ROUTE_WALLET);
+      } else {
+        setPrevAddress(address);
+      }
     }
-  }, [address])
+  }, [address, prevAddress]);
 
   useEffect(() => {
     window.scrollTo(0, 0)
     dispatch(setCurrentRoute(location.pathname))
   }, [location]);
-
-  useEffect(() => {
-    web3Provider && dispatch(getNetworkName(web3Provider))
-  },[web3Provider])
 
   useEffect(() => {
     if (error) {

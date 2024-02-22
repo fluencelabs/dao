@@ -1,7 +1,4 @@
-import {
-    SET_CURRENT_ROUTE,
-    ROUTE_CLEANUP
-} from '../actions/types'
+import { ROUTE_CLEANUP, SET_CURRENT_ROUTE } from '../actions/types'
 
 const initialState = {
     currentRoute: null

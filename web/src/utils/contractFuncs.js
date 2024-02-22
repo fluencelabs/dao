@@ -5,18 +5,6 @@ import { catchError } from "../utils";
 
 const SUCCESS_MSG = "Success! Please wait for transaction confirmation.";
 
-export async function getNetworkName(w3provider) {
-  let network = await w3provider.getNetwork();
-  switch (network.name) {
-    case "sepolia":
-      return "sepolia";
-    case "rinkeby":
-      return "rinkeby";
-    default:
-      throw new Error("getNetworkName error: Unknwon network " + network.name);
-  }
-}
-
 export async function delegates(w3provider, address, network) {
   let contract = new Contract(
     governanceContracts[network].token,

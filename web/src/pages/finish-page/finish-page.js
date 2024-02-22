@@ -13,16 +13,17 @@ import { hideString } from '../../utils';
 import { addTokenToMetamask } from '../../utils/metamask';
 import { governanceContracts } from '../../constants';
 import TwitterShare from '../../hoc/TwitterShare';
+import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const TwitterShareButton = TwitterShare(Button)
 
 const FinishPage = () => {
-    const { address, networkName } = useSelector(state => state.wallet)
+    const { address, network } = useWeb3Connection();
     const { delegatee } = useSelector(state => state.governance.values)
     const { currentAward } = useSelector(state => state.distributor)
 
     const handleAddToken = () => {
-        addTokenToMetamask(governanceContracts[networkName].token)
+        addTokenToMetamask(governanceContracts[network.name].token)
     }
 
     return (

@@ -18,8 +18,7 @@ import { MINED, MINING } from '../../constants';
 import { toast } from 'react-toastify';
 
 const DonePage = () => {
-    const { web3Provider } = useWeb3Connection()
-    const { address, networkName } = useSelector(state => state.wallet)
+    const { provider, address, network } = useWeb3Connection()
     const { claimStatus } = useSelector(state => state.governance)
     const { currentAward } = useSelector(state => state.distributor)
     const { proof } = useSelector(state => state.governance.values)
@@ -35,8 +34,8 @@ const DonePage = () => {
                 proof?.merkleProof,
                 proof?.tmpEthAddr,
                 proof?.signature,
-                web3Provider,
-                networkName
+                provider,
+                network.name
             )
         )
     }

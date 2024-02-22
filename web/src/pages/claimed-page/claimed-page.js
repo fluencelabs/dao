@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 
 import Header from '../../components/Header/Header';
 import Title from '../../components/Title/Title';
@@ -10,14 +9,15 @@ import TwitterShare from '../../hoc/TwitterShare';
 import { addTokenToMetamask } from '../../utils/metamask';
 import { governanceContracts } from '../../constants';
 import styles from './claimed-page.module.css';
+import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const TwitterShareButton = TwitterShare(Button)
 
 const ClaimedPage = () => {
-    const { networkName } = useSelector(state => state.wallet)
+    const { network } = useWeb3Connection();
 
     const handleAddToken = () => {
-        addTokenToMetamask(governanceContracts[networkName].token)
+        addTokenToMetamask(governanceContracts[network.name].token)
     }
 
     return (

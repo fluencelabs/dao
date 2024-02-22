@@ -1,12 +1,12 @@
 import {
-    PROPOSAL_CREATED,
-    DELEGATE_STATUS,
-    SET_DELEGATEE,
     CLAIM_STATUS,
+    DELEGATE_STATUS,
+    GOV_CLEANUP,
+    PROPOSAL_CREATED,
     SET_CLAIM_STATUS,
-    STORE_PROOF,
+    SET_DELEGATEE,
     STORE_KEY,
-    GOV_CLEANUP
+    STORE_PROOF
 } from "../actions/types"
 
 const initialState = {

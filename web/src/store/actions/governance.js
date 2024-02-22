@@ -2,14 +2,7 @@ import { Contract } from "@ethersproject/contracts";
 import abis from "../../contracts";
 import { FAIL, governanceContracts, MINED, MINING, PENDING, REJECTED } from "../../constants";
 
-import {
-    CLAIM_STATUS,
-    DELEGATE_STATUS,
-    SET_CLAIM_STATUS,
-    SET_DELEGATEE,
-    SET_ERROR,
-    STORE_PROOF
-} from "./types"
+import { CLAIM_STATUS, DELEGATE_STATUS, SET_CLAIM_STATUS, SET_DELEGATEE, SET_ERROR, STORE_PROOF } from "./types"
 import supportedChains from "../../constants/chains";
 
 export const delegateStatus = (status) => ({

@@ -24,9 +24,10 @@ import { hashedLeaf } from '../../utils/award'
 import { Buffer } from "buffer";
 import { validateASN1Signature } from '../../utils/asn1';
 import { ethers } from 'ethers';
+import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const ProofPage = () => {
-    const { address, web3Provider, networkName } = useSelector(state => state.wallet)
+    const { address, provider, network } = useWeb3Connection();
     const { proof } = useSelector(state => state.governance.values)
     const [ haveProof, setHaveProof ] = useState(!!proof)
     const { hasClaimed } = useSelector(state => state.governance)
@@ -63,7 +64,7 @@ const ProofPage = () => {
             let [ userId, tmpEthAddrNoPrefix, signatureHex, merkleProofHex ] = proofValue.split(",");
             let tmpEthAddr = '0x' + tmpEthAddrNoPrefix;
             
-            dispatch(checkHasClaimed(userId, web3Provider, networkName));
+            dispatch(checkHasClaimed(userId, provider, network.name));
             
             try {
                 console.log("signatureHex", signatureHex);
