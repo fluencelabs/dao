@@ -233,7 +233,7 @@ contract DevRewardDistributor {
      *
      */
     function withdraw() external {
-        require(!isClaimingActive() || msg.sender == canceler, "Claiming is still active or you are not the canceler");
+        require(msg.sender == canceler, "Caller is not a canceler");
 
         IERC20 rewardToken = IERC20(token); //gas saving
 

@@ -435,12 +435,6 @@ describe("DevRewardDistributor", () => {
     );
   });
 
-  it("transfer unclaimed when claiming is active", async () => {
-    await expect(rewardDistributor.withdraw()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Claiming is still active or you are not the canceler'`
-    );
-  });
-
   it("try to claim more then max", async () => {
     const maxClaimedSupply = await rewardDistributor.maxClaimedSupply();
 
@@ -498,18 +492,6 @@ describe("DevRewardDistributor", () => {
     );
   }
 
-  it("transfer unclaimed when claiming is not active", async () => {
-    const period = await rewardDistributor.claimingEndTime();
-
-    await ethers.provider.send("evm_increaseTime", [period.toNumber()]);
-    await ethers.provider.send("evm_mine", []);
-
-    const amount = await token.balanceOf(rewardDistributor.address);
-
-    const tx = await rewardDistributor.withdraw();
-    await _isTransferedToExecutor(tx, amount);
-  });
-
   it("transfer unclaimed when fluence multisig used (#withdraw)", async () => {
     const amount = await token.balanceOf(rewardDistributor.address);
 
@@ -519,7 +501,7 @@ describe("DevRewardDistributor", () => {
 
   it("throw when transfer unclaimed not from multisig", async () => {
     await expect(rewardDistributor.withdraw()).to.be.revertedWith(
-      `${THROW_ERROR_PREFIX} 'Claiming is still active or you are not the canceler'`
+      `${THROW_ERROR_PREFIX} 'Caller is not a canceler'`
     );
   });
 });
