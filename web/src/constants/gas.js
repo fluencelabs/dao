@@ -1,1 +1,0 @@
-export const defaultGas = '1434000000000000'

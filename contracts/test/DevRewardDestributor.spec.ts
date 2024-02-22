@@ -189,29 +189,26 @@ describe("DevRewardDistributor", () => {
 
       const reward = await rewardDistributor.currentReward();
 
-      const tx = await rewardDistributor.claimTokens(
-        info.accountId,
-        tree.getHexProof(info.leaf),
-        info.account.address,
-        await info.account.signMessage(
-          ethers.utils.arrayify(developerAccount.address)
-        )
-      );
+      const signer = (await ethers.getSigners())[i];
+      const tx = await rewardDistributor
+        .connect(signer)
+        .claimTokens(
+          info.accountId,
+          tree.getHexProof(info.leaf),
+          info.account.address,
+          await info.account.signMessage(ethers.utils.arrayify(signer.address))
+        );
 
       await expect(tx)
         .to.emit(rewardDistributor, "Transfer")
-        .withArgs(
-          ethers.constants.AddressZero,
-          developerAccount.address,
-          reward
-        );
+        .withArgs(ethers.constants.AddressZero, signer.address, reward);
 
-      await expect(
-        await rewardDistributor.balanceOf(developerAccount.address)
-      ).to.eq(reward);
+      await expect(await rewardDistributor.balanceOf(signer.address)).to.eq(
+        reward
+      );
 
       const lockedBalance = await rewardDistributor.lockedBalances(
-        developerAccount.address
+        signer.address
       );
 
       const txReceipt = await tx.wait();
@@ -453,17 +450,19 @@ describe("DevRewardDistributor", () => {
       i < Number(maxClaimedSupply.div(await rewardDistributor.initialReward()));
       i++
     ) {
+      const signer = (await ethers.getSigners())[i];
+
       const info = getRandomAccountInfo(lastId);
       lastId = info.accountId;
 
-      await rewardDistributor.claimTokens(
-        info.accountId,
-        tree.getHexProof(info.leaf),
-        info.account.address,
-        await info.account.signMessage(
-          ethers.utils.arrayify(developerAccount.address)
-        )
-      );
+      await rewardDistributor
+        .connect(signer)
+        .claimTokens(
+          info.accountId,
+          tree.getHexProof(info.leaf),
+          info.account.address,
+          await info.account.signMessage(ethers.utils.arrayify(signer.address))
+        );
     }
 
     const info = getRandomAccountInfo(lastId);

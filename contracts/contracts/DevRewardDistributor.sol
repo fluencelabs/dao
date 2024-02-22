@@ -202,6 +202,7 @@ contract DevRewardDistributor {
         bytes calldata signature
     ) external whenClaimingIs(true) {
         require(!isClaimed(userId), "Tokens already claimed");
+        require(lockedBalances[msg.sender].unlockTime == 0, "Tokens are already locked");
 
         uint256 amount = currentReward();
         uint256 claimedSupply_ = claimedSupply;
