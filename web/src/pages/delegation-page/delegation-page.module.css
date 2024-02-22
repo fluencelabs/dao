@@ -1,0 +1,110 @@
+.background {
+    padding-top: 54px;
+
+    background: rgba(177, 169, 153, 1);
+    background-image: url('../../images/Rectangle 76.21553159.webp');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.progress {
+    margin-bottom: 30px;
+}
+
+.title {
+    max-width: 900px;
+    margin-bottom: 82px;
+}
+
+.dashboard {
+    max-width: 1028px;
+    margin-bottom: 161px;
+}
+
+.wallet {
+    max-width: 200px;
+}
+
+.dashboard__text {
+    margin: 0;
+    margin-bottom: 20px;
+    max-width: 711px;
+
+    font-family: 'Hauora_Regular', sans-serif;
+    font-size: 24px;
+    line-height: 33px;
+    color: rgb(0, 0, 0);
+
+    letter-spacing: 0.5px;
+}
+
+.dashboard__caption {
+    margin: 0;
+    margin-bottom: 60px;
+
+    font-family: 'Hauora_Regular', sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: rgba(0, 0, 0, 0.5);
+
+    letter-spacing: 0.5px;
+}
+
+.dashboard__list {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 18px;
+    column-gap: 30px;
+
+    list-style: none;
+}
+
+.dashboard__item {
+    width:48.06%;
+}
+
+@media screen and (max-width: 1275px) {
+    .main {
+        width: 100%;
+        
+    }
+
+    .dashboard {
+        max-width: 100%;
+    }
+}
+
+
+
+@media screen and (max-width: 1000px) {
+    .dashboard__item {
+        width:42%;
+        min-width: 320px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .dashboard__item {
+        width:100%;
+        min-width: 320px;
+    }
+
+    .main {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .main {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .wallet,
+    .title {
+        margin-left: 15px;
+    }
+}
