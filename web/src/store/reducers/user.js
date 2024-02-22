@@ -1,4 +1,4 @@
-import { SET_KEY, WEB2_LOGIN, WEB2_LOGOUT, USER_CLEANUP, SET_USERNAME } from "../actions/types"
+import { SET_USERNAME, USER_CLEANUP } from "../actions/types"
 
 export const initialState = {
     name: null,
@@ -24,24 +24,6 @@ export const userReducer = (state=initialState, action) => {
                 username: action.payload
             }
         }
-
-        case WEB2_LOGIN:
-            return {
-                ...state,
-                ...action.payload
-            }
-
-        case WEB2_LOGOUT:
-            return {
-                ...state,
-                ...action.payload
-            }
-
-        case SET_KEY:
-            return {
-                ...state,
-                key: action.payload
-            }
     
         default:
             return state

@@ -16,7 +16,7 @@ import styles from './proof-page.module.css';
 import { hideString } from '../../utils';
 
 import { checkHasClaimed, storeProof } from '../../store/actions/governance';
-import { ROUTE_CLAIMED, ROUTE_DELEGATION } from '../../constants/routes';
+import { ROUTE_CLAIMED, ROUTE_DONE } from '../../constants/routes';
 import { toast } from 'react-toastify';
 import { MerkleTree } from 'merkletreejs';
 import keccak256 from 'keccak256';
@@ -24,19 +24,10 @@ import { hashedLeaf } from '../../utils/award'
 import { Buffer } from "buffer";
 import { validateASN1Signature } from '../../utils/asn1';
 import { ethers } from 'ethers';
-
-
-function isBase64(str) {
-    if (str === '' || str.trim() ===''){ return false; }
-    try {
-        return btoa(atob(str)) === str;
-    } catch (err) {
-        return false;
-    }
-}
+import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const ProofPage = () => {
-    const { address, web3Provider, networkName } = useSelector(state => state.wallet)
+    const { address, provider, network } = useWeb3Connection();
     const { proof } = useSelector(state => state.governance.values)
     const [ haveProof, setHaveProof ] = useState(!!proof)
     const { hasClaimed } = useSelector(state => state.governance)
@@ -73,7 +64,7 @@ const ProofPage = () => {
             let [ userId, tmpEthAddrNoPrefix, signatureHex, merkleProofHex ] = proofValue.split(",");
             let tmpEthAddr = '0x' + tmpEthAddrNoPrefix;
             
-            dispatch(checkHasClaimed(userId, web3Provider, networkName));
+            dispatch(checkHasClaimed(userId, provider, network.name));
             
             try {
                 console.log("signatureHex", signatureHex);
@@ -117,7 +108,7 @@ const ProofPage = () => {
 
     useEffect(() => {
         if (haveProof & !hasClaimed?.claimed & hasClaimed?.checked) {
-            navigate(ROUTE_DELEGATION)
+            navigate(ROUTE_DONE)
         }
     }, [haveProof, hasClaimed])
 

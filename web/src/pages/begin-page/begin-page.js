@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import githubUsernameRegex from 'github-username-regex';
@@ -16,10 +16,11 @@ import TimeUntilReduce from '../../components/TimeUntilReduce/TimeUntilReduce';
 import styles from './begin-page.module.css';
 import { setUsername, storeKey } from '../../store/actions/user';
 import { ROUTE_WALLET } from '../../constants/routes';
+import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const PageBegin = memo(() => {
     const navigate = useNavigate()
-    const { web3Provider } = useSelector(state => state.wallet)
+    const { provider } = useWeb3Connection();
     const { currentAward, nextHalvePeriod } = useSelector(state => state.distributor)
     const { username, key } = useSelector(state => state.user)
     const [name, setName] = useState('')
@@ -30,7 +31,7 @@ const PageBegin = memo(() => {
 
     useEffect(() => {
         key && dispatch(storeKey(key))
-    }, [web3Provider, key])
+    }, [provider, key])
 
     useEffect(() => {
         if (username) {

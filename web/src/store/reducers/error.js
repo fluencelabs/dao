@@ -1,4 +1,4 @@
-import { SET_ERROR, ERROR_CLEANUP } from "../actions/types";
+import { ERROR_CLEANUP, SET_ERROR } from "../actions/types";
 
 const initialState = {
     error: null

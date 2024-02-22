@@ -18,11 +18,10 @@ import { MINED, MINING } from '../../constants';
 import { toast } from 'react-toastify';
 
 const DonePage = () => {
-    const { web3Provider } = useWeb3Connection()
-    const { address, networkName } = useSelector(state => state.wallet)
+    const { provider, address, network } = useWeb3Connection()
     const { claimStatus } = useSelector(state => state.governance)
     const { currentAward } = useSelector(state => state.distributor)
-    const { proof, delegatee } = useSelector(state => state.governance.values)
+    const { proof } = useSelector(state => state.governance.values)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -32,12 +31,11 @@ const DonePage = () => {
         dispatch(
             claim(
                 proof?.userId,
-                delegatee,
                 proof?.merkleProof,
                 proof?.tmpEthAddr,
                 proof?.signature,
-                web3Provider,
-                networkName
+                provider,
+                network.name
             )
         )
     }
@@ -66,9 +64,6 @@ const DonePage = () => {
                     <ul className={styles.wallets}>
                         <li className={styles.wallet}>
                             <WalletInfo wallet="wallet" account={hideString(address)} />
-                        </li>
-                        <li className={styles.wallet}>
-                            <WalletInfo wallet="delegate" account={hideString(delegatee)} />
                         </li>
                     </ul>
                     

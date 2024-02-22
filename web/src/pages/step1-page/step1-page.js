@@ -14,14 +14,15 @@ import ConnectWallet from '../../components/ConnectWallet/ConnectWallet';
 import styles from './step1-page.module.css';
 import { useSelector } from 'react-redux';
 import { ROUTE_PROOF } from '../../constants/routes';
+import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const FirstStepPage = memo(() => {
     const navigate = useNavigate()
-    const { address, web3Provider } = useSelector(state => state.wallet)
+    const { address, provider } = useWeb3Connection();
     const { currentAward } = useSelector(state => state.distributor)
 
     useEffect(() => {
-        if (address && web3Provider) {
+        if (address) {
             navigate(ROUTE_PROOF)
         }
     }, [address])
