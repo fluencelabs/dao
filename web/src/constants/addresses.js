@@ -1,6 +1,6 @@
 export const governanceContracts = {
   sepolia: {
-    token: "0x1e554D8f3Bd07D27ef47DD4571a16CDA74c3b731",
-    devRewardDistributor: "0x4e20a2BcaE17D432A62b868518870ffFBA1b8A60",
+    token: "0xF595832d4E4b20899680faDbBB9f2F604019a0a9",
+    devRewardDistributor: "0xC49ACaA831a8738bE2e9f8491c57c975F9b8a3BE",
   },
 };
