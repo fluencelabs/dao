@@ -51,7 +51,7 @@ export const fetchCurrentAward = (network) => {
     try {
       const award = await contract.methods.currentReward().call();
       const formattedAward = web3.utils.fromWei(award, "ether");
-      dispatch(setCurrentAward(formattedAward));
+      dispatch(setCurrentAward(award === 0n ? "0" : formattedAward));
     } catch (error) {
       console.log(error);
     }

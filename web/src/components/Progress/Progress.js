@@ -6,10 +6,6 @@ import styles from "./Progress.module.css";
 const Progress = () => {
   const location = useLocation();
 
-  useEffect(() => {
-    console.log(location);
-  }, []);
-
   return (
     <ul className={styles["progress-list"]}>
       <li
