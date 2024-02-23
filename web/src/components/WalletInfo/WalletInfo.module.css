@@ -1,38 +1,38 @@
 .wallet {
-    padding: 5px 11px;
-    display: flex;
+  padding: 5px 11px;
+  display: flex;
 
-    background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
 
-    border-radius: 5px;
+  border-radius: 5px;
 }
 
 .wallet__name {
-    margin: 0;
-    padding: 0;
-    padding-right: 16px;
+  margin: 0;
+  padding: 0;
+  padding-right: 16px;
 
-    font-family: 'Hauora_Bold', sans-serif;
-    font-size: 10px;
-    line-height: 16px;
-    color: rgb(0, 0, 0);
+  font-family: "Hauora_Bold", sans-serif;
+  font-size: 10px;
+  line-height: 16px;
+  color: rgb(0, 0, 0);
 
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-right: 1px solid rgba(0, 0, 0, 0.5)
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
 }
 
 .wallet__account {
-    margin: 0;
-    padding: 0;
-    padding-left: 16px;
+  margin: 0;
+  padding: 0;
+  padding-left: 16px;
 
-    font-family: 'Hauora_Bold', sans-serif;
-    font-size: 10px;
-    line-height: 16px;
-    color: rgb(0, 0, 0);
+  font-family: "Hauora_Bold", sans-serif;
+  font-size: 10px;
+  line-height: 16px;
+  color: rgb(0, 0, 0);
 
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-left: 1px solid rgba(0, 0, 0, 0.5)
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
 }

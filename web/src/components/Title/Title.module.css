@@ -1,77 +1,77 @@
 .title {
-    margin: 0;
+  margin: 0;
 
-    font-family: "Hauora_Regular";
-    
-    color: rgb(255, 255, 255);
+  font-family: "Hauora_Regular";
 
-    letter-spacing: 1px;
+  color: rgb(255, 255, 255);
+
+  letter-spacing: 1px;
 }
 
 .title_size_large {
-    font-size: 80px;
-    line-height: 88px;
+  font-size: 80px;
+  line-height: 88px;
 }
 
 .title_size_big {
-    font-size: 60px;
-    line-height: 70px;
+  font-size: 60px;
+  line-height: 70px;
 }
 
 .title_size_medium {
-    font-size: 42px;
-    line-height: 50px;
+  font-size: 42px;
+  line-height: 50px;
 }
 
 .title_size_default {
-    font-size: 30px;
-    line-height: 36px;
+  font-size: 30px;
+  line-height: 36px;
 }
 
 .title_size_small {
-    font-size: 19px;
-    line-height: 24px;
+  font-size: 19px;
+  line-height: 24px;
 }
 
 .title_color_black {
-    color: rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
 }
 
-@media screen and (max-width: 1366px)  {
-    .title_size_large {
-        font-size: 60px;
-        line-height: 70px;
-    }
+@media screen and (max-width: 1366px) {
+  .title_size_large {
+    font-size: 60px;
+    line-height: 70px;
+  }
 }
 
-@media screen and (max-width: 900px)  {
-    .title_size_large {
-        font-size: 60px;
-        line-height: 70px;
-    }
-    .title_size_big {
-        font-size: 42px;
-        line-height: 50px;
-    }
+@media screen and (max-width: 900px) {
+  .title_size_large {
+    font-size: 60px;
+    line-height: 70px;
+  }
+  .title_size_big {
+    font-size: 42px;
+    line-height: 50px;
+  }
 }
 
-@media screen and (max-width: 600px)  {
-    .title_size_large {
-        font-size: 42px;
-        line-height: 50px;
-    }
-    .title_size_big {
-        font-size: 30px;
-        line-height: 36px;
-    }
+@media screen and (max-width: 600px) {
+  .title_size_large {
+    font-size: 42px;
+    line-height: 50px;
+  }
+  .title_size_big {
+    font-size: 30px;
+    line-height: 36px;
+  }
 
-    .title_size_medium {
-        font-size: 30px;
-        line-height: 36px;
-    }
+  .title_size_medium {
+    font-size: 30px;
+    line-height: 36px;
+  }
 
-    .title_size_default {
-        font-size: 19px;
-        line-height: 23px;
-    }
+  .title_size_default {
+    font-size: 19px;
+    line-height: 23px;
+  }
 }

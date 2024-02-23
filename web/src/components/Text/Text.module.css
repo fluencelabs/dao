@@ -1,47 +1,47 @@
 .text {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 
-    font-family: "Hauora_Regular";
+  font-family: "Hauora_Regular";
 
-    letter-spacing: 0.5px;
+  letter-spacing: 0.5px;
 }
 
 .text_type_large {
-    font-size: 24px;
-    line-height: 32px;
+  font-size: 24px;
+  line-height: 32px;
 }
 
 .text_type_mid {
-    font-size: 18px;
-    line-height: 24px;
+  font-size: 18px;
+  line-height: 24px;
 }
 
 .text_type_default {
-    font-size: 15px;
-    line-height: 21px;
+  font-size: 15px;
+  line-height: 21px;
 }
 
 .text_type_small {
-    font-size: 13px;
-    line-height: 18px;
+  font-size: 13px;
+  line-height: 18px;
 }
 
 .text_color_default {
-    color: rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
 }
 
 .text_color_black {
-    color: rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
 }
 
 .text_color_grey {
-    color: rgb(204, 204, 204);
+  color: rgb(204, 204, 204);
 }
 
-@media screen and (max-width:768px) {
-    .text_type_large {
-        font-size: 21px;
-        line-height: 30px;
-    }
+@media screen and (max-width: 768px) {
+  .text_type_large {
+    font-size: 21px;
+    line-height: 30px;
+  }
 }
