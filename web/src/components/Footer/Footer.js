@@ -26,52 +26,25 @@ const Footer = () => {
     return (
         <footer className={styles.footer}>
             <div className={styles.footer__container}>
-                <div className={styles.footer_row_top}>
-                    <div className={styles[`footer__flex-container`]}>
-                        <Title size="medium" type="h2" text="Stay up to date" />
-                        <div className={styles.footer__text}>
-                            <Text type='default' color='grey'>
-                                Fluence Labs sends regular updates about the project. Subscribe via email to get notified.
-                            </Text>
-                        </div>
-                    </div>
-                    <form className={styles.footer__form} onSubmit={handleSubmit}>
-                        <input 
-                            className={`${styles.footer__input} ${!isValid && values.email  && styles.footer__input_type_error}`}
-                            type='email'
-                            placeholder='Enter email'
-                            name='email'
-                            required
-                            value={values.email || ''}
-                            onChange={handleChange}
-                        />
-                        <span className={`${styles.footer__error} ${!isValid && values.email && styles.footer__error_show}`}>That doesn’t look like a valid email</span>
-                        <button type='submit' className={styles.footer__submit} disabled={!isValid}>
-                        </button>
-                    </form>
-                </div>
                 <div className={styles.footer_row_bottom}>
                     <div className={styles.footer_column_left}>
-                        <List title='Learn' >
+                        <List title='Resources' >
                             <li className={styles.footer__item}>
-                                <Link className={styles.footer__link} to="/">Technology</Link>
-                            </li>
-                            <li className={styles.footer__item}>
-                                <Link className={styles.footer__link} to="/">FAQ</Link>
+                                <Link className={styles.footer__link} to="https://fluence.dev/docs/learn/overview">Overview</Link>
                             </li>
                             <li className={`${styles.footer__item} ${styles.footer__item_list_arrow}`}>
-                                <Link className={styles.footer__link} to="/">Videos</Link>
+                                <Link className={styles.footer__link} to="https://www.youtube.com/@fluencelabs/videos">Videos</Link>
                             </li>
                         </List>
                         <List title='Build' >
                             <li className={styles.footer__item}>
-                                <Link className={styles.footer__link} to="/">Quick start </Link>
+                                <Link className={styles.footer__link} to="https://fluence.dev/docs/build/introduction">Docs</Link>
                             </li>
                             <li className={styles.footer__item}>
-                                <Link className={styles.footer__link} to="/">Tutorials</Link>
+                                <Link className={styles.footer__link} to="https://fluence.dev/docs/build/get-started">Get Started</Link>
                             </li>
                             <li className={`${styles.footer__item}`}>
-                                <Link className={styles.footer__link} to="/">Docs</Link>
+                                <Link className={styles.footer__link} to="https://fluence.dev/docs/build/introduction">Github</Link>
                             </li>
                         </List>
                     </div>
@@ -79,58 +52,55 @@ const Footer = () => {
                         <div className={styles["footer__flex-column"]}>
                             <List title='Get involved' >
                                 <li className={styles.footer__item}>
-                                    <Link className={styles.footer__link} to="/">DAO </Link>
-                                </li>
-                                <li className={styles.footer__item}>
-                                    <Link className={styles.footer__link}  to="/">Events</Link>
+                                    <Link className={styles.footer__link} to="https://fluence.network/governance">DAO </Link>
                                 </li>
                             </List>
                             <div style={{"marginTop": "20px"}}>
                                 <List>
                                     <li className={`${styles.footer__item} ${styles.footer__item_list_arrow}`}>
-                                        <Link className={styles.footer__link} to="/">Telegram</Link>
+                                        <Link className={styles.footer__link} to="https://t.me/fluence_project">Telegram</Link>
                                     </li>
                                     <li className={`${styles.footer__item} ${styles.footer__item_list_arrow}`}>
-                                        <Link className={styles.footer__link} to="/">Discord</Link>
+                                        <Link className={styles.footer__link} to="https://fluence.chat">Discord</Link>
                                     </li>
-                                    <li className={`${styles.footer__item} ${styles.footer__item_disabled} ${styles.footer__item_list_arrow}`}>
-                                        Forum <span className={styles.footer__caption}>soon</span>
+                                    <li className={`${styles.footer__item} ${styles.footer__item_list_arrow}`}>
+                                        <Link className={styles.footer__link} to="https://gov.fluence.network/">Forum</Link>
                                     </li>
                                 </List>
                             </div>
-                            
+
                         </div>
                         <div className={styles["footer__column_flex-end"]}>
                             <List social>
                                 <li className={`${styles.footer__item} ${styles.footer__item_mr}`}>
-                                    <Link className={styles.footer__link} to="/">
+                                    <Link className={styles.footer__link} to="https://fluence.chat/">
                                         <img src={discord} className={styles.footer__icon_discord} alt="icon"/>
                                     </Link>
                                 </li>
                                 <li className={`${styles.footer__item} ${styles.footer__item_mr}`}>
-                                    <Link className={styles.footer__link} to="/">
+                                    <Link className={styles.footer__link} to="https://twitter.com/fluence_project">
                                     <img src={twitter} className={styles.footer__icon_twitter} alt="icon"/>
                                     </Link>
                                 </li>
                                 <li className={`${styles.footer__item} ${styles.footer__item_mr}`}>
-                                    <Link className={styles.footer__link} to="/">
+                                    <Link className={styles.footer__link} to="https://t.me/fluence_project">
                                         <img src={telegram} className={styles.footer__icon_telegram} alt="icon"/>
                                     </Link>
                                 </li>
                                 <li className={`${styles.footer__item} ${styles.footer__item_mr}`}>
-                                    <Link className={styles.footer__link} to="/">
+                                    <Link className={styles.footer__link} to="https://www.youtube.com/@fluencelabs/videos">
                                     <img src={youtube} className={styles.footer__icon_youtube} alt="icon"/>
                                     </Link>
                                 </li>
                             </List>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
             <div className={styles.footer__corner} />
-            
-            
+
+
         </footer>
     )
 }

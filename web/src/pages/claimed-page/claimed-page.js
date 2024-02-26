@@ -23,17 +23,17 @@ const ClaimedPage = () => {
     return (
         <div className={styles.background}>
             <div className={styles.background__image}>
-                
+
             </div>
             <div className={styles.header}>
                 <Header button />
             </div>
-            
+
             <div className="container">
                 <main className={`main ${styles.main}`}>
-                    
+
                     <div className={styles.title}>
-                        <Title type="h1" size="large" text="Seems like you have claimed your reward already"  />
+                        <Title type="h1" size="large" text="Seems like you have claimed your FLT already"  />
                     </div>
 
                     <ul className={styles.buttons}>
@@ -45,12 +45,9 @@ const ClaimedPage = () => {
                                 type="large"
                                 icon="twitter"
                                 text="Share on Twitter"
-                                caption="I just claimed 500 FLT tokens on the Fluence Network!"
-                                url="https://fluence.one"
+                                caption="I just claimed 5000 FLT tokens of Fluence!"
+                                url="https://fluence.network"
                             />
-                        </li>
-                        <li className={styles.button}>
-                            <Url text="Get more FLT on Uniswap" />
                         </li>
                     </ul>
                 </main>

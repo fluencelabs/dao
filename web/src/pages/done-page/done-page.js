@@ -44,10 +44,10 @@ const DonePage = () => {
 
     useEffect(() => {
         if (claimStatus === MINING) {
-            loader.current = toast.loading("Please wait while the transaction is being mined...")
+            loader.current = toast.loading("Please wait while the transaction is being processed...")
         }
         if (claimStatus === MINED) {
-            toast.update(loader.current, { render: "Transaction mined succesfully", type: "success", isLoading: false });
+            toast.update(loader.current, { render: "Transaction processed succesfully", type: "success", isLoading: false });
             navigate(ROUTE_FINISH)
             toast.dismiss(loader.current)
         }
@@ -66,15 +66,14 @@ const DonePage = () => {
                             <WalletInfo wallet="wallet" account={hideString(address)} />
                         </li>
                     </ul>
-                    
+
                     <div className={styles.title}>
-                        <Title type="h1" size="large" text="Almost done! You can claim your reward now"  />
+                        <Title type="h1" size="large" text="Almost done! You can claim your FLT now"  />
                     </div>
 
                     <p className={styles.caption}>
-                        0.002 ETH (~$30) gas fee will be involved for claiming transaction
                     </p>
-                    
+
                     <div className={styles.button}>
                         <Button callback={handleClaim} text={`Claim ${currentAward} FLT`} />
                     </div>

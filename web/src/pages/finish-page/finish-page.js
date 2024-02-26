@@ -29,18 +29,18 @@ const FinishPage = () => {
     return (
         <div className={styles.background}>
             <div className={styles.background__image}>
-                
+
             </div>
             <div className={styles.header}>
                 <Header button />
             </div>
-            
-            
+
+
             <div className="container">
                 <main className={` main ${styles.main}`}>
                     <div className={styles.progress}>
                         <Progress />
-                    </div> 
+                    </div>
                     <ul className={styles.wallets}>
                         <li className={styles.wallet}>
                             <WalletInfo wallet="wallet" account={hideString(address)} />
@@ -49,7 +49,7 @@ const FinishPage = () => {
                             <WalletInfo wallet="delegate" account={hideString(delegatee)} />
                         </li>
                     </ul>
-                    
+
                     <div className={styles.title}>
                         <Title type="h1" size="large" text={`${currentAward} FLT claimed`}  />
                         <span className={styles["icon-fire"]}> 🔥</span>
@@ -67,12 +67,9 @@ const FinishPage = () => {
                                 type="large"
                                 icon="twitter"
                                 text="Share on Twitter"
-                                caption={`I just claimed ${currentAward} FLT tokens on the Fluence Network!`}
-                                url="https://fluence.one"
+                                caption={`I have just claimed ${currentAward} FLT tokens of Fluence!`}
+                                url="https://fluence.network"
                             />
-                        </li>
-                        <li className={styles.button}>
-                            <Url text="Get more FLT on Uniswap" />
                         </li>
                     </ul>
                 </main>

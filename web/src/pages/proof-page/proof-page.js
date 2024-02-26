@@ -241,9 +241,9 @@ const ProofPage = () => {
                 </div>
                 <p className={styles.dashboard__paragraph}>
                   If you are an advanced Ethereum user, you can claim directly
-                  from the smart contract.{" "}
+                  from the smart contract {" "}
                   <Link to="/" className={styles.dashboard__link}>
-                    Learn how to do it
+                    on Etherescan
                   </Link>
                 </p>
               </form>

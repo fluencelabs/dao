@@ -46,7 +46,7 @@ const FirstStepPage = memo(() => {
                                 <div className={styles.definition}>
                                     <DefinitionList dd={`${currentAward || 0} FLT`} dt="ready to be claimed" colorD="orange" colorT="black"/>
                                 </div>
-                                
+
                             </div>
                             <div className={styles.dashboard__text}>
                                 <Text color="black" type="large">
@@ -61,22 +61,18 @@ const FirstStepPage = memo(() => {
                                     Generate proof of Github account ownership
                                 </li>
                                 <li className={styles.dashboard__item}>
-                                    Delegate or self-delegate DAO voting power
-                                </li>
-                                <li className={styles.dashboard__item}>
-                                    Receive the tokens
+                                    Receive FLT
                                 </li>
                             </ol>
                             <div className={styles.dashboard__caption}>
                                 <Text color="grey" type="small">
-                                    Two Ethereum transactions of 0.001 ETH & 0.002 ETH gas fees will be involved on steps 3 & 4
                                 </Text>
                             </div>
                             <div className={styles.dashboard__button}>
                                 <ConnectWallet />
                             </div>
                             <p className={styles.dashboard__paragraph}>
-                                If you are an advanced Ethereum user, you can claim directly from the smart contract.  <Link to='/' className={styles.dashboard__link}>Learn how to do it</Link>
+                                If you are an advanced Ethereum user, you can claim directly from the smart contract <Link to='/' className={styles.dashboard__link}>on Etherscan</Link>
                             </p>
                         </Dashboard>
                     </div>
