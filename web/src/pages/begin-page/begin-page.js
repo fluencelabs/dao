@@ -76,12 +76,12 @@ const PageBegin = memo(() => {
                                     <ul className={styles.texts}>
                                         <li className={styles.text}>
                                             <Text type="large" color="black" >
-                                                10% of the FLT supply is distributed to ~10,000 selected Web3 developers and contributors. Public keys of selected Github accounts were added into a smart contract on Ethereum. Claim your allocation and help us build the decentralized internet together!
+                                                5% of the FLT supply is allocated to ~110,000 developers who contributed into open source web3 repositories during last year. Public keys of selected Github accounts were added into a smart contract on Ethereum. Claim your allocation and help us build the decentralized internet together!
                                             </Text>
                                         </li>
                                         <li className={styles.text}>
                                             <Text type="mid" color="black">
-                                                Authenticate via Github, to check if you are eligible and proceed with claiming.
+                                                Check if you are eligible and proceed with claiming
                                             </Text>
                                         </li>
                                     </ul>
