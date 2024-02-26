@@ -36,7 +36,7 @@ const PageBegin = memo(() => {
     useEffect(() => {
         if (username) {
             navigate(ROUTE_WALLET)
-        } 
+        }
     }, [username])
 
     const [inputValid, setInputValid] = useState(true)
@@ -46,7 +46,7 @@ const PageBegin = memo(() => {
         e.target.value !== '' ? setInputPressed(true) : setInputPressed(false)
         setInputValid(githubUsernameRegex.test(e.target.value))
         setName(e.target.value)
-    } 
+    }
 
     const getInputClassName = () => {
         if (!inputValid) {
@@ -59,7 +59,7 @@ const PageBegin = memo(() => {
 
         return styles.input
     }
-    
+
     return (
         <div className={styles.background}>
             <Header />
@@ -102,14 +102,14 @@ const PageBegin = memo(() => {
                                                     icon="git"
                                                     text="Check if I’m eligible"
                                                     callback={() => dispatch(setUsername(name))}
-                                                /> 
+                                                />
                                             }
                                         </li>
                                         <li className={styles.button}>
-                                            <span className={styles.span}>or</span>
-                                            <Url text="Get FLT on Uniswap"  color="black"/>
+                                            // <span className={styles.span}>or</span>
+                                            // <Url text="Get FLT on Uniswap"  color="black"/>
                                         </li>
-                                    </ul>    
+                                    </ul>
                                 </div>
                                 <div className={styles["flex-container__part-right"]}>
                                     <ul className={styles.definitions}>
@@ -123,13 +123,13 @@ const PageBegin = memo(() => {
                                     <div className={styles.url}>
                                         <Url text="Details about the reward" color="black" />
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </Dashboard>
                     </div>
-                    
-                    
+
+
                 </main>
             </div>
             <Footer />

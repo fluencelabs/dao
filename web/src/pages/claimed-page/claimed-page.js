@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 import Header from '../../components/Header/Header';
 import Title from '../../components/Title/Title';
@@ -15,6 +16,7 @@ const TwitterShareButton = TwitterShare(Button)
 
 const ClaimedPage = () => {
     const { network } = useWeb3Connection();
+    const { currentAward } = useSelector(state => state.distributor)
 
     const handleAddToken = () => {
         addTokenToMetamask(governanceContracts[network.name].token)
@@ -45,7 +47,7 @@ const ClaimedPage = () => {
                                 type="large"
                                 icon="twitter"
                                 text="Share on Twitter"
-                                caption="I just claimed 5000 FLT tokens of Fluence!"
+                                caption={`I just claimed ${currentAward} FLT tokens of Fluence!`}
                                 url="https://fluence.network"
                             />
                         </li>
