@@ -22,9 +22,11 @@ import { MerkleTree } from "merkletreejs";
 import keccak256 from "keccak256";
 import { hashedLeaf } from "../../utils/award";
 import { Buffer } from "buffer";
-import { validateSignature } from "../../utils/asn1";
-import { ethers } from "ethers";
+import { findEthereumSig } from "../../utils/asn1";
+import { Contract, ethers } from "ethers";
 import { useWeb3Connection } from "../../hooks/useWeb3Connection";
+import { governanceContracts } from "../../constants";
+import abis from "../../contracts";
 
 const ProofPage = () => {
   const { address, provider, network } = useWeb3Connection();
@@ -74,46 +76,70 @@ const ProofPage = () => {
         let merkleProof = JSON.parse(
           Buffer.from(merkleProofHex, "base64").toString(),
         );
-        try {
-          console.log("address is", address);
-          let signedHash = ethers.utils.hashMessage(fromHex(address));
-          console.log("Signed Hash", signedHash);
+        let verified = false;
+        console.log("network", network);
 
-          let signature = validateSignature(
-            signedHash,
-            signatureHex,
-            tmpEthAddr,
-            isASN1,
-          );
-          console.log("Signature is correct.", signature);
+        let contract = new Contract(
+          governanceContracts[network.name].devRewardDistributor,
+          abis.DevRewardDistributor.abi,
+          provider,
+        );
 
-          const leaf = await hashedLeaf(userId, tmpEthAddr);
-          const verified = MerkleTree.verify(
-            merkleProof,
-            leaf,
-            merkleRoot,
-            keccak256,
-            { hashLeaves: false, sortPairs: true },
-          );
+        let signer = provider.getSigner();
+        let signed = await contract.connect(signer);
 
-          console.log("MerkleTree verified", verified);
-          if (verified) {
-            setHaveProof(true);
-            dispatch(
-              storeProof({ userId, tmpEthAddr, signature, merkleProof }),
+        let signature = signatureHex;
+        if (isASN1) {
+          let asn1Signature = Buffer.from(signatureHex, "hex");
+
+          let bufferSig = Buffer.from(asn1Signature);
+
+          let { r, s } = findEthereumSig(bufferSig);
+          let v = 27;
+          let raw_signature = {
+            r: "0x" + r.toString(16, 32),
+            s: "0x" + s.toString(16, 32),
+            v,
+          };
+          signature = ethers.utils.splitSignature(raw_signature);
+
+          signature = ethers.utils.joinSignature(signature);
+          try {
+            await signed.estimateGas.claimTokens(
+              userId,
+              merkleProof,
+              tmpEthAddr,
+              signature,
             );
-          } else {
-            toast("Invalid merkle proof. Please check the data.");
+          } catch (error) {
+            console.log("invalid v", error);
+            raw_signature.v = 28;
+            signature = ethers.utils.joinSignature(signature);
           }
-        } catch (error) {
-          console.log(error);
-          toast("Invalid signature.");
+        }
+
+        console.log("claiming with", {
+          userId,
+          merkleProof,
+          tmpEthAddr,
+          signature,
+        });
+        await signed.estimateGas.claimTokens(
+          userId,
+          merkleProof,
+          tmpEthAddr,
+          signature,
+        );
+        verified = true;
+
+        if (verified) {
+          setHaveProof(true);
+          dispatch(storeProof({ userId, tmpEthAddr, signature, merkleProof }));
+        } else {
+          toast("Invalid merkle proof. Please check the data.");
         }
       } catch (error) {
-        console.log(error);
-        toast(
-          "Invalid proof format. Please check the data. It should be [userId,tmpEthAddr,signatureHex,merkleProofHex].",
-        );
+        toast(error.error.message);
       }
     } catch (error) {
       console.log(error);

@@ -15,7 +15,7 @@ export function validateSignature(
   hashHex,
   signatureArg,
   expectedEthAddr,
-  isASN1
+  isASN1,
 ) {
   // let hash = "50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750";
   // let asn1Signature = "304402204c45f724b4bc4b7994f634f94807701e399731f422f2556d205ffa10df1ab1b302206685617710ad55a5ac4f9b605e5d21461feba47ddf76eea8c581657eebc20734";
@@ -57,7 +57,7 @@ export function validateSignature(
 
   if (recoveredAddress.toLowerCase() !== expectedEthAddr.toLowerCase()) {
     throw new Error(
-      `Expected ETH addr ${expectedEthAddr}, but recovered ${recoveredAddress}. Signature must be invalid.`
+      `Expected ETH addr ${expectedEthAddr}, but recovered ${recoveredAddress}. Signature must be invalid.`,
     );
   }
 
@@ -71,7 +71,7 @@ function recoverPubKeyFromSig(msg, r, s, v) {
       " r: " +
       r.toString(16) +
       " s: " +
-      s.toString(16)
+      s.toString(16),
   );
   let rBuffer = r.toArrayLike(Buffer);
   let sBuffer = s.toArrayLike(Buffer);
@@ -102,10 +102,11 @@ function findRightKey(msg, r, s, expectedEthAddr) {
   return { pubKey, v };
 }
 
-function findEthereumSig(signatureHex) {
+export function findEthereumSig(signatureHex) {
   let decoded = EcdsaSigAsnParse.decode(signatureHex, "der");
   let r = decoded.r;
   let s = decoded.s;
+  console.log("decoded: " + JSON.stringify(decoded));
   console.log("r: " + r.toString(10));
   console.log("s: " + s.toString(10));
 
@@ -113,7 +114,7 @@ function findEthereumSig(signatureHex) {
 
   let secp256k1N = new BN(
     "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
-    16
+    16,
   ); // max value on the curve
   let secp256k1halfN = secp256k1N.div(new BN(2)); // half of the curve
   // Because of EIP-2 not all elliptic curve signatures are accepted
@@ -124,7 +125,7 @@ function findEthereumSig(signatureHex) {
       "s is on the wrong side of the curve... flipping - tempsig: " +
         tempsig +
         " length: " +
-        tempsig.length
+        tempsig.length,
     );
     // According to EIP2 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
     // if s < half the curve we need to invert it
