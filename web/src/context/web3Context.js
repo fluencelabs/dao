@@ -52,6 +52,11 @@ export const Web3ContextProvider = ({ children }) => {
       const networkData = supportedChains.find(
         (chain) => chain.network_id === Number(modal.networkVersion),
       );
+      if (networkData === undefined) {
+        alert("Connecting to the wrong network. Supported networks: " + supportedChains.map(c => c.network).join(','));
+        return;
+      }
+
       const web3Provider = new providers.Web3Provider(
         await web3Modal.connect(),
         {
