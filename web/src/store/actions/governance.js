@@ -149,31 +149,3 @@ export const storeProof = (proof) => ({
   type: STORE_PROOF,
   payload: proof,
 });
-
-export const delegate = (w3provider, delegatee, network) => {
-  return async (dispatch) => {
-    dispatch(delegateStatus(PENDING));
-    let signer = w3provider.getSigner();
-    let contract = new Contract(
-      governanceContracts[network].token,
-      abis.Comp.abi,
-      w3provider,
-    );
-    let signed = await contract.connect(signer);
-    try {
-      const tx = await signed.delegate(delegatee);
-      dispatch(delegateStatus(MINING));
-      try {
-        await tx.wait();
-        dispatch(delegateStatus(MINED));
-        dispatch(setDelegatee(delegatee));
-      } catch (error) {
-        dispatch(delegateStatus(FAIL));
-        dispatch(setError(error.message));
-      }
-    } catch (error) {
-      dispatch(delegateStatus(REJECTED));
-      dispatch(setError(error.message));
-    }
-  };
-};

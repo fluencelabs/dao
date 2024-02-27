@@ -133,8 +133,10 @@ const ProofPage = () => {
         verified = true;
 
         if (verified) {
-          setHaveProof(true);
-          dispatch(storeProof({ userId, tmpEthAddr, signature, merkleProof }));
+          dispatch(
+            storeProof({ userId, tmpEthAddr, signature, merkleProof }),
+          );
+          navigate(ROUTE_DONE);
         } else {
           toast("Invalid merkle proof. Please check the data.");
         }
@@ -146,12 +148,6 @@ const ProofPage = () => {
       toast("The proof should be a valid hex string");
     }
   };
-
-  useEffect(() => {
-    if (haveProof & !hasClaimed?.claimed & hasClaimed?.checked) {
-      navigate(ROUTE_DONE);
-    }
-  }, [haveProof, hasClaimed]);
 
   return (
     <div className={styles.background}>

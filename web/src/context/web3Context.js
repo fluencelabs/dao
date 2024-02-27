@@ -52,18 +52,36 @@ export const Web3ContextProvider = ({ children }) => {
       const networkData = supportedChains.find(
         (chain) => chain.network_id === Number(modal.networkVersion),
       );
+
       if (networkData === undefined) {
         alert("Connecting to the wrong network. Supported networks: " + supportedChains.map(c => c.network).join(','));
+        await web3Modal.clearCachedProvider();
         return;
       }
 
+      modal.on("chainChanged", () => {
+        console.log('modal.on("chainChanged", handleChainChanged);');
+      });
+
       const web3Provider = new providers.Web3Provider(
-        await web3Modal.connect(),
+        modal,
         {
           name: networkData.network,
           chainId: networkData.chain_id,
         },
       );
+
+      provider.on("network", () => {
+        console.log('provider.on("network", handleChainChanged); ');
+      });
+
+      provider.provider.on("chainChanged", () => {
+        console.log('provider.on("chainChanged", handleChainChanged); ');
+      });
+
+      web3Provider.on('network', () => {
+        console.log('adas');
+      });
 
       const signer = web3Provider.getSigner();
       const address = await signer.getAddress();
@@ -121,7 +139,7 @@ export const Web3ContextProvider = ({ children }) => {
       return () => {
         if (provider.removeListener) {
           provider.removeListener("accountsChanged", handleAccountsChanged);
-          provider.removeListener("chainChanged", handleChainChanged);
+          provider.removeListener("network", handleChainChanged);
           provider.removeListener("disconnect", handleDisconnect);
         }
       };
