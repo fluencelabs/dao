@@ -81,7 +81,10 @@ const FirstStepPage = memo(() => {
                 If you are not comfortable connecting your wallet and submiting
                 the proof via web UI, you can claim directly from the smart
                 contract{" "}
-                <Link to="/" className={styles.dashboard__link}>
+                <Link
+                  to="https://etherscan.io/address/0x6081d7F04a8c31e929f25152d4ad37c83638C62b#code"
+                  className={styles.dashboard__link}
+                >
                   on Etherscan
                 </Link>
               </p>
