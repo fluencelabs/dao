@@ -30,6 +30,7 @@ const ProofPage = () => {
   const { proof } = useSelector((state) => state.governance.values);
   const [haveProof, setHaveProof] = useState(!!proof);
   const { hasClaimed } = useSelector((state) => state.governance);
+  console.log('address', address);
 
   const { merkleRoot } = useSelector((state) => state.distributor);
 

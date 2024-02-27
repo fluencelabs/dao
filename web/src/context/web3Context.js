@@ -48,7 +48,7 @@ export const Web3Context = createContext(null);
 export const Web3ContextProvider = ({ children }) => {
   const { open, close } = useWeb3Modal()
   const [provider, setProvider] = useState(defaultProvider);
-  const { modalProvider } = useWeb3ModalProvider();
+  const { walletProvider } = useWeb3ModalProvider();
   const { address, chainId, isConnected } = useWeb3ModalAccount();
   const { disconnect: disconnectWallet } = useDisconnect();
 
@@ -61,15 +61,20 @@ export const Web3ContextProvider = ({ children }) => {
   }, [open]);
 
   useEffect(() => {
-    if (modalProvider) {
+    if (walletProvider) {
+      const network = supportedChains.find(chain => chain.chain_id === Number(walletProvider.networkVersion));
       const web3Provider = new providers.Web3Provider(
-        modalProvider,
+        walletProvider,
+        {
+          name: network.network,
+          chainId: Number(walletProvider.networkVersion)
+        }
       );
       setProvider(web3Provider)
     } else {
       setProvider(defaultProvider);
     }
-  }, [modalProvider]);
+  }, [walletProvider]);
 
   const disconnect = useCallback(async function () {
     await disconnectWallet();
