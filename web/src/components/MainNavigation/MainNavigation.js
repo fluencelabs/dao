@@ -78,6 +78,7 @@ const MainNavigation = ({ width }) => {
                     <a
                       href={link}
                       target="_blank"
+                      rel="noreferrer"
                       className={styles.burger__link}
                     >
                       {content}
@@ -85,7 +86,7 @@ const MainNavigation = ({ width }) => {
                   </li>
                 ))}
               </ul>
-              <a href="https://fluence.dev/docs" target="_blank">
+              <a href="https://fluence.dev/docs" target="_blank" rel="noreferrer">
                 <Button text="Start Building" />
               </a>
               <ul className={styles["burger__socials"]}>
@@ -95,6 +96,7 @@ const MainNavigation = ({ width }) => {
                       <a
                         href={link}
                         target="_blank"
+                        rel="noreferrer"
                         className={styles.footer__link}
                       >
                         {content}
@@ -114,6 +116,7 @@ const MainNavigation = ({ width }) => {
                 <a
                   href={link}
                   target="_blank"
+                  rel="noreferrer"
                   className={styles.nav__link}
                 >
                   {content}

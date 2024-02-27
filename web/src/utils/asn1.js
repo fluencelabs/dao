@@ -40,7 +40,7 @@ export function validateSignature(
     let bufferSig = Buffer.from(asn1Signature);
 
     let { r, s } = findEthereumSig(bufferSig);
-    let { pubkey, v } = findRightKey(bufferHash, r, s, expectedEthAddr);
+    let { v } = findRightKey(bufferHash, r, s, expectedEthAddr);
     let raw_signature = {
       r: "0x" + r.toString(16, 32),
       s: "0x" + s.toString(16, 32),

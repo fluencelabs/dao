@@ -6,7 +6,7 @@ import {
   SET_CLAIM_STATUS,
   SET_DELEGATEE,
   STORE_KEY,
-  STORE_PROOF,
+  STORE_PROOF
 } from "../actions/types";
 
 const initialState = {

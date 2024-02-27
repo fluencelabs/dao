@@ -5,7 +5,6 @@ import Header from "../../components/Header/Header";
 import Title from "../../components/Title/Title";
 import Button from "../../components/Button/Button";
 import Footer from "../../components/Footer/Footer";
-import Url from "../../components/Url/Url";
 import TwitterShare from "../../hoc/TwitterShare";
 import { addTokenToMetamask } from "../../utils/metamask";
 import { governanceContracts } from "../../constants";
