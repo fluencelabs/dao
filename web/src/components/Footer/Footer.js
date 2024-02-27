@@ -41,7 +41,7 @@ const Footer = () => {
               <li className={styles.footer__item}>
                 <Link
                   className={styles.footer__link}
-                  to="https://fluence.dev/docs/build/introduction"
+                  to="https://fluence.dev/docs/build-mvm/introducing_fluence"
                   target="_blank"
                 >
                   Docs
@@ -50,7 +50,7 @@ const Footer = () => {
               <li className={styles.footer__item}>
                 <Link
                   className={styles.footer__link}
-                  to="https://fluence.dev/docs/build/get-started"
+                  to="https://fluence.dev/docs/build-mvm/overview/getting_started"
                   target="_blank"
                 >
                   Get Started
