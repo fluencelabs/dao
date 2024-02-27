@@ -95,7 +95,7 @@ export const Web3ContextProvider = ({ children }) => {
       };
 
       const handleChainChanged = (_hexChainId) => {
-        console.log("chainChanged", accounts);
+        console.log("chainChanged", _hexChainId);
         let chainSupported = false;
 
         supportedChains.forEach((chain) => {
