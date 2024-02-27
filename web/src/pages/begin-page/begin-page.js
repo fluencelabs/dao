@@ -14,7 +14,7 @@ import TimeUntilReduce from "../../components/TimeUntilReduce/TimeUntilReduce";
 
 import styles from "./begin-page.module.css";
 import { checkEligibility } from "../../utils/metadata";
-import { ROUTE_WALLET } from "../../constants/routes";
+import { ROUTE_NOT_FOUND, ROUTE_WALLET } from "../../constants/routes";
 
 const PageBegin = memo(() => {
   const navigate = useNavigate();
@@ -28,23 +28,20 @@ const PageBegin = memo(() => {
 
   const [inputValid, setInputValid] = useState(true);
   const [inputPressed, setInputPressed] = useState(false);
-  const [isEligible, setIsEligible] = useState(true);
 
   const onEligibilityCheckButtonClick = () => {
     if (checkEligibility(username)) {
       navigate(ROUTE_WALLET);
     } else {
-      setIsEligible(false);
+      navigate(ROUTE_NOT_FOUND);
     }
   };
 
   const handleChangeUsername = (e) => {
-    e.target.value !== "" ? setInputPressed(true) : setInputPressed(false);
-    setInputValid(githubUsernameRegex.test(e.target.value));
-    setUsername(e.target.value);
-    if (!isEligible) {
-      setIsEligible(true);
-    }
+    const value = e.target.value.toLowerCase();
+    value !== "" ? setInputPressed(true) : setInputPressed(false);
+    setInputValid(githubUsernameRegex.test(value));
+    setUsername(value);
   };
 
   const getInputClassName = () => {
@@ -105,7 +102,6 @@ const PageBegin = memo(() => {
                         text="Check if I’m eligible"
                         callback={onEligibilityCheckButtonClick}
                       />
-                      <p className={styles.incorrect}>{isEligible ? <>&nbsp;</> : "This github username not eligible for reward"}</p>
                     </li>
                   </ul>
                 </div>

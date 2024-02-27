@@ -66,6 +66,7 @@ const AccountNotFound = () => {
                   <LinkWithIcon
                     text="Join the Discord server"
                     icon={discordBlack}
+                    url="https://fluence.chat"
                   />
                 </li>
                 <li className={styles.dashboard__item}>
@@ -73,10 +74,11 @@ const AccountNotFound = () => {
                     text="Connect on Telegram"
                     style={{ backgroundSize: "14px" }}
                     icon={telegramBlack}
+                    url="https://t.me/fluence_project"
                   />
                 </li>
                 <li className={styles.dashboard__item}>
-                  <LinkWithIcon text="Governance forum" icon={dialogBlack} />
+                  <LinkWithIcon text="Governance forum" icon={dialogBlack} url="https://gov.fluence.network/" />
                 </li>
               </ul>
             </Dashboard>
