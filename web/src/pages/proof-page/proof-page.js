@@ -261,11 +261,6 @@ const ProofPage = () => {
                     </div>
                     For bash script:
                     <div className={styles.dashboard__textarea}>
-                      <p className={styles.paragraph}>
-                        {" "}
-                        Instal cargo
-                        (https://doc.rust-lang.org/cargo/getting-started/installation.html)
-                      </p>
                       <p className={styles.paragraph}>./install.sh</p>
                       <p className={styles.paragraph}>./proof-sh/proof.sh</p>
                     </div>
