@@ -20,6 +20,7 @@ const Footer = () => {
                 <Link
                   className={styles.footer__link}
                   to="https://fluence.dev/docs/learn/overview"
+                  target="_blank"
                 >
                   Overview
                 </Link>
@@ -30,6 +31,7 @@ const Footer = () => {
                 <Link
                   className={styles.footer__link}
                   to="https://www.youtube.com/@fluencelabs/videos"
+                  target="_blank"
                 >
                   Videos
                 </Link>
@@ -40,6 +42,7 @@ const Footer = () => {
                 <Link
                   className={styles.footer__link}
                   to="https://fluence.dev/docs/build/introduction"
+                  target="_blank"
                 >
                   Docs
                 </Link>
@@ -48,6 +51,7 @@ const Footer = () => {
                 <Link
                   className={styles.footer__link}
                   to="https://fluence.dev/docs/build/get-started"
+                  target="_blank"
                 >
                   Get Started
                 </Link>
@@ -55,7 +59,8 @@ const Footer = () => {
               <li className={`${styles.footer__item}`}>
                 <Link
                   className={styles.footer__link}
-                  to="https://fluence.dev/docs/build/introduction"
+                  to="https://github.com/fluencelabs"
+                  target="_blank"
                 >
                   Github
                 </Link>
@@ -69,6 +74,7 @@ const Footer = () => {
                   <Link
                     className={styles.footer__link}
                     to="https://fluence.network/governance"
+                    target="_blank"
                   >
                     DAO{" "}
                   </Link>
@@ -82,6 +88,7 @@ const Footer = () => {
                     <Link
                       className={styles.footer__link}
                       to="https://t.me/fluence_project"
+                      target="_blank"
                     >
                       Telegram
                     </Link>
@@ -92,6 +99,7 @@ const Footer = () => {
                     <Link
                       className={styles.footer__link}
                       to="https://fluence.chat"
+                      target="_blank"
                     >
                       Discord
                     </Link>
@@ -102,6 +110,7 @@ const Footer = () => {
                     <Link
                       className={styles.footer__link}
                       to="https://gov.fluence.network/"
+                      target="_blank"
                     >
                       Forum
                     </Link>
@@ -117,6 +126,7 @@ const Footer = () => {
                   <Link
                     className={styles.footer__link}
                     to="https://fluence.chat/"
+                    target="_blank"
                   >
                     <img
                       src={discord}
@@ -131,6 +141,7 @@ const Footer = () => {
                   <Link
                     className={styles.footer__link}
                     to="https://twitter.com/fluence_project"
+                    target="_blank"
                   >
                     <img
                       src={twitter}
@@ -145,6 +156,7 @@ const Footer = () => {
                   <Link
                     className={styles.footer__link}
                     to="https://t.me/fluence_project"
+                    target="_blank"
                   >
                     <img
                       src={telegram}
@@ -159,6 +171,7 @@ const Footer = () => {
                   <Link
                     className={styles.footer__link}
                     to="https://www.youtube.com/@fluencelabs/videos"
+                    target="_blank"
                   >
                     <img
                       src={youtube}
@@ -172,7 +185,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className={styles.footer__corner} />
     </footer>
   );
 };
