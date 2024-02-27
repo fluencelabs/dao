@@ -22,6 +22,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       ethers.utils.parseEther("1000"),
       20 * HOURS,
       deployer,
+      ethers.utils.parseEther("1000000000"),
     ],
     waitConfirmations: 1,
   });
