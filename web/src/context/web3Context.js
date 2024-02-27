@@ -64,7 +64,8 @@ export const Web3ContextProvider = ({ children }) => {
   useEffect(() => {
     console.log("wallet provider", walletProvider, walletProvider?.networkVersion);
     if (walletProvider) {
-      const network = supportedChains.find(chain => chain.chain_id === Number(walletProvider.networkVersion));
+      const chainId = Number(walletProvider.chainId ?? walletProvider.networkVersion);
+      const network = supportedChains.find(chain => chain.chain_id === chainId);
       if (network === undefined) {
         toast(`The supported networks are: ${supportedChains.map(chain => chain.network).join(',')}. Falling back to default provider.`);
         setProvider(defaultProvider);
