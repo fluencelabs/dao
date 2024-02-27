@@ -239,7 +239,7 @@ const ProofPage = () => {
                     </div>
                     For python:
                     <div className={styles.dashboard__textarea}>
-                      <p className={styles.paragraph}>./install.sh</p>
+                      <p className={styles.paragraph}>./install_for_py.sh</p>
                       <p className={styles.paragraph}>
                         pip3 install -r python/requirements.txt
                       </p>
@@ -248,7 +248,11 @@ const ProofPage = () => {
                       </p>
                     </div>
                     For bash script:
-                    <p className={styles.paragraph}>./install.sh</p>
+                    <p className={styles.paragraph}>
+                      Instal cargo
+                      (https://doc.rust-lang.org/cargo/getting-started/installation.html)
+                    </p>
+                    <p className={styles.paragraph}>./install_for_sh.sh</p>
                     <div className={styles.dashboard__textarea}>
                       <p className={styles.paragraph}>./proof-sh/proof.sh</p>
                     </div>
