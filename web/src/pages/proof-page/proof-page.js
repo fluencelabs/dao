@@ -102,7 +102,6 @@ const ProofPage = () => {
             v,
           };
           signature = ethers.utils.splitSignature(raw_signature);
-
           signature = ethers.utils.joinSignature(signature);
           try {
             await signed.estimateGas.claimTokens(
@@ -114,6 +113,7 @@ const ProofPage = () => {
           } catch (error) {
             console.log("invalid v", error);
             raw_signature.v = 28;
+            signature = ethers.utils.splitSignature(raw_signature);
             signature = ethers.utils.joinSignature(signature);
           }
         }
@@ -133,9 +133,7 @@ const ProofPage = () => {
         verified = true;
 
         if (verified) {
-          dispatch(
-            storeProof({ userId, tmpEthAddr, signature, merkleProof }),
-          );
+          dispatch(storeProof({ userId, tmpEthAddr, signature, merkleProof }));
           navigate(ROUTE_DONE);
         } else {
           toast("Invalid merkle proof. Please check the data.");
@@ -182,19 +180,19 @@ const ProofPage = () => {
                       className={`${styles.dashboard__text} ${styles.dashboard__text_size_large}`}
                     >
                       <span className={styles.dashboard__span}>Step 1: </span>
-                      Get the bash or python script
+                      Get proof generator
                     </p>
                     <p
                       className={`${styles.dashboard__text} ${styles.dashboard__text_size_mid}`}
                     >
                       <Link
-                        to="https://github.com/fluencelabs/dao"
+                        to="https://github.com/fluencelabs/dev-rewards"
                         className={styles.dashboard__link}
                       >
                         Clone this repo
                       </Link>{" "}
-                      the proof generation bash script to your local machine
-                      from Github and run it with the following command.
+                      the proof generation script to your local machine from
+                      Github and run it with the following command.
                     </p>
                     <p
                       className={`${styles.dashboard__paragraph} ${styles.dashboard__paragraph_pl_27}`}
@@ -230,23 +228,29 @@ const ProofPage = () => {
                       If everything went well, you should see a base64-encoded
                       string in your terminal — that’s your proof.
                     </p>
+                    For docker:
                     <div className={styles.dashboard__textarea}>
-                      <p className={styles.paragraph}>cd reward</p>
+                      <p className={styles.paragraph}>
+                        docker build -t dev-reward-script .
+                      </p>
+                      <p className={styles.paragraph}>
+                        docker run -it -v ~/.ssh:/root/.ssh dev-reward-script
+                      </p>
                     </div>
                     For python:
                     <div className={styles.dashboard__textarea}>
+                      <p className={styles.paragraph}>./install.sh</p>
                       <p className={styles.paragraph}>
-                        pip install -r requirements.txt
+                        pip3 install -r python/requirements.txt
                       </p>
                       <p className={styles.paragraph}>
-                        python3 proof.py metadata.json
+                        python3 python/proof.py
                       </p>
                     </div>
                     For bash script:
+                    <p className={styles.paragraph}>./install.sh</p>
                     <div className={styles.dashboard__textarea}>
-                      <p className={styles.paragraph}>
-                        ./proof-sh/proof.sh metadata.json
-                      </p>
+                      <p className={styles.paragraph}>./proof-sh/proof.sh</p>
                     </div>
                   </li>
 
