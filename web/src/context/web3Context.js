@@ -9,6 +9,7 @@ import {
   useWeb3ModalAccount,
   useWeb3ModalProvider
 } from "@web3modal/ethers5/react";
+import { toast } from "react-toastify";
 
 const metadata = {
   name: 'Fluence reward',
@@ -64,6 +65,7 @@ export const Web3ContextProvider = ({ children }) => {
     if (walletProvider) {
       const network = supportedChains.find(chain => chain.chain_id === Number(walletProvider.networkVersion));
       if (network === undefined) {
+        toast(`The supported networks are: ${supportedChains.map(chain => chain.network).join(',')}. Falling back to default provider.`);
         setProvider(defaultProvider);
         return;
       }
