@@ -74,7 +74,7 @@ const ProofPage = () => {
         console.log("isASN1", isASN1);
 
         let merkleProof = JSON.parse(
-          Buffer.from(merkleProofHex, "base64").toString()
+          Buffer.from(merkleProofHex, "base64").toString(),
         );
         try {
           console.log("address is", address);
@@ -85,7 +85,7 @@ const ProofPage = () => {
             signedHash,
             signatureHex,
             tmpEthAddr,
-            isASN1
+            isASN1,
           );
           console.log("Signature is correct.", signature);
 
@@ -95,14 +95,14 @@ const ProofPage = () => {
             leaf,
             merkleRoot,
             keccak256,
-            { hashLeaves: false, sortPairs: true }
+            { hashLeaves: false, sortPairs: true },
           );
 
           console.log("MerkleTree verified", verified);
           if (verified) {
             setHaveProof(true);
             dispatch(
-              storeProof({ userId, tmpEthAddr, signature, merkleProof })
+              storeProof({ userId, tmpEthAddr, signature, merkleProof }),
             );
           } else {
             toast("Invalid merkle proof. Please check the data.");
@@ -114,7 +114,7 @@ const ProofPage = () => {
       } catch (error) {
         console.log(error);
         toast(
-          "Invalid proof format. Please check the data. It should be [userId,tmpEthAddr,signatureHex,merkleProofHex]."
+          "Invalid proof format. Please check the data. It should be [userId,tmpEthAddr,signatureHex,merkleProofHex].",
         );
       }
     } catch (error) {
@@ -162,14 +162,17 @@ const ProofPage = () => {
                       className={`${styles.dashboard__text} ${styles.dashboard__text_size_large}`}
                     >
                       <span className={styles.dashboard__span}>Step 1: </span>
-                      Get the bash script
+                      Get the bash or python script
                     </p>
                     <p
                       className={`${styles.dashboard__text} ${styles.dashboard__text_size_mid}`}
                     >
-                      <Link to="/" className={styles.dashboard__link}>
-                        Download{" "}
-                      </Link>
+                      <Link
+                        to="https://github.com/fluencelabs/deal"
+                        className={styles.dashboard__link}
+                      >
+                        Clone this repo
+                      </Link>{" "}
                       the proof generation bash script to your local machine
                       from Github and run it with the following command.
                     </p>
@@ -198,7 +201,8 @@ const ProofPage = () => {
                     >
                       Run the script in your machine terminal. Make sure keys
                       that are uploaded to Github are also stored on this
-                      machine. You can sign with any of those keys (only RSA and Ed25519 are supported).
+                      machine. You can sign with any of those keys (only RSA and
+                      Ed25519 are supported).
                     </p>
                     <p
                       className={`${styles.dashboard__text} ${styles.dashboard__text_size_mid}`}
@@ -207,7 +211,23 @@ const ProofPage = () => {
                       string in your terminal — that’s your proof.
                     </p>
                     <div className={styles.dashboard__textarea}>
-                      <p className={styles.paragraph}>./flt-proof.sh</p>
+                      <p className={styles.paragraph}>cd reward</p>
+                    </div>
+                    For python:
+                    <div className={styles.dashboard__textarea}>
+                      <p className={styles.paragraph}>
+                        pip install -r requirements.txt
+                      </p>
+                      <p className={styles.paragraph}>
+                        python3 proof.py metadata.json
+                      </p>
+                    </div>
+                    For bash script:
+                    <div className={styles.dashboard__textarea}>
+                      <p className={styles.paragraph}>proof.sh</p>
+                      <p className={styles.paragraph}>
+                        ./proof-sh/proof.sh metadata.json
+                      </p>
                     </div>
                   </li>
 
@@ -240,8 +260,8 @@ const ProofPage = () => {
                   <Button type="large" text="Submit proof" />
                 </div>
                 <p className={styles.dashboard__paragraph}>
-                  If you are not comfortable submiting the proof via web UI, you can claim directly
-                  from the smart contract {" "}
+                  If you are not comfortable submiting the proof via web UI, you
+                  can claim directly from the smart contract{" "}
                   <Link to="/" className={styles.dashboard__link}>
                     on Etherescan
                   </Link>

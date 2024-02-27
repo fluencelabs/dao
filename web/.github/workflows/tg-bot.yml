@@ -1,7 +1,6 @@
 name: telegram message
 on: [push]
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -14,7 +13,7 @@ jobs:
           message: |
             ${{ github.actor }} created commit:
             Commit message: ${{ github.event.commits[0].message }}
-            
+
             Repository: ${{ github.repository }}
-            
+
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}

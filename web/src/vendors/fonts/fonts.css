@@ -1,44 +1,49 @@
 @font-face {
-    font-family: "Hauora_Bold";
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url("./Hauora-Bold.woff2") format("woff2"), 
+  font-family: "Hauora_Bold";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    url("./Hauora-Bold.woff2") format("woff2"),
     url("./Hauora-Bold.woff") format("woff");
 }
 
 @font-face {
-    font-family: "Hauora_Light";
-    font-style: normal;
-    font-weight: 300;
-    font-display: swap;
-    src: url("./Hauora-Light.woff2") format("woff2"), 
+  font-family: "Hauora_Light";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src:
+    url("./Hauora-Light.woff2") format("woff2"),
     url("./Hauora-Light.woff") format("woff");
 }
 
 @font-face {
-    font-family: "Hauora_Regular";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("./Hauora-Regular.woff2") format("woff2"), 
+  font-family: "Hauora_Regular";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url("./Hauora-Regular.woff2") format("woff2"),
     url("./Hauora-Regular.woff") format("woff");
 }
 
 @font-face {
-    font-family: "Hauora_Medium";
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-    src: url("./Hauora-Medium.woff2") format("woff2"), 
+  font-family: "Hauora_Medium";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    url("./Hauora-Medium.woff2") format("woff2"),
     url("./Hauora-Medium.woff") format("woff");
 }
 
 @font-face {
-    font-family: "Roboto_Regular";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("./RobotoMono-Regular.woff2") format("woff2"), 
+  font-family: "Roboto_Regular";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url("./RobotoMono-Regular.woff2") format("woff2"),
     url("./RobotoMono-Regular.woff") format("woff");
 }

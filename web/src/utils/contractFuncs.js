@@ -9,7 +9,7 @@ export async function delegates(w3provider, address, network) {
   let contract = new Contract(
     governanceContracts[network].token,
     abis.Comp.abi,
-    w3provider
+    w3provider,
   );
   let delegates;
   try {
@@ -33,13 +33,13 @@ export async function propose(
   signatures,
   calldatas,
   description,
-  network
+  network,
 ) {
   let signer = w3provider.getSigner();
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let signed = await contract.connect(signer);
   let proposal;
@@ -57,7 +57,7 @@ export async function propose(
         values,
         signatures,
         calldatas,
-        description
+        description,
       );
     } else {
       console.log("propose calling propose with", {
@@ -73,7 +73,7 @@ export async function propose(
         signatures,
         calldatas,
         description,
-        network
+        network,
       );
     }
     proposal = SUCCESS_MSG;
@@ -89,7 +89,7 @@ export async function getReceipt(w3provider, proposalId, voter, network) {
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let receipt;
   try {
@@ -104,7 +104,7 @@ export async function getActions(w3provider, proposalId, network) {
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let actions;
   try {
@@ -120,13 +120,13 @@ export async function castVote(
   proposalId,
   support,
   votes,
-  network
+  network,
 ) {
   let signer = w3provider.getSigner();
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let signed = await contract.connect(signer);
   let castVote;
@@ -144,7 +144,7 @@ export async function queue(w3provider, proposalId, network) {
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let signed = await contract.connect(signer);
   let queue;
@@ -162,7 +162,7 @@ export async function execute(w3provider, proposalId, network) {
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let signed = await contract.connect(signer);
   let execute;
@@ -180,7 +180,7 @@ export async function cancel(w3provider, proposalId, network) {
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let signed = await contract.connect(signer);
   let cancel;
@@ -198,7 +198,7 @@ export async function refund(w3provider, proposalId, network) {
   let contract = new Contract(
     governanceContracts[network].alpha,
     abis.GovernorAlpha.abi,
-    w3provider
+    w3provider,
   );
   let signed = await contract.connect(signer);
   let refund;

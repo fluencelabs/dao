@@ -1,155 +1,147 @@
 .card {
-    padding: 21px 42px 26px 30px;
+  padding: 21px 42px 26px 30px;
 
-    background-color: rgb(37, 39, 43);
+  background-color: rgb(37, 39, 43);
 
-    border-radius: 20px;
+  border-radius: 20px;
 }
 
 .card_status_failed {
-    background-color: rgba(37, 39, 43, 0.5);
+  background-color: rgba(37, 39, 43, 0.5);
 }
 
 .flex-container {
-    margin-bottom: 15px;
-    display: flex;
+  margin-bottom: 15px;
+  display: flex;
 
-    justify-content: space-between;
+  justify-content: space-between;
 }
 
 .card__rating {
-    align-self: center;
+  align-self: center;
 }
 
 .card__text {
+  width: 63.13%;
 
-    width: 63.13%;
+  font-family: "Hauora_Bold", sans-serif;
+  font-size: 19px;
+  line-height: 24px;
+  color: rgb(204, 204, 204);
+}
+
+.card__text_status_failed {
+  color: rgba(196, 196, 196, 0.5);
+}
+
+.card__status {
+  padding: 2px 7px;
+
+  font-family: "Hauora_Bold", sans-serif;
+  font-size: 10px;
+  line-height: 16px;
+  color: rgb(255, 255, 255);
+
+  border: 1px solid rgb(255, 255, 255);
+  border-radius: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card__status_failed {
+  color: rgba(196, 196, 196, 0.5);
+
+  border-color: rgba(196, 196, 196, 0.5);
+}
+
+.card__status_executed {
+  position: relative;
+
+  padding-left: 24px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+
+  color: rgba(207, 255, 196, 1);
+
+  border-color: rgba(207, 255, 196, 1);
+}
+
+.card__status_executed::before {
+  content: "";
+
+  position: absolute;
+  top: 5px;
+  left: 4px;
+
+  width: 13px;
+  height: 13px;
+
+  background-color: rgba(207, 255, 196, 1);
+  background-image: url("../../images/check.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border-radius: 50%;
+}
+
+.card__number {
+  padding: 0 11px;
+
+  font-family: "Hauora_Bold", sans-serif;
+  font-size: 10px;
+  line-height: 16px;
+  color: rgb(255, 255, 255);
+
+  text-transform: uppercase;
+  border-right: 1px solid rgb(255, 255, 255);
+  letter-spacing: 1px;
+}
+
+.card__date {
+  padding-left: 11px;
+  font-family: "Hauora_Bold", sans-serif;
+  font-size: 10px;
+  line-height: 16px;
+  color: rgb(255, 255, 255);
+
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@media screen and (max-width: 1060px) {
+  .card {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+@media screen and (max-width: 1005px) {
+  .card__text {
+    width: 60%;
 
     font-family: "Hauora_Bold", sans-serif;
     font-size: 19px;
     line-height: 24px;
-    color: rgb(204, 204, 204);
-}
-
-.card__text_status_failed {
-    color: rgba(196, 196, 196, 0.5);
-}
-
-.card__status {
-    padding: 2px 7px;
-
-    font-family: "Hauora_Bold", sans-serif;
-    font-size: 10px;
-    line-height: 16px;
-    color: rgb(255, 255, 255);
-
-    border: 1px solid rgb(255, 255, 255);
-    border-radius: 7px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.card__status_failed {
-    color: rgba(196, 196, 196, 0.5);
-
-    border-color: rgba(196, 196, 196, 0.5);
-}
-
-.card__status_executed {
-    position: relative;
-
-    padding-left: 24px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-
-    color: rgba(207, 255, 196, 1);
-
-    border-color: rgba(207, 255, 196, 1);
-}
-
-.card__status_executed::before {
-    content: '';
-
-    position: absolute;
-    top: 5px;
-    left: 4px;
-
-    width: 13px;
-    height: 13px;
-
-    background-color: rgba(207, 255, 196, 1);
-    background-image: url("../../images/check.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-
-    border-radius: 50%;
-}
-
-.card__number {
-    padding: 0 11px;
-
-    font-family: "Hauora_Bold", sans-serif;
-    font-size: 10px;
-    line-height: 16px;
-    color: rgb(255, 255, 255);
-
-    text-transform: uppercase;
-    border-right: 1px solid rgb(255, 255, 255);
-    letter-spacing: 1px;
-}
-
-.card__date {
-    padding-left: 11px;
-    font-family: "Hauora_Bold", sans-serif;
-    font-size: 10px;
-    line-height: 16px;
-    color: rgb(255, 255, 255);
-
-    
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-@media screen and (max-width: 1060px) {
-    .card {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-}
-
-@media screen and (max-width: 1005px) {
-    .card__text {
- 
-        width: 60%;
-    
-        font-family: "Hauora_Bold", sans-serif;
-        font-size: 19px;
-        line-height: 24px;
-    }
-
+  }
 }
 
 @media screen and (max-width: 750px) {
+  .card {
+    padding-left: 40px;
+    padding-right: 30px;
+  }
+  .flex-container {
+    display: block;
+  }
 
-    .card {
-        padding-left: 40px;
-        padding-right: 30px;
-    }
-    .flex-container {
-        display: block;
-    }
-
-    .card__text {
-        width: 100%;
-    }
+  .card__text {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 750px) {
-
-    .card {
-        padding-left: 5%;
-        padding-right: 5%;
-
-    }
+  .card {
+    padding-left: 5%;
+    padding-right: 5%;
+  }
 }

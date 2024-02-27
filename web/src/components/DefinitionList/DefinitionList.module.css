@@ -1,45 +1,45 @@
 .definition-list {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .definition-list__definition {
-    display: block;
-    margin: 0 0 17px;
+  display: block;
+  margin: 0 0 17px;
 
-    font-family: "Hauora_Regular";
-    font-size: 30px;
-    line-height: 36px;
-    color: rgb(255, 255, 255);
+  font-family: "Hauora_Regular";
+  font-size: 30px;
+  line-height: 36px;
+  color: rgb(255, 255, 255);
 }
 
 .definition-list__line {
-    margin-bottom: 6px;
+  margin-bottom: 6px;
 
-    border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .definition-list__term {
-    display: block;
+  display: block;
 
-    font-family: "Hauora_Bold";
-    font-size: 10px;
-    line-height: 16px;
-    color: rgba(255, 255, 255, 0.6);
+  font-family: "Hauora_Bold";
+  font-size: 10px;
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.6);
 
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .definition-list__definition_color_orange {
-    color: rgb(239, 127, 36);
+  color: rgb(239, 127, 36);
 }
 
 .definition-list__definition_color_black {
-    color: rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
 }
 
 .color_black {
-    color: rgba(0,0,0,0.5);
-    border-color: rgba(0,0,0,0.5);
+  color: rgba(0, 0, 0, 0.5);
+  border-color: rgba(0, 0, 0, 0.5);
 }

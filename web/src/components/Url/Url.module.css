@@ -1,26 +1,26 @@
 .url {
-    font-family: "Hauora_Bold";
-    font-size: 15px;
-    line-height: 21px;
-    color: rgba(255, 255, 255, 1);
+  font-family: "Hauora_Bold";
+  font-size: 15px;
+  line-height: 21px;
+  color: rgba(255, 255, 255, 1);
 
-    text-decoration: none;
-    letter-spacing: 0.2px;
-    border-bottom: 2px solid rgba(207, 255, 196, 1);
+  text-decoration: none;
+  letter-spacing: 0.2px;
+  border-bottom: 2px solid rgba(207, 255, 196, 1);
 }
 
 .url_color_black {
-    color: rgb(0, 0, 0);
-    border-bottom: 2px solid rgba(0, 0, 0, 1);
+  color: rgb(0, 0, 0);
+  border-bottom: 2px solid rgba(0, 0, 0, 1);
 }
 
 .url:hover {
-    color: rgb(255, 255, 255, 0.6);
-    cursor: pointer;
-    border-bottom: 2px solid rgba(207, 255, 196, 0.6);
+  color: rgb(255, 255, 255, 0.6);
+  cursor: pointer;
+  border-bottom: 2px solid rgba(207, 255, 196, 0.6);
 }
 
 .url_color_black:hover {
-    border-bottom: 2px solid rgba(0, 0, 0, 0.6);
-    color: rgb(0, 0, 0, 0.6);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.6);
+  color: rgb(0, 0, 0, 0.6);
 }
