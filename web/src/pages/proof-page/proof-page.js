@@ -302,8 +302,11 @@ const ProofPage = () => {
                 <p className={styles.dashboard__paragraph}>
                   If you are not comfortable submiting the proof via web UI, you
                   can claim directly from the smart contract{" "}
-                  <Link to="/" className={styles.dashboard__link}>
-                    on Etherescan
+                  <Link
+                    to="https://etherscan.io/address/0x6081d7F04a8c31e929f25152d4ad37c83638C62b#code"
+                    className={styles.dashboard__link}
+                  >
+                    on Etherscan
                   </Link>
                 </p>
               </form>
