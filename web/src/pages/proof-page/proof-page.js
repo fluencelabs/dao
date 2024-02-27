@@ -137,11 +137,19 @@ const ProofPage = () => {
           toast("Invalid merkle proof. Please check the data.");
         }
       } catch (error) {
-        toast(error.error.message);
+        const message = error.error.message;
+        console.log(message);
+        if (message === "execution reverted: Invalid signature") {
+          toast(
+            "Invalid signature. Are you using the same wallet you specified in proof generation?",
+          );
+        } else {
+          toast(error.error.message);
+        }
       }
     } catch (error) {
       console.log(error);
-      toast("The proof should be a valid hex string");
+      toast("Proof has invalid format");
     }
   };
 
