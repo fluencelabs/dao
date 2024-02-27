@@ -23,7 +23,7 @@ const FirstStepPage = memo(() => {
   const { currentAward } = useSelector((state) => state.distributor);
 
   const submitProofCallback = useCallback(() => {
-    navigate(ROUTE_PROOF)
+    navigate(ROUTE_PROOF);
   }, [navigate]);
 
   return (
@@ -69,14 +69,14 @@ const FirstStepPage = memo(() => {
               <div className={styles.dashboard__caption}>
                 <Text color="grey" type="small"></Text>
               </div>
-              <div className={styles.dashboard__button}>
-                <ConnectWallet />
-              </div>
-              { address && (
+              {address && (
                 <div className={styles.dashboard__button}>
                   <Button callback={submitProofCallback} text="Submit proofs" />
                 </div>
               )}
+              <div className={styles.dashboard__button}>
+                <ConnectWallet />
+              </div>
               <p className={styles.dashboard__paragraph}>
                 If you are not comfortable connecting your wallet and submiting
                 the proof via web UI, you can claim directly from the smart
