@@ -42,6 +42,7 @@ const LinkWithIcon = ({
   return (
     <Link
       to={url}
+      target="_blank"
       className={`${styles["link-with-icon"]} ${color === "white" && styles["link-with-icon_color_white"]}`}
     >
       <div style={color === "white" ? styleWhite : style} />
