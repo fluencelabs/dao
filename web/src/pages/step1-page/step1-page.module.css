@@ -1,167 +1,169 @@
 .background {
-    padding-top: 54px;
+  padding-top: 54px;
 
-    background: radial-gradient(50% 45.85% at 50% 54.15%, #C51103 0%, #DC9E61 100%), #C4C4C4;
-    background-image: url('../../images/Rectangle 76.21553159.webp');
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
+  background: radial-gradient(
+      50% 45.85% at 50% 54.15%,
+      #c51103 0%,
+      #dc9e61 100%
+    ),
+    #c4c4c4;
+  background-image: url("../../images/Rectangle 76.21553159.webp");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 .progress {
-    margin-bottom: 30px;
+  margin-bottom: 30px;
 }
 
 .title {
-    align-items: flex-end;
-    display: flex;
-    margin-bottom: 82px;
+  align-items: flex-end;
+  display: flex;
+  margin-bottom: 82px;
 }
 
 .icon {
-    width: 60px;
-    height: 80px;
+  width: 60px;
+  height: 80px;
 
-    background-image: url('https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/285/fire_1f525.png');
-    background-position: center;
-    background-repeat: no-repeat;
+  background-image: url("https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/apple/285/fire_1f525.png");
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .definition {
-    width: 234px;
+  width: 234px;
 }
 
 .dashboard {
-    margin-bottom: 161px;
+  margin-bottom: 161px;
 }
 
 .dashboard__flex-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 53px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 53px;
 }
 
 .dashboard__logo {
-    width: 80px;
-    height: 80px;
-    margin-right: 19px;
+  width: 80px;
+  height: 80px;
+  margin-right: 19px;
 
-    background-color: rgb(239, 127, 36);
-    background-image: url("../../images/Ф.svg");
-    background-repeat: no-repeat;
-    background-position: center;
+  background-color: rgb(239, 127, 36);
+  background-image: url("../../images/Ф.svg");
+  background-repeat: no-repeat;
+  background-position: center;
 
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .dashboard__text {
-    margin-bottom: 10px;
-    max-width: 785px;
+  margin-bottom: 10px;
+  max-width: 785px;
 }
 
 .icon-fire {
-    font-size: 80px; 
-    line-height: 88px;
-    margin-left: 10px;
+  font-size: 80px;
+  line-height: 88px;
+  margin-left: 10px;
 }
 
 .dashboard__list {
-    margin: 0 0 30px;
+  margin: 0 0 30px;
 }
 
 .dashboard__item {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 
-    font-family: "Hauora_Regular", sans-serif;
-    font-size: 18px;
-    line-height: 32px;
-    color: rgb(0, 0, 0);
+  font-family: "Hauora_Regular", sans-serif;
+  font-size: 18px;
+  line-height: 32px;
+  color: rgb(0, 0, 0);
 }
 
 .dashboard__caption {
-    margin-bottom: 50px;
+  margin-bottom: 50px;
 }
 
 .dashboard__button {
-    margin-bottom: 32px;
+  margin-bottom: 32px;
 }
 
 .dashboard__paragraph {
+  margin: 0;
 
-    margin: 0;
+  font-family: "Hauora_Bold", sans-serif;
+  font-size: 10px;
+  line-height: 16px;
+  color: rgba(0, 0, 0, 0.5);
 
-    font-family: "Hauora_Bold", sans-serif;
-    font-size: 10px;
-    line-height: 16px;
-    color: rgba(0, 0, 0, 0.5);
-
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .dashboard__link {
-    color: rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
 }
 
 .dashboard__link:hover {
-    color: rgba(0, 0, 0, 0.5);
-    cursor: pointer;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
 }
 
 @media screen and (max-width: 1366px) {
-    .icon-fire {
-        font-size: 60px;
-        line-height: 70px;
-    }
+  .icon-fire {
+    font-size: 60px;
+    line-height: 70px;
+  }
 }
 
 @media screen and (max-width: 600px) {
-    .icon-fire {
-        font-size: 42px;
-        line-height: 50px;
-    }
+  .icon-fire {
+    font-size: 42px;
+    line-height: 50px;
+  }
 }
 
 @media screen and (max-width: 1275px) {
-    .main {
-        width: 100%;
-        
-    }
+  .main {
+    width: 100%;
+  }
 
-    .dashboard {
-        max-width: 100%;
-    }
+  .dashboard {
+    max-width: 100%;
+  }
 }
 
 @media screen and (max-width: 951px) {
-    .dashboard__item {
-        width:100%;
-    }
+  .dashboard__item {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 900px) {
-    .main {
-        padding-right: 15px;
-        padding-left: 15px;
-    }
+  .main {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
 }
 
 @media screen and (max-width: 500px) {
+  .dashboard__text {
+    margin-bottom: 30px;
+  }
+  .main {
+    padding-right: 0;
+    padding-left: 0;
+  }
 
-    .dashboard__text {
-        margin-bottom: 30px;
-    }
-    .main {
-        padding-right: 0;
-        padding-left: 0;
-    }
+  .wallet,
+  .title,
+  .progress {
+    margin-left: 15px;
+  }
 
-    .wallet,
-    .title,
-    .progress {
-        margin-left: 15px;
-    }
-
-    .dashboard__button {
-        margin-bottom: 56px;
-    }
+  .dashboard__button {
+    margin-bottom: 56px;
+  }
 }

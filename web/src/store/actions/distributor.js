@@ -1,6 +1,10 @@
 import { governanceContracts } from "../../constants";
 import { infuraUrlFactory } from "../../utils";
-import { FETCH_CURRENT_AWARD, FETCH_MERKLE_ROOT, FETCH_NEXT_HALVE_PERIOD, } from "./types";
+import {
+  FETCH_CURRENT_AWARD,
+  FETCH_MERKLE_ROOT,
+  FETCH_NEXT_HALVE_PERIOD,
+} from "./types";
 import Web3 from "web3";
 import abis from "../../contracts";
 
@@ -17,7 +21,7 @@ export const fetchMerkleRoot = (network) => {
   console.log(governanceContracts[network].devRewardDistributor);
   const contract = new web3.eth.Contract(
     abis.DevRewardDistributor.abi,
-    governanceContracts[network].devRewardDistributor
+    governanceContracts[network].devRewardDistributor,
   );
 
   return async (dispatch) => {
@@ -40,14 +44,14 @@ export const fetchCurrentAward = (network) => {
   const web3 = new Web3(infuraUrlFactory(network));
   const contract = new web3.eth.Contract(
     abis.DevRewardDistributor.abi,
-    governanceContracts[network].devRewardDistributor
+    governanceContracts[network].devRewardDistributor,
   );
 
   return async (dispatch) => {
     try {
       const award = await contract.methods.currentReward().call();
-      const formattedAward = web3.utils.fromWei(award, 'ether');
-      dispatch(setCurrentAward(formattedAward));
+      const formattedAward = web3.utils.fromWei(award, "ether");
+      dispatch(setCurrentAward(award === 0n ? "0" : formattedAward));
     } catch (error) {
       console.log(error);
     }
@@ -63,7 +67,7 @@ export const fetchNextHalvePeriod = (network) => {
   const web3 = new Web3(infuraUrlFactory(network));
   const contract = new web3.eth.Contract(
     abis.DevRewardDistributor.abi,
-    governanceContracts[network].devRewardDistributor
+    governanceContracts[network].devRewardDistributor,
   );
 
   return async (dispatch) => {

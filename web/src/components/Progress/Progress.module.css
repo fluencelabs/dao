@@ -1,103 +1,95 @@
 .progress-list {
-    display: flex;
-    margin: 0;
-    padding: 0;
+  display: flex;
+  margin: 0;
+  padding: 0;
 
-    list-style: none;
+  list-style: none;
 
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .progress-list__item {
-    position: relative;
+  position: relative;
 
-    margin-right: 10px;
-    padding-left: 33px;
-    display: flex;
-    align-items: center;
+  margin-right: 10px;
+  padding-left: 33px;
+  display: flex;
+  align-items: center;
 
-    opacity: 0.4;
+  opacity: 0.4;
 }
 
 .progress-item_current {
-    opacity: 1;
+  opacity: 1;
 }
 
 .progress-list__item:first-child {
-    padding-left: 0;
+  padding-left: 0;
 }
 
 .progress-list__item:last-child {
-    margin-right: 0;
+  margin-right: 0;
 }
 
 .progress-list__caption {
-    position: relative;
+  position: relative;
 
-    padding-left: 21px;
+  padding-left: 21px;
 
-    font-family: "Hauora_Bold";
-    font-size: 10px;
-    line-height: 16px;
-    color: rgb(255,255,255);
+  font-family: "Hauora_Bold";
+  font-size: 10px;
+  line-height: 16px;
+  color: rgb(255, 255, 255);
 
-    letter-spacing: 1px;
-    text-transform: uppercase;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .progress-list__caption_done {
-    color: rgb(207, 255, 196);
+  color: rgb(207, 255, 196);
 }
 
-
 .progress-list__item::before {
-    content: '';
-    position: absolute;
+  content: "";
+  position: absolute;
 
-    left: 0;
+  left: 0;
 
-    width: 21px;
-    height: 2px;
+  width: 21px;
+  height: 2px;
 
-    background-color: rgb(255,255,255);
-    border-radius: 43px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 43px;
 }
 
 .progress-list__item:first-child::before {
-    opacity: 0;
+  opacity: 0;
 }
 
-.progress-list__item_done::before {  
-    background-color: rgb(207, 255, 196);
+.progress-list__item_done::before {
+  background-color: rgb(207, 255, 196);
 }
 
 .progress-list__caption::before {
-    content: '';
-    position: absolute;
+  content: "";
+  position: absolute;
 
-    top: 1px;
-    left: 0;
+  top: 1px;
+  left: 0;
 
-    width: 12px;
-    height: 12px;
+  width: 12px;
+  height: 12px;
 
-    border: 2px solid rgb(255,255,255);
-    border-radius: 50%;
-    box-sizing: border-box;
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 50%;
+  box-sizing: border-box;
 }
 
 .progress-list__caption_done::before {
-    
+  background-color: rgb(207, 255, 196);
+  background-image: url("../../images/check.svg");
+  background-repeat: no-repeat;
+  background-position: center;
 
-    background-color:rgb(207, 255, 196);
-    background-image: url("../../images/check.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-
-    border: none;
+  border: none;
 }
-
-
-
-
-

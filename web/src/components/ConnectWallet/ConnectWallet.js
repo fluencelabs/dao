@@ -1,20 +1,19 @@
-import Button from '../Button/Button'
-import { useWeb3Connection } from '../../hooks/useWeb3Connection'
+import Button from "../Button/Button";
+import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 //import { getChainData } from '../../utils'
 
 const ConnectWallet = () => {
+  const { connect, disconnect, address } = useWeb3Connection();
 
-    const { connect, disconnect, address } = useWeb3Connection()
+  return (
+    <>
+      {address ? (
+        <Button callback={disconnect} text="Disconnect" />
+      ) : (
+        <Button callback={connect} text="Connect a wallet" />
+      )}
+    </>
+  );
+};
 
-    return (
-        <>
-            {address ? (
-                <Button callback={disconnect} text='Disconnect'/>
-            ) : (
-                <Button callback={connect} text='Connect a wallet'/>
-            )}
-        </>
-  )
-}
-
-export default ConnectWallet
+export default ConnectWallet;
