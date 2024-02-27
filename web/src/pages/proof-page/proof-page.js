@@ -224,7 +224,6 @@ const ProofPage = () => {
                     </div>
                     For bash script:
                     <div className={styles.dashboard__textarea}>
-                      <p className={styles.paragraph}>proof.sh</p>
                       <p className={styles.paragraph}>
                         ./proof-sh/proof.sh metadata.json
                       </p>
