@@ -7,7 +7,7 @@ import {
 } from "react";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
-import { providers } from "ethers";
+import { ethers, providers } from "ethers";
 import supportedChains from "../constants/chains";
 import Web3 from "web3";
 import { toast } from "react-toastify";
@@ -59,10 +59,6 @@ export const Web3ContextProvider = ({ children }) => {
         return;
       }
 
-      modal.on("chainChanged", () => {
-        console.log('modal.on("chainChanged", handleChainChanged);');
-      });
-
       const web3Provider = new providers.Web3Provider(
         modal,
         {
@@ -70,18 +66,6 @@ export const Web3ContextProvider = ({ children }) => {
           chainId: networkData.chain_id,
         },
       );
-
-      provider.on("network", () => {
-        console.log('provider.on("network", handleChainChanged); ');
-      });
-
-      provider.provider.on("chainChanged", () => {
-        console.log('provider.on("chainChanged", handleChainChanged); ');
-      });
-
-      web3Provider.on('network', () => {
-        console.log('adas');
-      });
 
       const signer = web3Provider.getSigner();
       const address = await signer.getAddress();
@@ -105,12 +89,13 @@ export const Web3ContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (provider?.on) {
+    if (provider instanceof providers.Web3Provider) {
       const handleAccountsChanged = (accounts) => {
         console.log("accountsChanged", accounts);
       };
 
       const handleChainChanged = (_hexChainId) => {
+        console.log("chainChanged", accounts);
         let chainSupported = false;
 
         supportedChains.forEach((chain) => {
@@ -131,16 +116,16 @@ export const Web3ContextProvider = ({ children }) => {
         disconnect();
       };
 
-      provider.on("accountsChanged", handleAccountsChanged);
-      provider.on("chainChanged", handleChainChanged);
-      provider.on("disconnect", handleDisconnect);
+      provider.provider.on("accountsChanged", handleAccountsChanged);
+      provider.provider.on("chainChanged", handleChainChanged);
+      provider.provider.on("disconnect", handleDisconnect);
 
       // Subscription Cleanup
       return () => {
-        if (provider.removeListener) {
-          provider.removeListener("accountsChanged", handleAccountsChanged);
-          provider.removeListener("network", handleChainChanged);
-          provider.removeListener("disconnect", handleDisconnect);
+        if (provider instanceof providers.Web3Provider) {
+          provider.provider.off("accountsChanged", handleAccountsChanged);
+          provider.provider.off("network", handleChainChanged);
+          provider.provider.off("disconnect", handleDisconnect);
         }
       };
     }
