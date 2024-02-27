@@ -6,8 +6,8 @@ export const hideString = (str) => {
 
 export const infuraUrlFactory = (network) => {
   switch (network) {
-    case "sepolia":
-      return `https://rpc.sepolia.org`;
+    case "mainnet":
+      return `https://mainnet.infura.io/v3/${REACT_APP_INFURA_KEY}`;
 
     default:
       return `https://mainnet.infura.io/v3/${REACT_APP_INFURA_KEY}`;

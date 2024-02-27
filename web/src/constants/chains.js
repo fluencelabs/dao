@@ -1,13 +1,13 @@
 const supportedChains = [
   {
-    name: "Ethereum Sepolia",
-    short_name: "sepolia",
+    name: "Ethereum Mainnet",
+    short_name: "mainnet",
     chain: "ETH",
-    network: "sepolia",
-    chain_id: 11155111,
-    network_id: 11155111,
-    explorer_url: 'https://sepolia.etherscan.io/',
-    rpc_url: `https://rpc.sepolia.org`,
+    network: "mainnet",
+    chain_id: 1,
+    network_id: 1,
+    explorer_url: "https://etherscan.io",
+    rpc_url: `https://mainnet.gateway.tenderly.co`,
     native_currency: {
       symbol: "ETH",
       name: "Ethereum",

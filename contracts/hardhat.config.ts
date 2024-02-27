@@ -52,7 +52,7 @@ const hardhatConfig: HardhatUserConfig = {
     },
     sepolia: {
       url: "https://sepolia.infura.io/v3/0f778ddd63a942a6bfdb713f85482055",
-      accounts: [process.env.PRIVATE_KEY as string],
+      // accounts: [process.env.PRIVATE_KEY as string],
     },
   },
   namedAccounts: {
