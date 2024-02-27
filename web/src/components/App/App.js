@@ -64,10 +64,10 @@ function App() {
 
   useEffect(() => {
     console.log("nerwork: " + network.name);
+    dispatch(fetchNextHalvePeriod(network.name));
     if (!merkleRootFetched && network?.name && network.name !== "unknown") {
       dispatch(fetchMerkleRoot(network.name));
       dispatch(fetchCurrentAward(network.name));
-      dispatch(fetchNextHalvePeriod(network.name));
       setMerkleRootFetched(true);
     }
   }, [network]);

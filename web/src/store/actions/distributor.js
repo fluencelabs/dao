@@ -72,8 +72,18 @@ export const fetchNextHalvePeriod = (network) => {
 
   return async (dispatch) => {
     try {
-      const period = await contract.methods.halvePeriod().call();
-      dispatch(setNextHalvePeriod(Number(period * 1000n)));
+      const halvePeriod =
+        Number(await contract.methods.halvePeriod().call()) * 1000;
+      const deployTime =
+        Number(await contract.methods.deployTime().call()) * 1000;
+
+      console.log("halvePeriod: " + halvePeriod);
+      console.log("deployTime: " + deployTime);
+      const n = Math.floor((Date.now() - deployTime) / halvePeriod);
+      console.log("n: " + n);
+      const nextHalvePeriod = deployTime + (n + 1) * halvePeriod;
+      console.log("nextHalvePeriod: " + nextHalvePeriod);
+      dispatch(setNextHalvePeriod(nextHalvePeriod));
     } catch (error) {
       console.log(error);
     }
