@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Header from "../../components/Header/Header";

@@ -6,6 +6,7 @@ const supportedChains = [
     network: "sepolia",
     chain_id: 11155111,
     network_id: 11155111,
+    explorer_url: 'https://sepolia.etherscan.io/',
     rpc_url: `https://rpc.sepolia.org`,
     native_currency: {
       symbol: "ETH",

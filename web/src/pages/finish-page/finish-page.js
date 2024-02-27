@@ -7,7 +7,6 @@ import Title from "../../components/Title/Title";
 import WalletInfo from "../../components/WalletInfo/WalletInfo";
 import Button from "../../components/Button/Button";
 import Footer from "../../components/Footer/Footer";
-import Url from "../../components/Url/Url";
 import styles from "./finish-page.module.css";
 import { hideString } from "../../utils";
 import { addTokenToMetamask } from "../../utils/metamask";

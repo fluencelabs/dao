@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import githubUsernameRegex from "github-username-regex";
 
 import Header from "../../components/Header/Header";
@@ -23,10 +23,12 @@ const PageBegin = memo(() => {
   const [username, setUsername] = useState("");
   const [githubAccounts, setGithubAccounts] = useState(new Set());
 
-  useEffect(async () => {
-    const { default: url } = await import('../../assets/github-accounts.txt');
-    const accounts = await fetch(url).then(res => res.text());
-    setGithubAccounts(new Set(accounts.split(',').map(account => account.toLowerCase())));
+  useEffect(() => {
+    (async function() {
+      const { default: url } = await import('../../assets/github-accounts.txt');
+      const accounts = await fetch(url).then(res => res.text());
+      setGithubAccounts(new Set(accounts.split(',').map(account => account.toLowerCase())));
+    })();
   }, []);
 
   const [inputValid, setInputValid] = useState(true);

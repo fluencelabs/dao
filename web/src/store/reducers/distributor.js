@@ -1,8 +1,4 @@
-import {
-  FETCH_CURRENT_AWARD,
-  FETCH_MERKLE_ROOT,
-  FETCH_NEXT_HALVE_PERIOD,
-} from "../actions/types";
+import { FETCH_CURRENT_AWARD, FETCH_MERKLE_ROOT, FETCH_NEXT_HALVE_PERIOD } from "../actions/types";
 
 const initialState = {
   merkleRoot: null,

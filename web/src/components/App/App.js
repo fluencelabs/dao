@@ -1,8 +1,4 @@
-import {
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { memo, useEffect, useState } from "react";
 
@@ -28,14 +24,10 @@ import {
   ROUTE_INDEX,
   ROUTE_NOT_FOUND,
   ROUTE_PROOF,
-  ROUTE_WALLET,
+  ROUTE_WALLET
 } from "../../constants/routes";
 import { catchError } from "../../utils";
-import {
-  fetchCurrentAward,
-  fetchMerkleRoot,
-  fetchNextHalvePeriod,
-} from "../../store/actions/distributor";
+import { fetchCurrentAward, fetchMerkleRoot, fetchNextHalvePeriod } from "../../store/actions/distributor";
 import { useVh } from "../../hooks/useVh";
 
 function App() {
