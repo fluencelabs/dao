@@ -62,6 +62,7 @@ export const Web3ContextProvider = ({ children }) => {
   }, [open]);
 
   useEffect(() => {
+    console.log("wallet provider", walletProvider, walletProvider?.networkVersion);
     if (walletProvider) {
       const network = supportedChains.find(chain => chain.chain_id === Number(walletProvider.networkVersion));
       if (network === undefined) {
