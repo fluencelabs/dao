@@ -40,7 +40,7 @@ const AccountNotFound = () => {
                 Also, there could be a case that you haven’t uploaded public
                 keys to your Github account, so we couldn’t add you to the
                 reward.{" "}
-                <Link className={styles.dashboard__link} to="/">
+                <Link className={styles.dashboard__link} to="https://blog.fluence.network/the-future-is-cloudless-fluences-depin-computing-platform-and-flt-token-are-now-live/">
                   Learn more
                 </Link>{" "}
                 about how this reward is designed.
