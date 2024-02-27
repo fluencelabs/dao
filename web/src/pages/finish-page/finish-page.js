@@ -41,9 +41,6 @@ const FinishPage = () => {
             <li className={styles.wallet}>
               <WalletInfo wallet="wallet" account={hideString(address)} />
             </li>
-            <li className={styles.wallet}>
-              <WalletInfo wallet="delegate" account={hideString(delegatee)} />
-            </li>
           </ul>
 
           <div className={styles.title}>
