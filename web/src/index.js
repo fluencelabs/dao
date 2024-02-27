@@ -1,7 +1,7 @@
 import "./globals";
 import React from "react";
 import ReactDOM from "react-dom";
-import { HashRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import "./index.css";
 import App from "./components/App/App";
@@ -39,9 +39,9 @@ ReactDOM.render(
     <Provider store={store}>
       <Web3ContextProvider>
         <PersistGate loading={null} persistor={persistor}>
-          <Router>
+          <BrowserRouter>
             <App />
-          </Router>
+          </BrowserRouter>
         </PersistGate>
       </Web3ContextProvider>
     </Provider>

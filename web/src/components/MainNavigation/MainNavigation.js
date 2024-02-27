@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
 
 import Button from "../Button/Button";
 
@@ -9,9 +8,41 @@ import telegram from "../../images/telegram-black.svg";
 import twitter from "../../images/twitter-black.svg";
 import youtube from "../../images/youtube-black.svg";
 
-const MainNavigation = ({ width }) => {
-  const [active, setActive] = useState("dao");
+const navLinks = [
+  {
+    content: 'Developers',
+    link: 'https://fluence.network/build'
+  },
+  {
+    content: 'Network',
+    link: 'https://fluencenetwork.notion.site/Employ-your-CPUs-with-Fluence-9e721f2c99c944e68e1fc8aaf5a7d96f'
+  },
+  {
+    content: 'Community',
+    link: 'https://fluence.network/governance'
+  },
+];
 
+const socialLinks = [
+  {
+    content: <img src={discord} style={{ width: "26px" }} alt="icon" />,
+    link: 'https://fluence.chat/'
+  },
+  {
+    content: <img src={twitter} alt="icon" />,
+    link: 'https://twitter.com/fluence_project'
+  },
+  {
+    content: <img src={telegram} style={{ width: "19px" }} alt="icon" />,
+    link: 'https://t.me/fluence_project'
+  },
+  {
+    content: <img src={youtube} alt="icon" />,
+    link: 'https://www.youtube.com/@fluencelabs/videos'
+  },
+];
+
+const MainNavigation = ({ width }) => {
   const [IsOpenMenu, setIsOpenMenu] = useState(false);
 
   const handleOpenMenu = () => {
@@ -42,68 +73,35 @@ const MainNavigation = ({ width }) => {
             />
             <div className={styles.body}>
               <ul className={styles.burger__list}>
-                <li className={styles.burger__item}>
-                  <NavLink
-                    to="https://fluence.network/build"
-                    className={`${styles.burger__link} ${active === "tech" && styles.burger__link_active}`}
-                    onClick={() => setActive("tech")}
-                  >
-                    Developers
-                  </NavLink>
-                </li>
-                <li className={styles.burger__item}>
-                  <NavLink
-                    to="https://fluencenetwork.notion.site/Employ-your-CPUs-with-Fluence-9e721f2c99c944e68e1fc8aaf5a7d96f"
-                    className={`${styles.burger__link} ${active === "dao" && styles.burger__link_active}`}
-                    onClick={() => setActive("dao")}
-                  >
-                    Network
-                  </NavLink>
-                </li>
-                <li className={styles.burger__item}>
-                  <NavLink
-                    to="https://fluence.network/governance"
-                    className={`${styles.burger__link} ${active === "faq" && styles.burger__link_active}`}
-                    onClick={() => setActive("faq")}
-                  >
-                    Community
-                  </NavLink>
-                </li>
+                {navLinks.map(({content, link}, i) => (
+                  <li className={styles.burger__item} key={i}>
+                    <a
+                      href={link}
+                      target="_blank"
+                      className={styles.burger__link}
+                    >
+                      {content}
+                    </a>
+                  </li>
+                ))}
               </ul>
-              <Button text="Start Building" />
+              <a href="https://fluence.dev/docs" target="_blank">
+                <Button text="Start Building" />
+              </a>
               <ul className={styles["burger__socials"]}>
-                <li className={styles["burger__social"]}>
-                  <Link
-                    className={styles.footer__link}
-                    to="https://fluence.chat/"
-                  >
-                    <img src={discord} style={{ width: "26px" }} alt="icon" />
-                  </Link>
-                </li>
-                <li className={styles["burger__social"]}>
-                  <Link
-                    className={styles.footer__link}
-                    to="https://twitter.com/fluence_project"
-                  >
-                    <img src={twitter} alt="icon" />
-                  </Link>
-                </li>
-                <li className={styles["burger__social"]}>
-                  <Link
-                    className={styles.footer__link}
-                    to="https://t.me/fluence_project"
-                  >
-                    <img src={telegram} style={{ width: "19px" }} alt="icon" />
-                  </Link>
-                </li>
-                <li className={styles["burger__social"]}>
-                  <Link
-                    className={styles.footer__link}
-                    to="https://www.youtube.com/@fluencelabs/videos"
-                  >
-                    <img src={youtube} alt="icon" />
-                  </Link>
-                </li>
+                {
+                  socialLinks.map(({content, link}, i) => (
+                    <li className={styles["burger__social"]} key={i}>
+                      <a
+                        href={link}
+                        target="_blank"
+                        className={styles.footer__link}
+                      >
+                        {content}
+                      </a>
+                    </li>
+                  ))
+                }
               </ul>
             </div>
           </div>
@@ -111,33 +109,17 @@ const MainNavigation = ({ width }) => {
       ) : (
         <nav className={styles.nav}>
           <ul className={styles.nav__list}>
-            <li className={styles.nav__item}>
-              <NavLink
-                to="https://fluence.network/build"
-                className={`${styles.nav__link} ${active === "tech" && styles.nav__link_active}`}
-                onClick={() => setActive("tech")}
-              >
-                Developers
-              </NavLink>
-            </li>
-            <li className={styles.nav__item}>
-              <NavLink
-                to="https://fluencenetwork.notion.site/Employ-your-CPUs-with-Fluence-9e721f2c99c944e68e1fc8aaf5a7d96f"
-                className={`${styles.nav__link} ${active === "dao" && styles.nav__link_active}`}
-                onClick={() => setActive("dao")}
-              >
-                Network
-              </NavLink>
-            </li>
-            <li className={styles.nav__item}>
-              <NavLink
-                to="https://fluence.network/governance"
-                className={`${styles.nav__link} ${active === "faq" && styles.nav__link_active}`}
-                onClick={() => setActive("faq")}
-              >
-                Community
-              </NavLink>
-            </li>
+            {navLinks.map(({content, link}, i) => (
+              <li className={styles.nav__item} key={i}>
+                <a
+                  href={link}
+                  target="_blank"
+                  className={styles.nav__link}
+                >
+                  {content}
+                </a>
+              </li>
+            ))}
           </ul>
         </nav>
       )}

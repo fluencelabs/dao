@@ -81,8 +81,6 @@ const DonePage = () => {
             />
           </div>
 
-          <p className={styles.caption}></p>
-
           <div className={styles.button}>
             <Button callback={handleClaim} text={`Claim ${currentAward} FLT`} />
           </div>

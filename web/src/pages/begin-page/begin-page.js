@@ -19,12 +19,11 @@ import { ROUTE_WALLET } from "../../constants/routes";
 import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const PageBegin = memo(() => {
-  const navigate = useNavigate();
   const { provider } = useWeb3Connection();
   const { currentAward, nextHalvePeriod } = useSelector(
     (state) => state.distributor,
   );
-  const { username, key } = useSelector((state) => state.user);
+  const { key } = useSelector((state) => state.user);
   const [name, setName] = useState("");
   const dispatch = useDispatch();
 
@@ -34,12 +33,6 @@ const PageBegin = memo(() => {
   useEffect(() => {
     key && dispatch(storeKey(key));
   }, [provider, key]);
-
-  useEffect(() => {
-    if (username) {
-      navigate(ROUTE_WALLET);
-    }
-  }, [username]);
 
   const [inputValid, setInputValid] = useState(true);
   const [inputPressed, setInputPressed] = useState(false);
@@ -97,6 +90,7 @@ const PageBegin = memo(() => {
                     placeholder="Github username"
                     onChange={handleChangeUsername}
                   />
+                  <p className={styles.incorrect}>{inputValid ? <>&nbsp;</> : "Incorrect username"}</p>
 
                   <ul className={styles.buttons}>
                     <li className={styles.button}>
@@ -108,10 +102,6 @@ const PageBegin = memo(() => {
                           callback={() => dispatch(setUsername(name))}
                         />
                       }
-                    </li>
-                    <li className={styles.button}>
-                      <span className={styles.span}>or</span>
-                      <Url text="Get FLT on Uniswap" color="black" />
                     </li>
                   </ul>
                 </div>

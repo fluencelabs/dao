@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Header from "../../components/Header/Header";
@@ -13,19 +13,18 @@ import ConnectWallet from "../../components/ConnectWallet/ConnectWallet";
 
 import styles from "./step1-page.module.css";
 import { useSelector } from "react-redux";
-import { ROUTE_PROOF } from "../../constants/routes";
 import { useWeb3Connection } from "../../hooks/useWeb3Connection";
+import Button from "../../components/Button/Button";
+import { ROUTE_PROOF } from "../../constants/routes";
 
 const FirstStepPage = memo(() => {
   const navigate = useNavigate();
   const { address } = useWeb3Connection();
   const { currentAward } = useSelector((state) => state.distributor);
 
-  useEffect(() => {
-    if (address) {
-      navigate(ROUTE_PROOF);
-    }
-  }, [address]);
+  const submitProofCallback = useCallback(() => {
+    navigate(ROUTE_PROOF)
+  }, [navigate]);
 
   return (
     <div className={styles.background}>
@@ -73,6 +72,11 @@ const FirstStepPage = memo(() => {
               <div className={styles.dashboard__button}>
                 <ConnectWallet />
               </div>
+              { address && (
+                <div className={styles.dashboard__button}>
+                  <Button callback={submitProofCallback} text="Submit proofs" />
+                </div>
+              )}
               <p className={styles.dashboard__paragraph}>
                 If you are not comfortable connecting your wallet and submiting
                 the proof via web UI, you can claim directly from the smart

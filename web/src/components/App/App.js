@@ -2,8 +2,6 @@ import {
   Navigate,
   Route,
   Routes,
-  useLocation,
-  useNavigate,
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { memo, useEffect, useState } from "react";
@@ -33,7 +31,6 @@ import {
   ROUTE_WALLET,
 } from "../../constants/routes";
 import { catchError } from "../../utils";
-import { setCurrentRoute } from "../../store/actions/routes";
 import {
   fetchCurrentAward,
   fetchMerkleRoot,
@@ -45,22 +42,10 @@ function App() {
   const { network, address } = useWeb3Connection();
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { error } = useSelector((state) => state.error);
-  const [prevAddress, setPrevAddress] = useState(null);
-  const { username } = useSelector((state) => state.user);
-  const { currentRoute } = useSelector((state) => state.routes);
-  const location = useLocation();
-  const [locationPut, setLocationPut] = useState(false);
   const [merkleRootFetched, setMerkleRootFetched] = useState(false);
 
   useVh();
-  useEffect(() => {
-    if (currentRoute && !locationPut && currentRoute !== location.pathname) {
-      navigate(currentRoute);
-      setLocationPut(true);
-    }
-  }, [currentRoute]);
 
   useEffect(() => {
     console.log("nerwork: " + network.name);
@@ -73,23 +58,8 @@ function App() {
   }, [network]);
 
   useEffect(() => {
-    if (address) {
-      if (prevAddress && address !== prevAddress) {
-        dispatch(reduxCleanup());
-        navigate(ROUTE_INDEX);
-        dispatch(setCurrentRoute(ROUTE_INDEX));
-      } else if (!address && username) {
-        navigate(ROUTE_WALLET);
-      } else {
-        setPrevAddress(address);
-      }
-    }
-  }, [address, prevAddress]);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    dispatch(setCurrentRoute(location.pathname));
-  }, [location]);
+    dispatch(reduxCleanup());
+  }, [address]);
 
   useEffect(() => {
     if (error) {
