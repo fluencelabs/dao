@@ -40,8 +40,6 @@ const ProofPage = () => {
 
   console.log("merkleRoot is", merkleRoot);
 
-  window.Buffer = Buffer;
-
   useEffect(() => {
     if (hasClaimed?.claimed) {
       navigate(ROUTE_CLAIMED);
@@ -168,7 +166,7 @@ const ProofPage = () => {
                       className={`${styles.dashboard__text} ${styles.dashboard__text_size_mid}`}
                     >
                       <Link
-                        to="https://github.com/fluencelabs/deal"
+                        to="https://github.com/fluencelabs/dao"
                         className={styles.dashboard__link}
                       >
                         Clone this repo

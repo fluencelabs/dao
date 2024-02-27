@@ -6,21 +6,9 @@ const TimeUntilReduce = () => {
   const { nextHalvePeriod } = useSelector((state) => state.distributor);
   const [timer] = useCountdown(nextHalvePeriod || 0);
 
-  // loading
-  if (!nextHalvePeriod) {
-    return (
-      <DefinitionList
-        dd={"..."}
-        dt="Time until reducing amount"
-        colorT="black"
-        colorD="black"
-      />
-    );
-  }
-
   return (
     <DefinitionList
-      dd={timer}
+      dd={nextHalvePeriod ? timer : "..."}
       dt="Time until reducing amount"
       colorT="black"
       colorD="black"

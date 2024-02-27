@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import githubUsernameRegex from "github-username-regex";
@@ -7,40 +7,44 @@ import Header from "../../components/Header/Header";
 import Title from "../../components/Title/Title";
 import Text from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
-import Url from "../../components/Url/Url";
 import Dashboard from "../../components/Dashboard/Dashboard";
 import DefinitionList from "../../components/DefinitionList/DefinitionList";
 import Footer from "../../components/Footer/Footer";
 import TimeUntilReduce from "../../components/TimeUntilReduce/TimeUntilReduce";
 
 import styles from "./begin-page.module.css";
-import { setUsername, storeKey } from "../../store/actions/user";
+import { checkEligibility } from "../../utils/metadata";
 import { ROUTE_WALLET } from "../../constants/routes";
-import { useWeb3Connection } from "../../hooks/useWeb3Connection";
 
 const PageBegin = memo(() => {
-  const { provider } = useWeb3Connection();
+  const navigate = useNavigate();
   const { currentAward, nextHalvePeriod } = useSelector(
     (state) => state.distributor,
   );
-  const { key } = useSelector((state) => state.user);
-  const [name, setName] = useState("");
-  const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
 
   const time = new Date(nextHalvePeriod * 1000);
   console.log(time);
 
-  useEffect(() => {
-    key && dispatch(storeKey(key));
-  }, [provider, key]);
-
   const [inputValid, setInputValid] = useState(true);
   const [inputPressed, setInputPressed] = useState(false);
+  const [isEligible, setIsEligible] = useState(true);
+
+  const onEligibilityCheckButtonClick = () => {
+    if (checkEligibility(username)) {
+      navigate(ROUTE_WALLET);
+    } else {
+      setIsEligible(false);
+    }
+  };
 
   const handleChangeUsername = (e) => {
     e.target.value !== "" ? setInputPressed(true) : setInputPressed(false);
     setInputValid(githubUsernameRegex.test(e.target.value));
-    setName(e.target.value);
+    setUsername(e.target.value);
+    if (!isEligible) {
+      setIsEligible(true);
+    }
   };
 
   const getInputClassName = () => {
@@ -85,6 +89,7 @@ const PageBegin = memo(() => {
                     </li>
                   </ul>
                   <input
+                    value={username}
                     type="text"
                     className={getInputClassName()}
                     placeholder="Github username"
@@ -94,14 +99,13 @@ const PageBegin = memo(() => {
 
                   <ul className={styles.buttons}>
                     <li className={styles.button}>
-                      {
-                        <Button
-                          type="large"
-                          icon="git"
-                          text="Check if I’m eligible"
-                          callback={() => dispatch(setUsername(name))}
-                        />
-                      }
+                      <Button
+                        type="large"
+                        icon="git"
+                        text="Check if I’m eligible"
+                        callback={onEligibilityCheckButtonClick}
+                      />
+                      <p className={styles.incorrect}>{isEligible ? <>&nbsp;</> : "This github username not eligible for reward"}</p>
                     </li>
                   </ul>
                 </div>

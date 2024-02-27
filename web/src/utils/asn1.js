@@ -51,6 +51,7 @@ export function validateSignature(
 
   console.log("signature", signature);
   let recoveredAddress = ethers.utils.recoverAddress(hashHex, signature);
+  console.log("recoveredAddress", recoveredAddress);
 
   console.log("signature", ethers.utils.joinSignature(signature));
 
