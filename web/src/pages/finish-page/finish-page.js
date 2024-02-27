@@ -54,6 +54,7 @@ const FinishPage = () => {
 
           <p className={styles.caption}>
             You have successfully claimed the FLT reward!
+            After 2 months lockup you’ll be able to unlock it and start using FLT.
           </p>
           <ul className={styles.buttons}>
             <li className={styles.button}>
