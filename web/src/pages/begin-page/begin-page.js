@@ -125,7 +125,7 @@ const PageBegin = memo(() => {
                     </li>
                   </ul>
                   <div className={styles.url}>
-                    <Link to="/" className={styles.dashboard__link}>
+                    <Link to="https://blog.fluence.network/the-future-is-cloudless-fluences-depin-computing-platform-and-flt-token-are-now-live/" className={styles.dashboard__link}>
                       Read the announcement
                     </Link>
                   </div>
