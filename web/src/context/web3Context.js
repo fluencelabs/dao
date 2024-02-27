@@ -13,7 +13,7 @@ import {
 const metadata = {
   name: 'Fluence reward',
   description: 'Fluence dao reward for participating in web3 development',
-  url: 'https://claim.fluence.network/',
+  url: 'https://claim.fluence.network',
   icons: ['https://claim.fluence.network/favicon.ico']
 }
 
@@ -25,12 +25,12 @@ const chains = supportedChains.map(({chain_id, network, native_currency, explore
   rpcUrl: rpc_url
 }));
 
-const DEFAULT_NETWORK_NAME = 'sepolia';
+const DEFAULT_NETWORK = supportedChains[0];
 
 createWeb3Modal({
   ethersConfig: defaultConfig({ metadata }),
   chains,
-  defaultChain: chains.find(chain => chain.name === DEFAULT_NETWORK_NAME),
+  defaultChain: DEFAULT_NETWORK.network,
   projectId: 'c7ce6e969f0b45089bfe1aed1187d348',
   enableAnalytics: false // Optional - defaults to your Cloud configuration
 });
@@ -63,6 +63,10 @@ export const Web3ContextProvider = ({ children }) => {
   useEffect(() => {
     if (walletProvider) {
       const network = supportedChains.find(chain => chain.chain_id === Number(walletProvider.networkVersion));
+      if (network === undefined) {
+        setProvider(defaultProvider);
+        return;
+      }
       const web3Provider = new providers.Web3Provider(
         walletProvider,
         {
