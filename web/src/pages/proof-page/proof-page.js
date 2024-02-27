@@ -30,7 +30,7 @@ const ProofPage = () => {
   const { proof } = useSelector((state) => state.governance.values);
   const [haveProof, setHaveProof] = useState(!!proof);
   const { hasClaimed } = useSelector((state) => state.governance);
-  console.log('address', address);
+  console.log("address", address);
 
   const { merkleRoot } = useSelector((state) => state.distributor);
 
@@ -237,7 +237,13 @@ const ProofPage = () => {
                     </div>
                     For python:
                     <div className={styles.dashboard__textarea}>
-                      <p className={styles.paragraph}>./install_for_py.sh</p>
+                      <p className={styles.paragraph}>./install_for_py.sh</p>>
+                      <p className={styles.paragraph}>
+                        python3 -m venv claim-venv
+                      </p>
+                      <p className={styles.paragraph}>
+                        source claim-venv/bin/activate
+                      </p>
                       <p className={styles.paragraph}>
                         pip3 install -r python/requirements.txt
                       </p>
