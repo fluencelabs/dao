@@ -1,6 +1,10 @@
 import { governanceContracts } from "../../constants";
 import { infuraUrlFactory } from "../../utils";
-import { FETCH_CURRENT_AWARD, FETCH_MERKLE_ROOT, FETCH_NEXT_HALVE_PERIOD } from "./types";
+import {
+  FETCH_CURRENT_AWARD,
+  FETCH_MERKLE_ROOT,
+  FETCH_NEXT_HALVE_PERIOD,
+} from "./types";
 import Web3 from "web3";
 import abis from "../../contracts";
 

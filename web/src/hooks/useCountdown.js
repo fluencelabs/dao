@@ -2,14 +2,14 @@ import { intervalToDuration, isPast } from "date-fns";
 import { useEffect, useState } from "react";
 
 export const useCountdown = (date) => {
-  const format = ({ days, hours, minutes, seconds }) =>
-    `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  const format = ({ months, days, hours, minutes, seconds }) =>
+    `${months}M ${days}d ${hours}h ${minutes}m ${seconds}s`;
 
   const [ended, setEnded] = useState(isPast(date));
   const [duration, setDuration] = useState(
     intervalToDuration({
       start: date,
-      end: new Date(),
+      end: Date.now(),
     }),
   );
   const [formatted, setFormatted] = useState(format(duration));
@@ -18,7 +18,7 @@ export const useCountdown = (date) => {
     const timer = setInterval(() => {
       const intToDur = intervalToDuration({
         start: date,
-        end: new Date(),
+        end: Date.now(),
       });
       setDuration(intToDur);
       setFormatted(format(intToDur));
