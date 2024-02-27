@@ -198,7 +198,7 @@ const ProofPage = () => {
                     >
                       Run the script in your machine terminal. Make sure keys
                       that are uploaded to Github are also stored on this
-                      machine.
+                      machine. You can sign with any of those keys (only RSA and Ed25519 are supported).
                     </p>
                     <p
                       className={`${styles.dashboard__text} ${styles.dashboard__text_size_mid}`}
@@ -240,7 +240,7 @@ const ProofPage = () => {
                   <Button type="large" text="Submit proof" />
                 </div>
                 <p className={styles.dashboard__paragraph}>
-                  If you are an advanced Ethereum user, you can claim directly
+                  If you are not comfortable submiting the proof via web UI, you can claim directly
                   from the smart contract {" "}
                   <Link to="/" className={styles.dashboard__link}>
                     on Etherescan

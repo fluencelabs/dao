@@ -121,7 +121,7 @@ const PageBegin = memo(() => {
                                         </li>
                                     </ul>
                                     <div className={styles.url}>
-                                        <Url text="Details about the reward" color="black" />
+                                        <Link to="/" className={styles.dashboard__link}>Read the announcement</Link>
                                     </div>
 
                                 </div>

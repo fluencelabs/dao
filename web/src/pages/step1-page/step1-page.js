@@ -72,7 +72,7 @@ const FirstStepPage = memo(() => {
                                 <ConnectWallet />
                             </div>
                             <p className={styles.dashboard__paragraph}>
-                                If you are an advanced Ethereum user, you can claim directly from the smart contract <Link to='/' className={styles.dashboard__link}>on Etherscan</Link>
+                                If you are not comfortable connecting your wallet and submiting the proof via web UI, you can claim directly from the smart contract <Link to='/' className={styles.dashboard__link}>on Etherscan</Link>
                             </p>
                         </Dashboard>
                     </div>
