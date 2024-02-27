@@ -75,7 +75,7 @@ export const Web3ContextProvider = ({ children }) => {
         walletProvider,
         {
           name: network.network,
-          chainId: Number(walletProvider.networkVersion)
+          chainId
         }
       );
       setProvider(web3Provider)
