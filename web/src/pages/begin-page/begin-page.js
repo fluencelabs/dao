@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import githubUsernameRegex from "github-username-regex";
@@ -13,7 +13,6 @@ import Footer from "../../components/Footer/Footer";
 import TimeUntilReduce from "../../components/TimeUntilReduce/TimeUntilReduce";
 
 import styles from "./begin-page.module.css";
-import { checkEligibility } from "../../utils/metadata";
 import { ROUTE_NOT_FOUND, ROUTE_WALLET } from "../../constants/routes";
 
 const PageBegin = memo(() => {
@@ -22,15 +21,21 @@ const PageBegin = memo(() => {
     (state) => state.distributor,
   );
   const [username, setUsername] = useState("");
+  const [githubAccounts, setGithubAccounts] = useState(new Set());
 
-  const time = new Date(nextHalvePeriod * 1000);
-  console.log(time);
+  useEffect(async () => {
+    const { default: url } = await import('../../assets/github-accounts.txt');
+    const accounts = await fetch(url).then(res => res.text());
+    setGithubAccounts(new Set(accounts.split(',').map(account => account.toLowerCase())));
+  }, []);
 
   const [inputValid, setInputValid] = useState(true);
   const [inputPressed, setInputPressed] = useState(false);
 
   const onEligibilityCheckButtonClick = () => {
-    if (checkEligibility(username)) {
+    console.log(githubAccounts);
+    console.log(username);
+    if (githubAccounts.has(username)) {
       navigate(ROUTE_WALLET);
     } else {
       navigate(ROUTE_NOT_FOUND);
