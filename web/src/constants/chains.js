@@ -7,7 +7,7 @@ const supportedChains = [
     chain_id: 1,
     network_id: 1,
     explorer_url: "https://etherscan.io",
-    rpc_url: `https://mainnet.gateway.tenderly.co`,
+    rpc_url: `https://eth-mainnet.g.alchemy.com/v2/mTpanVgvjVVRocxu5nkJUjgcDnBcxPrr`,
     native_currency: {
       symbol: "ETH",
       name: "Ethereum",
