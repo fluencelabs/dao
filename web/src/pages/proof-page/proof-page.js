@@ -240,7 +240,7 @@ const ProofPage = () => {
                         docker build -t dev-reward-script .
                       </p>
                       <p className={styles.paragraph}>
-                        docker run -it -v ~/.ssh:/root/.ssh dev-reward-script
+                        docker run -it --network none -v ~/.ssh:/root/.ssh:ro dev-reward-script
                       </p>
                     </div>
                     For python:
