@@ -31,7 +31,7 @@ import { fetchCurrentAward, fetchMerkleRoot, fetchNextHalvePeriod } from "../../
 import { useVh } from "../../hooks/useVh";
 
 function App() {
-  const { network, address } = useWeb3Connection();
+  const { network, address, provider } = useWeb3Connection();
 
   const dispatch = useDispatch();
   const { error } = useSelector((state) => state.error);
@@ -41,10 +41,10 @@ function App() {
 
   useEffect(() => {
     console.log("nerwork: " + network.name);
-    dispatch(fetchNextHalvePeriod(network.name));
+    dispatch(fetchNextHalvePeriod(network.name, provider));
     if (!merkleRootFetched && network?.name && network.name !== "unknown") {
-      dispatch(fetchMerkleRoot(network.name));
-      dispatch(fetchCurrentAward(network.name));
+      dispatch(fetchMerkleRoot(network.name, provider));
+      dispatch(fetchCurrentAward(network.name, provider));
       setMerkleRootFetched(true);
     }
   }, [network]);

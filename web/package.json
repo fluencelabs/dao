@@ -23,8 +23,7 @@
     "redux-persist": "^6.0.0",
     "redux-thunk": "^3.1.0",
     "safer-buffer": "^2.1.0",
-    "web-vitals": "^1.0.1",
-    "web3": "^4.5.0"
+    "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
