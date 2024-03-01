@@ -48,7 +48,7 @@ export const fetchCurrentAward = (network, provider) => {
   return async (dispatch) => {
     try {
       const award = await contract.functions.currentReward();
-      const formattedAward = ethers.utils.formatUnits(award, "ether");
+      const formattedAward = ethers.utils.formatUnits(award.toString(), "ether");
       dispatch(setCurrentAward(award === 0n ? "0" : formattedAward));
     } catch (error) {
       console.log(error);
