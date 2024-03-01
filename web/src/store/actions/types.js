@@ -1,5 +1,4 @@
 //////----------- GOVERNANCE -----------//////
-export const PROPOSAL_CREATED = "gov/PROPOSAL_CREATED";
 export const DELEGATE_STATUS = "gov/DELEGATE_STATUS";
 export const SET_DELEGATEE = "gov/SET_DELEGATEE";
 export const CLAIM_STATUS = "gov/CLAIM_STATUS";
@@ -10,7 +9,6 @@ export const SET_ERROR = "errors/SET_ERROR";
 
 //////----------- GOV STORAGE -----------//////
 export const STORE_PROOF = "govstore/STORE_PROOF";
-export const STORE_KEY = "govstore/STORE_KEY";
 
 /////------------ UTILS -----------//////
 export const GOV_CLEANUP = "utils/GOV_CLEANUP";

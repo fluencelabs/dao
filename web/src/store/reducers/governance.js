@@ -2,10 +2,8 @@ import {
   CLAIM_STATUS,
   DELEGATE_STATUS,
   GOV_CLEANUP,
-  PROPOSAL_CREATED,
   SET_CLAIM_STATUS,
   SET_DELEGATEE,
-  STORE_KEY,
   STORE_PROOF
 } from "../actions/types";
 
@@ -40,12 +38,6 @@ export function governanceReducer(state = initialState, action) {
     case GOV_CLEANUP: {
       return initialState;
     }
-
-    case PROPOSAL_CREATED:
-      return {
-        ...state,
-        proposals: [...state.proposals, action.payload],
-      };
     case DELEGATE_STATUS: {
       return {
         ...state,
@@ -76,15 +68,6 @@ export function governanceReducer(state = initialState, action) {
         values: {
           ...state.values,
           proof: action.payload,
-        },
-      };
-    }
-    case STORE_KEY: {
-      return {
-        ...state,
-        values: {
-          ...state.values,
-          key: action.payload,
         },
       };
     }
