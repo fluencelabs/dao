@@ -21,6 +21,7 @@ export const setDelegatee = (address) => ({
 });
 
 export const setError = (message) => {
+  console.error(message);
   let msg;
   try {
     const isEthJs = /ethjs-query/.test(message);
@@ -31,7 +32,6 @@ export const setError = (message) => {
             .slice(0, -1),
         )
       : message;
-    console.log(parsedMessage);
 
     const newMessage = isEthJs
       ? `${parsedMessage.value.data.message}. Error code: ${parsedMessage.value.code}`
