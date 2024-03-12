@@ -46,6 +46,14 @@ const ProofPage = () => {
     }
   }, [hasClaimed]);
 
+  // Check if the wallet is connected
+  useEffect(() => {
+    if (!address) {
+      toast("Please connect your wallet first");
+      navigate(ROUTE_WALLET);
+    }
+  }, [address, navigate]);
+  
   function fromHex(str) {
     if (str.startsWith("0x")) {
       return Buffer.from(str.slice(2), "hex");
