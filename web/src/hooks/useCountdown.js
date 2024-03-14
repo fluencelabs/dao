@@ -1,33 +1,33 @@
 import { intervalToDuration, isPast } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+const format = ({ months = 0, days = 0, hours = 0, minutes = 0, seconds = 0 }) =>
+  `${months}M ${days}d ${hours}h ${minutes}m ${seconds}s`;
 
 export const useCountdown = (date) => {
-  const format = ({ months, days, hours, minutes, seconds }) =>
-    `${months}M ${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-  const [ended, setEnded] = useState(isPast(date));
   const [duration, setDuration] = useState(
-    intervalToDuration({
-      start: date,
-      end: Date.now(),
+    isPast(date) ? {} : intervalToDuration({
+      start: Date.now(),
+      end: date,
     }),
   );
-  const [formatted, setFormatted] = useState(format(duration));
 
   useEffect(() => {
     const timer = setInterval(() => {
+      if (isPast(date)) {
+        clearInterval(timer);
+        return;
+      }
+
       const intToDur = intervalToDuration({
-        start: date,
-        end: Date.now(),
+        start: Date.now(),
+        end: date,
       });
       setDuration(intToDur);
-      setFormatted(format(intToDur));
-      setEnded(isPast(date));
     }, 1000);
 
-    ended && clearInterval(timer);
     return () => clearInterval(timer);
-  }, []);
+  }, [date]);
 
-  return [formatted, duration];
+  return useMemo(() => format(duration), [duration]);
 };

@@ -4,7 +4,7 @@ import DefinitionList from "../DefinitionList/DefinitionList";
 
 const TimeUntilReduce = () => {
   const { nextHalvePeriod } = useSelector((state) => state.distributor);
-  const [timer] = useCountdown(nextHalvePeriod || 0);
+  const timer = useCountdown(nextHalvePeriod || 0);
 
   return (
     <DefinitionList

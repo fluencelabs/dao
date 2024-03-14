@@ -17,13 +17,13 @@
 }
 
 .flex-container {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  column-gap: 5%;
 }
 
 .flex-container__part-left {
   max-width: 715px;
-  width: 65%;
 }
 
 .dashboard {
@@ -164,11 +164,11 @@
 
 @media screen and (max-width: 803px) {
   .flex-container {
-    flex-direction: column-reverse;
-    justify-content: flex-start;
+    grid-template-columns: 1fr;
   }
 
   .flex-container__part-left {
+    order: 2;
     max-width: 715px;
     width: 100%;
   }
