@@ -5,25 +5,25 @@ const format = ({ months = 0, days = 0, hours = 0, minutes = 0, seconds = 0 }) =
   `${months}M ${days}d ${hours}h ${minutes}m ${seconds}s`;
 
 export const useCountdown = (date) => {
-  const [duration, setDuration] = useState(
-    isPast(date) ? {} : intervalToDuration({
-      start: Date.now(),
-      end: date,
-    }),
-  );
+  const [duration, setDuration] = useState({});
 
   useEffect(() => {
+    setDuration(isPast(date) ? {} : intervalToDuration({
+      start: Date.now(),
+      end: date,
+    }));
+
     const timer = setInterval(() => {
       if (isPast(date)) {
         clearInterval(timer);
+        setDuration({});
         return;
       }
 
-      const intToDur = intervalToDuration({
+      setDuration(intervalToDuration({
         start: Date.now(),
         end: date,
-      });
-      setDuration(intToDur);
+      }));
     }, 1000);
 
     return () => clearInterval(timer);
