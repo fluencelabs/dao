@@ -16,7 +16,7 @@ import styles from "./proof-page.module.css";
 import { hideString } from "../../utils";
 
 import { checkHasClaimed, storeProof } from "../../store/actions/governance";
-import { ROUTE_CLAIMED, ROUTE_DONE } from "../../constants/routes";
+import { ROUTE_CLAIMED, ROUTE_DONE, ROUTE_WALLET } from "../../constants/routes";
 import { toast } from "react-toastify";
 import { Buffer } from "buffer";
 import { findEthereumSig } from "../../utils/asn1";
@@ -27,8 +27,6 @@ import abis from "../../contracts";
 
 const ProofPage = () => {
   const { address, provider, network } = useWeb3Connection();
-  const { proof } = useSelector((state) => state.governance.values);
-  const [haveProof, setHaveProof] = useState(!!proof);
   const { hasClaimed } = useSelector((state) => state.governance);
   console.log("address", address);
 
@@ -46,16 +44,13 @@ const ProofPage = () => {
     }
   }, [hasClaimed]);
 
-  function fromHex(str) {
-    if (str.startsWith("0x")) {
-      return Buffer.from(str.slice(2), "hex");
-    } else {
-      return Buffer.from(str, "hex");
-    }
-  }
-
   const handleForm = async (e) => {
     e.preventDefault();
+
+    if (!address) {
+      navigate(ROUTE_WALLET);
+      return;
+    }
 
     try {
       // TODO: validate data better
@@ -292,7 +287,7 @@ const ProofPage = () => {
                 </ul>
 
                 <div className={styles.dashboard__button}>
-                  <Button type="large" text="Submit proof" />
+                  <Button type="large" text={address ? "Submit proof" : "Connect wallet"} />
                 </div>
                 <p className={styles.dashboard__paragraph}>
                   If you are not comfortable submiting the proof via web UI, you
