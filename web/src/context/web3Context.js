@@ -47,10 +47,10 @@ const defaultProvider = new providers.JsonRpcProvider(
 export const Web3Context = createContext(null);
 
 export const Web3ContextProvider = ({ children }) => {
-  const { open, close } = useWeb3Modal()
+  const { open } = useWeb3Modal()
   const [provider, setProvider] = useState(defaultProvider);
   const { walletProvider } = useWeb3ModalProvider();
-  const { address, chainId, isConnected } = useWeb3ModalAccount();
+  const { address } = useWeb3ModalAccount();
   const { disconnect: disconnectWallet } = useDisconnect();
 
   const connect = useCallback(async () => {
