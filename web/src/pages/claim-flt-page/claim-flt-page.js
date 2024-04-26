@@ -88,7 +88,7 @@ export const ClaimFltPage = memo(() => {
         <div className="container">
           <main className={`main ${styles.main}`}>
             <div className={styles.title}>
-              <Title type="h1" size="large" text="FLT-DROP Claim" icon="" />
+              <Title type="h1" size="large" text="Convert FLT-DROP to FLT" icon="" />
             </div>
             <div className={styles.dashboard}>
               <Dashboard>
