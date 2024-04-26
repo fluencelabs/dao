@@ -24,11 +24,13 @@ import {
   ROUTE_INDEX,
   ROUTE_NOT_FOUND,
   ROUTE_PROOF,
+  ROUTE_CLAIM_FLT,
   ROUTE_WALLET
 } from "../../constants/routes";
 import { catchError } from "../../utils";
 import { fetchCurrentAward, fetchMerkleRoot, fetchNextHalvePeriod } from "../../store/actions/distributor";
 import { useVh } from "../../hooks/useVh";
+import { ClaimFltPage } from "../../pages/claim-flt-page/claim-flt-page";
 
 function App() {
   const { network, address, provider } = useWeb3Connection();
@@ -71,6 +73,7 @@ function App() {
         <Route exact path={ROUTE_FINISH} element={<FinishPage />} />
         <Route exact path={ROUTE_NOT_FOUND} element={<AccountNotFound />} />
         <Route exact path={ROUTE_CLAIMED} element={<ClaimedPage />} />
+        <Route exact path={ROUTE_CLAIM_FLT} element={<ClaimFltPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>

@@ -7,6 +7,7 @@
 - Claiming flow 10 - Route "/finish"
 - Claiming flow 11 - Route "/not-found"
 - Claiming flow 12 - Route "/claimed"
+- Claiming FLT from FLT-DROP - Route "/claim-flt"
 
 #
 

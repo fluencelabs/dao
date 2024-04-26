@@ -6,3 +6,4 @@ export const ROUTE_DONE = "/done";
 export const ROUTE_FINISH = "/finish";
 export const ROUTE_NOT_FOUND = "/not-found";
 export const ROUTE_CLAIMED = "/claimed";
+export const ROUTE_CLAIM_FLT = "/claim-flt";
