@@ -13,7 +13,7 @@ import Footer from "../../components/Footer/Footer";
 import TimeUntilReduce from "../../components/TimeUntilReduce/TimeUntilReduce";
 
 import styles from "./begin-page.module.css";
-import { ROUTE_NOT_FOUND, ROUTE_WALLET } from "../../constants/routes";
+import { ROUTE_CLAIM_FLT, ROUTE_NOT_FOUND, ROUTE_WALLET } from "../../constants/routes";
 
 const PageBegin = memo(() => {
   const navigate = useNavigate();
@@ -42,6 +42,10 @@ const PageBegin = memo(() => {
     } else {
       navigate(ROUTE_NOT_FOUND);
     }
+  };
+
+  const onAlreadyHaveButtonClick = () => {
+    navigate(ROUTE_CLAIM_FLT);
   };
 
   const handleChangeUsername = (e) => {
@@ -108,6 +112,13 @@ const PageBegin = memo(() => {
                         icon="git"
                         text="Check if I’m eligible"
                         callback={onEligibilityCheckButtonClick}
+                      />
+                    </li>
+                    <li className={styles.button}>
+                      <Button
+                        type="large"
+                        text="I already have FLT-DROP"
+                        callback={onAlreadyHaveButtonClick}
                       />
                     </li>
                   </ul>
