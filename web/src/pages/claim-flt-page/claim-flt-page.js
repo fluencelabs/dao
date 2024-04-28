@@ -63,20 +63,25 @@ export const ClaimFltPage = memo(() => {
   const [waitForSigning, setWaitForSigning] = useState(false);
   const [waitForReceipt, setWaitForReceipt] = useState(false);
   const [confirmedTxHash, setConfirmedTxHash] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleClaim = async () => {
-    const contract = new ethers.Contract(
-      governanceContracts[network.name].devRewardDistributor,
-      abis.DevRewardDistributor.abi,
-      provider.getSigner(),
-    );
-    setWaitForSigning(true);
-    const response = await contract.functions.transfer(address, amountAndDate.amount, { from: address });
-    setWaitForSigning(false);
-    setWaitForReceipt(true);
-    const receipt = await response.wait();
-    setWaitForReceipt(false);
-    setConfirmedTxHash(receipt.transactionHash);
+    try {
+      const contract = new ethers.Contract(
+        governanceContracts[network.name].devRewardDistributor,
+        abis.DevRewardDistributor.abi,
+        provider.getSigner(),
+      );
+      setWaitForSigning(true);
+      const response = await contract.functions.transfer(address, amountAndDate.amount, { from: address });
+      setWaitForSigning(false);
+      setWaitForReceipt(true);
+      const receipt = await response.wait();
+      setWaitForReceipt(false);
+      setConfirmedTxHash(receipt.transactionHash);
+    } catch (e) {
+      setError(e.message);
+    }
   }
 
   const dateInFuture = amountAndDate?.unlockTime > new Date();
@@ -140,8 +145,9 @@ export const ClaimFltPage = memo(() => {
                   {!dateInFuture && Boolean(amountAndDate?.amount) && <div className={styles.dashboard__button}>
                     {waitForSigning && "Please sign tx in your wallet"}
                     {waitForReceipt && "Confirming..."}
+                    {Boolean(error) && (error || "Error")}
                     {confirmedTxHash && <a href={supportedChains[0].explorer_url + "/tx/" + confirmedTxHash} target="_blank" rel="noreferrer">Transaction confirmed</a>}
-                    {!waitForSigning && !waitForReceipt && !confirmedTxHash && <Button callback={handleClaim} text={`Claim FLT`} />}
+                    {!waitForSigning && !waitForReceipt && !confirmedTxHash && !error && <Button callback={handleClaim} text={`Convert FLT-DROP to FLT`} />}
                   </div>}
                 </div>
               </Dashboard>
