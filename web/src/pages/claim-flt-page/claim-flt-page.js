@@ -19,6 +19,7 @@ import supportedChains from "../../constants/chains";
 export const ClaimFltPage = memo(() => {
   const { address, provider, network } = useWeb3Connection();
   const [amountAndDate, setAmountAndDate] = useState(null);
+  const [rawAmount, setRawAmount] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(null);
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export const ClaimFltPage = memo(() => {
         const data = await contract.functions.lockedBalances(address);
         const { amount, unlockTime } = data;
         const _amount = +ethers.utils.formatEther(amount);
+        setRawAmount(amount);
         const _unlockTime = new Date(unlockTime.toNumber() * 1000);
         setAmountAndDate({ amount: _amount, unlockTime: _unlockTime });
       }
@@ -73,7 +75,7 @@ export const ClaimFltPage = memo(() => {
         provider.getSigner(),
       );
       setWaitForSigning(true);
-      const response = await contract.functions.transfer(address, amountAndDate.amount, { from: address });
+      const response = await contract.functions.transfer(address, rawAmount, { from: address });
       setWaitForSigning(false);
       setWaitForReceipt(true);
       const receipt = await response.wait();
