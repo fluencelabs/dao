@@ -30,22 +30,28 @@ const Header = ({ button = false }) => {
     };
   }, []);
   return (
-    <header className={styles.header}>
-      <div className={styles["header__flex-container"]}>
-        <Link to="/fluence">
-          <img
-            src={logo}
-            alt="fluence logotype"
-            className={styles.header__logo}
-          />
-        </Link>
-
-        <MainNavigation width={currentWidthWindow} />
+    <>
+      <div className={styles["header__top_notification"]}>
+        Join the FLT Stake Race • 1 million FLT in prizes
+        <a href="https://race.fluence.network/" target="_blank" className={styles["header__top_link"]}>Learn more</a>
       </div>
-      {button && currentWidthWindow > 768 && (
-        <Button type="default" text="Start building" callback={handleClick} />
-      )}
-    </header>
+      <header className={styles.header}>
+        <div className={styles["header__flex-container"]}>
+          <Link to="/fluence">
+            <img
+              src={logo}
+              alt="fluence logotype"
+              className={styles.header__logo}
+            />
+          </Link>
+
+          <MainNavigation width={currentWidthWindow} />
+        </div>
+        {button && currentWidthWindow > 768 && (
+          <Button type="default" text="Start building" callback={handleClick} />
+        )}
+      </header>
+    </>
   );
 };
 

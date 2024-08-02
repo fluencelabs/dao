@@ -11,6 +11,30 @@
   align-items: center;
 }
 
+.header__top_notification {
+  position: relative;
+  top: 0px;
+  width: 100vw;
+  text-align: center;
+  padding-top: 0;
+  margin-top: -30px;
+  padding-top: 24px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  letter-spacing: .1px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 131.25%;
+  background-color: #cfffc4;
+  z-index: 9999999;
+  font-family: Hauora, sans-serif;
+}
+
+.header__top_link {
+  margin-left: 16px;
+  color: #000000;
+}
+
 .header__logo {
   width: 118px;
   height: 32px;
